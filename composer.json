@@ -3,6 +3,7 @@
     "description": "Simple PHP framework",
     "type": "library",
     "license": "MIT",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "VPFramework\\": "src/"
@@ -15,6 +16,8 @@
         }
     ],
     "require": {
+        "php": ">=7.0.0",
+
         "doctrine/orm": "^2.9",
         "symfony/yaml": "^4.4",
         "symfony/cache": "^4.4",
