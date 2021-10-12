@@ -3,6 +3,7 @@
     "description": "Simple PHP framework",
     "type": "library",
     "license": "MIT",
+    "minimum-stability":"dev",
     "autoload": {
         "psr-4": {
             "VPFramework\\": "src/"
