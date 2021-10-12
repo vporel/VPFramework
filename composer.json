@@ -1,7 +1,7 @@
 {
     "name": "vporel/vpframework",
     "description": "Simple PHP framework",
-    "type": "project",
+    "type": "library",
     "autoload": {
         "psr-4": {
             "VPFramework\\": "src/"
@@ -13,12 +13,6 @@
             "email": "dev.vporel@gmail.com"
         }
     ],
-    "repositories": [
-        {
-          "type": "git",
-          "url": "https://github.com/vporel/vpframework"
-        }
-      ],
     "require": {
         "doctrine/orm": "^2.9",
         "symfony/yaml": "^4.4",
