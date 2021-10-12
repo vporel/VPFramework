@@ -3,6 +3,7 @@
     "description": "Simple PHP framework",
     "type": "library",
     "version":"1.0",
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "VPFramework\\": "src/"
