@@ -2,14 +2,12 @@
 
 namespace VPFramework\Core;
 
-use VPFramework\Core\Router;
-use VPFramework\Core\Request;
-use VPFramework\Core\Configuration;
+use VPFramework\Core\Configuration\Configuration;
 use VPFramework\Doctrine\Config;
 use Doctrine\ORM\EntityManager;
 
 if(!defined("ROOT"))
-    define("ROOT", __DIR__."/../../..");
+    define("ROOT", __DIR__."/../../../../..");
 
 /**
  * Conteneur d'injection de dépendances dans l'application
@@ -38,7 +36,6 @@ class DIC
                     $this->dynamicInstanciation($name);
                 }
             }else{
-                //Get Config from VPFramework\Core\Configuration
                 $database = $this->get(Configuration::class)->get("database");
 
                 // database configuration parameters
@@ -55,7 +52,7 @@ class DIC
         return $this->instances[$name];
     }
 
-    public function set(?string $name, Callable $resolver)
+    public function set(string $name, Callable $resolver)
     {
         $this->dependances[$name] = $resolver;
     }

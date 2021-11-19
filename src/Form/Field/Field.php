@@ -7,7 +7,11 @@ abstract class Field
     protected
         $label,
         $name,
-        $options,
+        $options = [
+            "default" => "",
+            "required" => false,
+            "isIgnored" => false // Cette option est mise à "true" sur un champ n'étant pas un attribut de la classe entité à la quelle le formulaire est lié
+        ],
         $error = "";
 
     /**
@@ -20,50 +24,49 @@ abstract class Field
     {
         $this->label = $label;
         $this->name = $name;
-        $this->options = $options;
+        $this->options = array_slice(array_merge($this->options, $options), 0, count($this->options));
+    }
+
+    protected function addOption(string $name, $value){
+        $this->options[$name] = $value;
+        return $this;
+    }
+    
+    public function __call($name, $arguments)
+    {
+        $nameStart2 = substr($name, 0, 2);
+        $nameStart3 = substr($name, 0, 3);
+        if($nameStart2 == "is"){
+            $option = lcfirst(substr($name, 2, strlen($name)));
+            if(array_key_exists($option, $this->options)){
+                return $this->options[$option];
+            }elseif(array_key_exists($name, $this->options)){
+                return $this->options[$name];
+            }else{
+                throw new \Exception("L'option $option n'existe pas");
+            }
         
+        }elseif($nameStart3 == "get" || $nameStart3 == "set"){
+            $option = lcfirst(substr($name, 3, strlen($name)));
+            if(array_key_exists($option, $this->options)){
+                if($nameStart3 == "get"){
+                    return $this->options[$option];
+                }elseif($nameStart3 == "set"){
+                    $this->options[$option] = $arguments[0];
+                    return $this;
+                }
+            }else{
+                throw new \Exception("L'option $option n'existe pas");
+            }
+        }
+        throw new \Exception("Fonction $name n'existe pas");
     }
-
-    public function getClass(){
-        $classNameExplode = explode("\\", get_called_class());
-        return end($classNameExplode);
-    }
-
-   
 
     public function getLabel(){ return $this->label; }
 
     public function getName(){ return $this->name; }
 
-    public function getDefault(){ return isset($this->options["default"]) ? $this->options["default"] : ""; }
-
-    public function setDefault($default){ 
-        $this->options["default"] = $default;  
-        return $this;
-    }
-
-    public function getPattern(){
-        if(isset($this->options["pattern"])){
-            return $this->options["pattern"];
-        }else{
-            if($this->getClass() == "Number"){
-                return "^[0-9]+$";
-            }else{
-                return "^(.[\s]*.*)*$";
-            }
-        } 
-    }
-
-    public function setPattern($pattern){
-       $this->options["pattern"] = $pattern;
-       return $this;
-    }
-
     public function getError(){ return $this->error; }
-
-    public function isRequired(){ return (isset($this->options["required"]) && $this->options["required"]); }
-
-    public function isIgnored(){ return (isset($this->options["isIgnored"]) && $this->options["isIgnored"]); }
 
     public function getRealValue($value){
         return $value;
@@ -79,7 +82,7 @@ abstract class Field
             <div class="form-group">
                 <label class="form-label" for="'.$this->name.'">'.$this->label.'</label>
                 '.$this->getFieldHTML().'
-                <span class="form-field-error text-bad">'.$this->error.'</span>
+                <span class="form-field-error text-error">'.$this->error.'</span>
             </div>
         ';
     }

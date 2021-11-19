@@ -6,6 +6,8 @@ use VPFramework\Core\DIC;
 use VPFramework\Core\Request;
 use VPFramework\Form\Field\Relation;
 use VPFramework\Form\Field\Field;
+use VPFramework\Form\Field\File;
+use VPFramework\Form\Field\Password;
 
 abstract class Form 
 {
@@ -22,7 +24,7 @@ abstract class Form
     protected $repository;
     protected $repositoryClass;
     protected $parameters = null;
-    protected $checked = false;
+    protected $validity = null;
     protected $error = "";
 
     public function __construct($object, $repositoryClass)
@@ -49,23 +51,24 @@ abstract class Form
 
     public function createHTML()
     {
+        if($this->isSubmitted())
+            $this->isValid();
         $html = '
             <input type="hidden" name="form-'.$this->name.'"/>
         ';
         if($this->error != "")
             $html .= '<div class="form-error alert alert-warning">'.$this->error.'</div>';
         if(isset($this->parameters["form-".$this->name])){ // Condition de la fonction isSubmitted : Condition réécrite pour éviter que la function updateObject soit appelée
-            if(!$this->checked)
-                $this->isValid();
+            
             foreach($this->fields as $field){
-                if($field->getClass() != "File")
+                if(!($field instanceof File))
                     $field->setDefault($this->parameters[$field->getName()]);
                 $this->htmls[$field->getName()] = $field->createHTML();
                 $html .= $this->htmls[$field->getName()];
             }
         }elseif($this->object->getId() != null){
             foreach($this->fields as $field){
-                if(!$field->isIgnored() && $field->getClass() != "Password" && $field->getClass() != "File"){
+                if(!$field->isIgnored() && !($field instanceof Password) && !($field instanceof File)){
                     $method = "get".ucfirst($field->getName());
                     $field->setDefault($this->object->$method());
                 }
@@ -84,14 +87,24 @@ abstract class Form
     }
 
     public function isValid(){
-        $this->checked = true;
-        foreach($this->fields as $field)
-        {
-            if($field->getClass() != "File" && !$field->isValid($this->parameters[$field->getName()]))
-                return false;
+        if($this->validity === null){
+            $valid = true;
+            foreach($this->fields as $field)
+            {
+                if(!($field instanceof File)){
+                    if($field instanceof Password){
+                        if($field->isDouble() && !$field->isValid($this->parameters[$field->getName()], $this->parameters[$field->getConfirmName()]))
+                            $valid = false;
+                    }elseif(!$field->isValid($this->parameters[$field->getName()])){
+                        $valid = false;
+                    }
+                }
+            }
+            if($valid)
+                $this->updateObject();
+            $this->validity = $valid;
         }
-        $this->updateObject();
-        return true;
+        return $this->validity;
 
     }
 
@@ -143,7 +156,7 @@ abstract class Form
                     throw new \Exception("La méthode $method n'existe pas : classe ".get_class($this->object));
                 }
             }else{
-                if($field->getClass() == "File" && $this->object->getId() != null){
+                if($field instanceof File && $this->object->getId() != null){
                     $field->uploadFile($this->object->getId());
                 }
             }
@@ -154,9 +167,7 @@ abstract class Form
     {
         if(!$this->isSubmitted())
             return false;
-        if(!$this->checked)
-            $this->isValid();
-        return $this->error != "";
+        return !$this->isValid();
     }
 
     public function __toString()

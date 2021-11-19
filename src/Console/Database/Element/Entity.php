@@ -221,7 +221,7 @@ $body .= '
 ';
 $body .= 
 '
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -244,12 +244,12 @@ switch($type){
 }
 $body .= 
 '
-    public function get'.ucfirst($field["name"]).'(): '.$type.'
+    public function get'.ucfirst($field["name"]).'(): ?'.$type.'
     {
         return $this->'.$field["name"].';
     }
 
-    public function set'.ucfirst($field["name"]).'('.$type.' $'.$field["name"].')
+    public function set'.ucfirst($field["name"]).'(?'.$type.' $'.$field["name"].')
     {
         $this->'.$field["name"].' = $'.$field["name"].';
         return $this;

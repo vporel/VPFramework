@@ -2,10 +2,11 @@
 
 namespace VPFramework\Core;
 
+use VPFramework\Core\Configuration\Configuration;
 use VPFramework\Core\Route\Route;
 
 if(!defined("ROOT")){
-     define("ROOT" , __DIR__."/../../..");
+     define("ROOT" , __DIR__."/../../../../..");
 }
 
 session_start();

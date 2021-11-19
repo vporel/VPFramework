@@ -3,7 +3,7 @@ namespace VPFramework\Doctrine;
 
 use Doctrine\ORM\Tools\Setup;
 
-const ROOT = __DIR__."/../../..";
+const ROOT = __DIR__."/../../../../..";
 
 require_once ROOT."/vendor/autoload.php";
 

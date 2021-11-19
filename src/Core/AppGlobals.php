@@ -2,8 +2,13 @@
 
 namespace VPFramework\Core;
 
+use VPFramework\Core\Configuration\Configuration;
+use VPFramework\Utils\FlexibleClassTrait;
+
 class AppGlobals
 {
+    use FlexibleClassTrait;
+
     private $config;
     private $user = null;
     public function __construct(Configuration $config)

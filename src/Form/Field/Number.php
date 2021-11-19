@@ -2,13 +2,16 @@
 
 namespace VPFramework\Form\Field;
 
-use VPFramework\Form\Field\Field;
-
-class Number extends Field
+class Number extends Input
 {
-    
-    public function getFieldHTML(){
-        return '<input type="number" name="'.$this->name.'" class="form-control" id="'.$this->name.'" value="'.$this->getDefault().'">';
+    public function __construct($label, $name, $options = [])
+    {
+        parent::__construct($label, $name, $options);
+        $this->setPattern("^[0-9]+$");
+    }
+
+    protected function getType(){
+        return "number";
     }
 
 }
