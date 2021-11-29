@@ -2,16 +2,18 @@
 
 namespace VPFramework\Form\Field;
 
-use VPFramework\Form\Field\Field;
-
-class Select extends Field
+class Select extends AbstractField
 {
-
+    public function __construct($label, $name, $options = [])
+    {
+        $this->addOption("elements", null);
+        parent::__construct($label, $name, $options);        
+    }
     public function getElements(){
-        if(isset($this->options["elements"])){
+        if($this->options["elements"] != null){ 
             return $this->options["elements"];
         }else
-            throw new \Exception("Les élément spour le champ select n'ont pas été fournis");
+            throw new \Exception("Les éléments pour le champ select n'ont pas été fournis");
     }
 
     public function getElementsJSON()
@@ -29,8 +31,6 @@ class Select extends Field
 
     public function getFieldHTML(){
         $select = '
-            <div class="form-group">
-                <label class="form-label" for="'.$this->name.'">'.$this->label.'</label>
                 <select name="'.$this->name.'">
         ';
         foreach($this->getElements() as $value => $text){

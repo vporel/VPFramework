@@ -2,9 +2,13 @@
 
 namespace VPFramework\Core\Route;
 
+/**
+ * Cette classe modélise les routes de l'applications
+ */
 class Route
 {
     private $path, $pathRegex, $action, $optionsRegex = [];
+    private $ontrollerName, $controllerAction, $controller = null;
     public function __construct($content)
     {
         $this->path = $content["path"];
@@ -19,6 +23,11 @@ class Route
             $path = str_replace("{".$key."}", "(".$regex.")", $path);
         }
         $this->pathRegex .= $path."$#i";
+
+        //Controller and action
+        $action = explode(":", $this->action);
+        $this->controllerName = $action[0];
+        $this->controllerAction = $action[1];
     }
 
     public function getPath($options = []): string
@@ -51,12 +60,22 @@ class Route
     }
 
     /**
-     * @return array
+     * Retour du contrôleur correspondant à la route
+     * @return string|\VPFramework\Core\Controller
      */
-    public function getAction(): array
+    public function getController()
     {
-        $action = explode(":", $this->action);
-        return ["controller" => $action[0], "action" => $action[1]];
+        if($this->controller === null){
+            $this->controller = "App\\Controller\\".$this->controllerName;
+            $controllerFile = ROOT."/app/Controller/".$this->controllerName.".php";
+            if(!file_exists($controllerFile))
+                throw new ControllerFileNotFoundException($this->controller);
+        }
+        return $this->controller;
+    }
+
+    public function getControllerAction(){
+        return $this->controllerAction;
     }
 
     public function getData($matches){

@@ -1,0 +1,50 @@
+
+body {
+    font-size: 13px;
+    color: $text-color;
+    background:linear-gradient(darken($secondary-color, 30%), darken($secondary-color, 20%)) fixed;
+    
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: 'century gothic', sans-serif;
+}
+.white-section{
+	background:linear-gradient(rgba(white, .1),  rgba(white, .0));padding:5px;margin-top:10px;
+}
+#body-container{
+	width:95%!important;margin:auto!important;
+}
+header{
+	width:100%;position:relative;padding:10px;margin-top:20px!important;
+	h2{color:$primary-color;font-weight:bold;}
+	strong{
+		font-size:.5em;color:lighten($secondary-color, 15%);font-weight:normal!important;
+	}
+
+	#menu{
+
+	}
+}
+
+#menu{
+	display:flex;flex-flow:row wrap;
+	*{transition:all .3s ease;}
+	>div{
+		width:24% ;margin:5px;padding:10px;
+		
+		h3{
+			color:rgb(200,200,200);font-weight:bold;
+		}
+
+		&:hover{
+			h3{color:lighten($primary-color, 10%);}
+		}
+	}
+	a{
+		cursor:pointer;text-decoration:none;display:block;
+		font-size:1.5em;
+		&:hover{color:$primary-color;text-decoration:underline;}
+	}
+	
+}

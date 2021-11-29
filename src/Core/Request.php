@@ -2,6 +2,7 @@
 
 namespace VPFramework\Core;
 
+use VPFramework\Core\Configuration\Configuration;
 use VPFramework\Core\Route\Route;
 
 /**

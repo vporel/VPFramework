@@ -2,21 +2,12 @@
 
 namespace VPFramework\Core;
 
-use App\Twig\TwigExtension;
-use Twig_Environment;
-use Twig_Loader_Filesystem;
-
-const VIEW_DIR = __DIR__."/../../../View";
-
-if(!defined('ROOT'))
-    define('ROOT', __DIR__."/../../..");
-
+use VPFramework\Core\Configuration\Configuration;
+use VPFramework\View\TemplateEngine;
+use VPFramework\View\View;
 
 abstract class Controller
 {
-
-    protected $twig;
-
     /**
      * Génère la vue associé au contrôleur
      * @param string $viewFile Données utilisées pour générer la vue
@@ -24,36 +15,11 @@ abstract class Controller
      */
     protected function render($viewFile, $data = [])
     {
-        
-        return $this->getTwig()->render($viewFile,$data);
+        return DIC::getInstance()->get(TemplateEngine::class)->getEngine()->render($viewFile, $data);
     }
-
-    protected function getTwig(): Twig_Environment
-    {
-        if($this->twig === null){
-            $loader = new Twig_Loader_Filesystem(VIEW_DIR);
-            $this->twig = new Twig_Environment($loader, [
-                "cache" => false,
-                "autoescape" => false
-            ]);
-            $extensions = require ROOT."/vendor/VPFramework/Twig/VPFrameworkTwigExtensions.php";
-            //Chargement de l'extensio de l'application
-            if(file_exists(ROOT."/app/twig/TwigExtensions.php")){
-                $extensions = array_merge($extensions, require ROOT."/app/twig/TwigExtensions.php");
-            }
-            foreach($extensions as $extension)
-                    $this->twig->addExtension($extension);
-        }
-        return $this->twig;
-    }
-
     /* GLOBALS GETTERS */
     public function getGlobal($name){
-        $globals = $this->getTwig()->getGlobals();
-        if(array_key_exists($name, $globals))
-            return $globals[$name];
-        else
-            throw new \Exception("La variable globale $name n'est pas");
+        return DIC::getInstance()->get(View::class)->getGlobal($name);
     }
 
     public function getUser(){

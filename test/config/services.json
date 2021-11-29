@@ -1,0 +1,21 @@
+{
+    /*
+    "security": {
+        "activated": true,
+        "safe_urls": {
+            "#^/account#": {"roles" :["user"], "entity": "App\\Entity\\User"},
+            "#^/wishlist#": {"roles" :["user"], "entity": "App\\Entity\\User"},
+            "#^/orders#": {"roles" :["user"], "entity": "App\\Entity\\User"},
+
+            "#^/admin#": {"roles" :["manager", "controller", "writter"], "entity": "App\\Entity\\Admin"}
+        },
+        "login_paths":{ 
+            "#^/account#": "/login",
+            "#^/wishlist#": "/login",
+            "#^/orders#": "/login",
+
+            "#^/admin#": "/login-admin"
+        
+        }
+    }*/
+}

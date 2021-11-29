@@ -4,9 +4,14 @@ namespace VPFramework\Form\Field;
 
 use Doctrine\ORM\EntityManager;
 use VPFramework\Core\DIC;
-use VPFramework\Form\Field\Field;
 
-class Relation extends Field
+
+/**
+ * Cette classe n'est pas utilisable dans un contexte différent de celui de VPFramework et de Doctrine
+ * Car elle ne peut fonctionner sans les classes : Doctrine\ORM\EntityManager et VPFramework\Core\DIC;
+ */
+
+class Relation extends AbstractField
 {
     private $repository;
 
@@ -63,8 +68,6 @@ class Relation extends Field
 
     public function getFieldHTML(){
         $select = '
-            <div class="form-group">
-                <label class="form-label" for="'.$this->name.'">'.$this->label.'</label>
                 <select name="'.$this->name.'">
         ';
         $elements = $this->getRepository()->findAll();

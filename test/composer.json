@@ -1,0 +1,16 @@
+{
+    "name": "vporel/vpframework.net",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "VPFramework\\": "../src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "NKOUANANG POREL",
+            "email": "dev.vporel@gmail.com"
+        }
+    ],
+    "require": {}
+}

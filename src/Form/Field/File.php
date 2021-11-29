@@ -4,36 +4,21 @@ namespace VPFramework\Form\Field;
 
 use VPFramework\Form\Field\Field;
 
-class File extends Field
+class File extends AbstractField
 {
-    
+    public function __construct($label, $name, $options = [])
+    {
+        $this
+            ->addOption("extensions", ["*"])
+            ->addOption("destFolder", ["."])
+            ->addOption("save", null) //Accepted values : all_raw, all_new, name_raw, name_new, extension
+            ->addOption("namePrefix", "") 
+            ->addOption("nameSuffix", "");
+        parent::__construct($label, $name, $options);        
+    }
+
     public function getFieldHTML(){
         return '<input type="file" name="'.$this->name.'" class="form-control" id="'.$this->name.'" accept=".'.implode(',.', $this->getExtensions()).'"/>';
-    }
-
-    public function getExtensions():array
-    {
-        return $this->options["extensions"] ?? ["jpg", "jpeg", "png", "gif"]; 
-    }
-
-    public function getDestFolder()
-    {
-        return $this->options["destFolder"] ?? ".";
-    }
-
-    public function getSave()
-    {
-        //Accepted values : all_raw, all_new, name_raw, name_new, extension
-        return $this->options["save"] ?? null;
-    }
-
-    public function getNameSuffix()
-    {
-        return $this->options["nameSuffix"] ?? "";
-    }
-    public function getNamePrefix()
-    {
-        return $this->options["namePrefix"] ?? "";
     }
 
     public function uploadFile($newName = null, $key = null, $object = null)
