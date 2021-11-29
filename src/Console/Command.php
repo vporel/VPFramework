@@ -8,7 +8,7 @@ abstract class Command
     
     public function __construct(array $parameters){
         $this->parameters = $parameters;
-    }
+    } 
 
     abstract public function execute();
 

@@ -2,7 +2,7 @@
 
 namespace VPFramework\Form\Field;
 
-class Number extends Input
+class Number extends AbstractInput
 {
     public function __construct($label, $name, $options = [])
     {

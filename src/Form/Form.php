@@ -5,7 +5,7 @@ namespace VPFramework\Form;
 use VPFramework\Core\DIC;
 use VPFramework\Core\Request;
 use VPFramework\Form\Field\Relation;
-use VPFramework\Form\Field\Field;
+use VPFramework\Form\Field\AbstractField;
 use VPFramework\Form\Field\File;
 use VPFramework\Form\Field\Password;
 
@@ -33,7 +33,8 @@ abstract class Form
         $this->name = end($getCalledClass);
         $this->object = $object;
         $this->repositoryClass = $repositoryClass;
-        $this->repository = DIC::getInstance()->get($repositoryClass);
+        if($repositoryClass != null)
+            $this->repository = DIC::getInstance()->get($repositoryClass);
 
         $this->build();
     }
@@ -66,7 +67,7 @@ abstract class Form
                 $this->htmls[$field->getName()] = $field->createHTML();
                 $html .= $this->htmls[$field->getName()];
             }
-        }elseif($this->object->getId() != null){
+        }elseif($this->object != null && $this->object->getId() != null){
             foreach($this->fields as $field){
                 if(!$field->isIgnored() && !($field instanceof Password) && !($field instanceof File)){
                     $method = "get".ucfirst($field->getName());
@@ -126,7 +127,7 @@ abstract class Form
         return $data;
     }
 
-    public function addField(Field $field)
+    public function addField(AbstractField $field)
     { 
         $this->fields[] = $field;
         return $this;

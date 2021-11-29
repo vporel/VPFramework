@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+use VPFramework\Console\Console;
+
+define('ROOT', __DIR__."/..");
+
+require ROOT."/vendor/autoload.php";
+
+$namespace = "VPFramework\\Console\\App";
+
+$associations = [
+    "create" => [
+        "class" => $namespace."\\Create",
+        "description" => "Creer un élément(controller, formulaire, ...) dans l'application"
+    ]
+];
+
+Console::manageConsole($associations);
+

@@ -59,11 +59,11 @@ class View
 
     public function css($element){
         if(is_string($element))
-            return '<link rel="stylesheet" type="text/css" href="'.ASSETS_DIR.'/'.$element.'"\/>';
+            return '<link rel="stylesheet" type="text/css" href="'.ASSETS_DIR.'/'.$element.'"/>';
         else {
             $html = '';
             foreach($element as $src){
-                $html .= '<link rel="stylesheet" type="text/css" href="'.ASSETS_DIR.'/'.$src.'"\/>';
+                $html .= '<link rel="stylesheet" type="text/css" href="'.ASSETS_DIR.'/'.$src.'"/>';
             }
             return $html;
         }

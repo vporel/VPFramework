@@ -2,7 +2,7 @@
 
 namespace VPFramework\Form\Field;
 
-class Password extends Input
+class Password extends AbstractInput
 {
 
     public function __construct($label, $name, $options = [])

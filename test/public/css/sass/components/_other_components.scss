@@ -1,0 +1,17 @@
+ 
+
+a{
+    text-decoration: none;color:inherit;
+    &:hover, &.active{text-decoration:none;color:$primary-color;}
+    &.primary-link, &.primary-link:hover{text-decoration: underline;color:$primary-color;}
+}
+
+.text-bad, .text-error{color:red;}
+.text-green{color:green;}
+.text-primary{color:$primary-color!important;}
+.text-secondary{color:$secondary-color!important;}
+.alert-primary{color:darken($primary-color, 20%); background:lighten($primary-color, 30%); border-color:$primary-color;}
+.alert-secondary{color:darken($secondary-color, 20%); background:lighten($secondary-color, 30%); border-color:$secondary-color;}
+
+.bg-primary{background-color:$primary-color;}
+.bg-secondary{background-color:$secondary-color;}

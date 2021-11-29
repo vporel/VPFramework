@@ -2,7 +2,7 @@
 
 namespace VPFramework\Form\Field;
 
-class Select extends Field
+class Select extends AbstractField
 {
     public function __construct($label, $name, $options = [])
     {

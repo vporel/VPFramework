@@ -4,7 +4,7 @@ namespace VPFramework\Form\Field;
 
 use VPFramework\Form\Field\Field;
 
-class File extends Field
+class File extends AbstractField
 {
     public function __construct($label, $name, $options = [])
     {

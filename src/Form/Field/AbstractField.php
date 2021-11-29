@@ -2,7 +2,7 @@
 
 namespace VPFramework\Form\Field;
 
-abstract class Field
+abstract class AbstractField
 {
     protected
         $label,

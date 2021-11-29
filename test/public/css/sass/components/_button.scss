@@ -1,0 +1,36 @@
+.btn{
+	border-radius:0px;padding:8px 15px;margin:5px;
+	border:0;background:rgb(220,220,220);
+	&:hover{background:rgb(190,190,190);}
+
+	i{display:inline-block;margin:0 2px;} 
+	em{margin: 0 2px;font-style:normal;display:inline-block;}
+}
+.btn.rounded{
+	border-radius:10px;
+}
+.btn.hard-rounded{
+	border-radius:100px/100px;
+}
+a.btn{text-decoration:none;}
+
+.btn-action, .btn-action2{border:1px solid lightgray;background:white;}
+.btn-action{&:hover, &:focus{background:$primary-color;color:white;}}
+.btn-action2{&:hover, &:focus{background:$secondary-color;color:white;}}
+
+.btn-primary{
+	background:darken($primary-color, 10%);color:rgb(220,220,220);
+	&:hover, &:focus{background:$primary-color;color:white;}
+}
+.btn-secondary{
+	background:darken($secondary-color, 10%);color:rgb(220,220,220);
+	&:hover, &:focus{background:$secondary-color;color:white;}
+}
+.btn-bad{
+	background:darken(red, 10%);color:rgb(220,220,220);
+	&:hover, &:focus{background:red,;color:white;}
+}
+.btn-disabled{
+	background:lightgray;color:rgb(150,150,150);
+	&:hover, &:focus{background:lightgray;color:rgb(150,150,150);}
+}

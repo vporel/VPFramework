@@ -4,7 +4,7 @@ namespace VPFramework\Form\Field;
 
 use VPFramework\Form\Field\Field;
 
-class TextArea extends Field
+class TextArea extends AbstractField
 {
     
     public function getFieldHTML(){

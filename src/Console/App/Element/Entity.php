@@ -1,12 +1,16 @@
 <?php
 
-namespace VPFramework\Console\Database\Element;
+namespace VPFramework\Console\App\Element;
 
 use VPFramework\Console\Console;
 
 const FIELD_TYPES = [ "integer", "string", "text", "float", "datetime", "relation"];
 const ENTITY_DIR = ROOT."/app/Entity";
 const REPOSITORY_DIR = ROOT."/app/Repository";
+if(!is_dir(ENTITY_DIR))
+    mkdir(ENTITY_DIR, 0777, true);
+if(!is_dir(REPOSITORY_DIR))
+    mkdir(REPOSITORY_DIR, 0777, true);
 
 class Entity
 {
@@ -65,26 +69,10 @@ class Entity
                 self::getEntityFileHead($entityName, $tableName, $usedClasses).
                 self::getEntityFileBody($entityName, $fields).
                 self::getEntityFileEnd();
-            try{            
-                $file = fopen(ENTITY_DIR."/".$entityName.".php", "w+");
-                fputs($file, $entityContent);
-                fclose($file);
-                echo "\t- The file ".$entityName.".php has been successfully created\n";
-            }catch(\Exception $e){
-                echo $e->getMessage();
-                echo "\nThe creation of ".$entityName.".php has failed\n";
-            }
+            Console::createFile(ENTITY_DIR."/".$entityName.".php",  $entityContent);
             $repositoryContent = self::getRepositoryFileContent($entityName);
             if(!file_exists(REPOSITORY_DIR."/".$entityName."Repository.php")){
-                try{
-                    $file = fopen(REPOSITORY_DIR."/".$entityName."Repository.php", "w+");
-                    fputs($file, $repositoryContent);
-                    fclose($file);
-                    echo "\t- The file ".$entityName."Repository.php has been successfully created\n";
-                }catch(\Exception $e){
-                    echo $e->getMessage();
-                    echo "\nThe creation of ".$entityName."Repository.php has failed\n";
-                }
+                Console::createFile(REPOSITORY_DIR."/".$entityName."Repository.php",  $repositoryContent);
             }else{
                 echo "\nThe repository for this entity already exists\n";
             }

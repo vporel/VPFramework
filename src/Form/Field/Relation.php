@@ -11,7 +11,7 @@ use VPFramework\Core\DIC;
  * Car elle ne peut fonctionner sans les classes : Doctrine\ORM\EntityManager et VPFramework\Core\DIC;
  */
 
-class Relation extends Field
+class Relation extends AbstractField
 {
     private $repository;
 
