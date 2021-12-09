@@ -2,9 +2,9 @@
 
 namespace VPFramework\Security;
 
-use VPFramework\Form\Form;
+use VPFramework\Form\AbstractFormUnique;
 
-abstract class AbstractLoginForm extends Form
+abstract class AbstractLoginForm extends AbstractFormUnique
 {
     public function isAuthenticated()
     {

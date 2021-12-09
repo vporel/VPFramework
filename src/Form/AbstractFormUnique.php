@@ -1,65 +1,42 @@
 <?php
-
+/*
+ * This file is part of VPFramework Framework
+ *
+ * (c) Porel Nkouanang
+ *
+ */
 namespace VPFramework\Form;
 
-use VPFramework\Core\DIC;
-use VPFramework\Core\Request;
-use VPFramework\Form\Field\Relation;
-use VPFramework\Form\Field\AbstractField;
 use VPFramework\Form\Field\File;
 use VPFramework\Form\Field\Password;
 
-abstract class Form 
+
+/**
+ * @author Porel Nkouanang <dev.vporel@gmail.com>
+ */
+abstract class AbstractFormUnique extends AbstractForm
 {
-    protected $name;
-
     /**
-     * @var Field[]
+     * The object managed by the form
      */
-    protected $fields;
-
-    protected $htmls;
-
     protected $object = null;
-    protected $repository;
-    protected $repositoryClass;
-    protected $parameters = null;
-    protected $validity = null;
-    protected $error = "";
 
-    public function __construct($object, $repositoryClass)
+    public function __construct($object)
     {
-        $getCalledClass = explode("\\", get_called_class());
-        $this->name = end($getCalledClass);
         $this->object = $object;
-        $this->repositoryClass = $repositoryClass;
-        if($repositoryClass != null)
-            $this->repository = DIC::getInstance()->get($repositoryClass);
-
-        $this->build();
+        
+        parent::__construct();
     }
-
-    public function setParameters($parameters){
-        $this->parameters = $parameters;
-        return $this;
-    }
-    public function getFields()
-    {
-        return $this->fields;
-    }
-
-    public abstract function build();
-
     public function createHTML()
     {
         if($this->isSubmitted())
             $this->isValid();
         $html = '
-            <input type="hidden" name="form-'.$this->name.'"/>
+            <input type="hidden" name="'.$this->name.'"/>
         ';
         if($this->error != "")
             $html .= '<div class="form-error alert alert-warning">'.$this->error.'</div>';
-        if(isset($this->parameters["form-".$this->name])){ // Condition de la fonction isSubmitted : Condition réécrite pour éviter que la function updateObject soit appelée
+        if(isset($this->parameters[$this->name])){ // Condition de la fonction isSubmitted : Condition réécrite pour éviter que la function updateObject soit appelée
             
             foreach($this->fields as $field){
                 if(!($field instanceof File))
@@ -109,40 +86,8 @@ abstract class Form
 
     }
 
-    public function serialize($parameters){
-        $data = [];
-        foreach($this->groups as $group){
-            $fields = $group->getFields();
-            for($i = 0;$i<count($fields);$i++){
-                $field = $fields[$i];
-                if($field->getType() != "FormConfirmPassword"){
-                    if($field->getType() == "FormPassword"){
-                        $hash = $field->getHashFunction();
-                        $data[$field->getName()] = $hash($parameters[$field->getName()]);
-                    }else
-                        $data[$field->getName()] = $parameters[$field->getName()];
-                }
-            }
-        }
-        return $data;
-    }
-
-    public function addField(AbstractField $field)
-    { 
-        $this->fields[] = $field;
-        return $this;
-    }
-
-    public function isSubmitted()
-    {
-        if($this->parameters !== null){
-            if(isset($this->parameters["form-".$this->name])){
-                return true;
-            }
-            return false;
-        }else{
-            throw new \Exception("Les parametres de la requête n'ont pas été passés au formulaire");
-        }
+    public function serialize(){
+        
     }
 
     public function updateObject()
@@ -162,18 +107,6 @@ abstract class Form
                 }
             }
         }
-    }
-
-    public function hasError()
-    {
-        if(!$this->isSubmitted())
-            return false;
-        return !$this->isValid();
-    }
-
-    public function __toString()
-    {
-        return $this->createHTML();
     }
 
 }
