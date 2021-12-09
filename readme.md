@@ -1,7 +1,10 @@
 # VPFramework
 > ***PHP Framework for simple applications***<br/>
 VPFramework is a light PHP framework that provide basis when creating a web application
-
+#### Sommaire
+ * [Contribution](#contribution)
+ * [Fonctionnalités offertes](#fonctionnalités-offertes)
+ * [Installation](#installation)
 ### Contribution
 Nous aimerions travailler avec d'autre personne pour l'évolution de ce framework.<br/>
 Suivez [ce guide.](contributing.md)
