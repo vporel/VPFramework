@@ -31,6 +31,10 @@ abstract class AbstractField
         $this->options[$name] = $value;
         return $this;
     }
+
+    public function existOption(string $name){
+        return array_key_exists($name, $this->options);
+    }
     
     public function __call($name, $arguments)
     {

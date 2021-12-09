@@ -3,25 +3,19 @@
 namespace VPFramework\Form;
 
 use Doctrine\ORM\EntityManager;
-use VPFramework\Core\DIC;
-use VPFramework\Form\Field\Field;
+use VPFramework\Form\Field\Relation;
+use VPFramework\Form\Field\Select;
 
-abstract class FormMultiple extends Form
+abstract class AbstractFormMultiple extends AbstractForm
 {
 
     private $objects;
     private $entityClass;
 
-    public function __construct($entityClass, $repositoryClass, $objects = null){
-        $getCalledClass = explode("\\", get_called_class());
-        $this->name = end($getCalledClass);
+    public function __construct($entityClass, $objects = null){
         $this->objects = $objects;
         $this->entityClass = $entityClass;
-        $this->repositoryClass = $repositoryClass;
-        $this->repository = DIC::getInstance()->get($repositoryClass);
-
-        $this->build();
-
+        parent::__construct();
     }
 
     public function getEntityClass(){ return $this->entityClass; }
@@ -53,7 +47,11 @@ abstract class FormMultiple extends Form
         }
     }
 
-    public function createHTML()
+    public function createHTML(){
+
+    }
+
+    public function createNewElementsHTML()
     {
         $html = '
             <div class="form-error on-top">'.$this->error.'</div>
@@ -67,7 +65,7 @@ abstract class FormMultiple extends Form
 				        <th>N°</th>
         ';
 		foreach($this->fields as $field){
-            if(in_array($field->getClass(), ["Select", "Relation"])){ 
+            if($field instanceof Select || $field instanceof Relation){ 
                 $html .= '
                             <th>'.$field->getLabel().'</th>
                             <input type="hidden" class="field-model" data-elements=\''.$field->getElementsJSON().'\' data-label="'.$field->getLabel().'"data-name="'.$field->getName().'" data-class="'.$field->getClass().'" data-pattern="'.$field->getPattern().'" data-default="'.$field->getDefault().'"/>
@@ -75,8 +73,10 @@ abstract class FormMultiple extends Form
             }else{
                 $html .= '
                             <th>'.$field->getLabel().'</th>
-                            <input type="hidden" class="field-model" data-label="'.$field->getLabel().'"data-name="'.$field->getName().'" data-class="'.$field->getClass().'" data-pattern="'.$field->getPattern().'" data-default="'.$field->getDefault().'"/>
-                ';
+                            <input type="hidden" class="field-model" data-label="'.$field->getLabel().'"data-name="'.$field->getName().'" data-class="'.get_class($field).'"';
+                if($field->existOption("pattern"))
+                    $html .= 'data-pattern="'.$field->getPattern().'"';
+                $html .= 'data-default="'.$field->getDefault().'"/>';
             }
         }
         $html .= '
@@ -109,4 +109,6 @@ abstract class FormMultiple extends Form
 
     }
 
+    public function isValid(){}
+    public function serialize(){}
 }
