@@ -1,6 +1,6 @@
 # VPFramework
 > ***PHP Framework for simple applications***<br/>
-VPFramework is a light PHP framework that provide basics when creating a web application
+VPFramework is a light PHP framework that provides basics when creating a web application
 #### Sommaire
  * [Contribution](#contribution)
  * [Fonctionnalités offertes](#fonctionnalités-offertes)
