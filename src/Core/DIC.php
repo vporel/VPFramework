@@ -6,13 +6,13 @@ use VPFramework\Core\Configuration\Configuration;
 use VPFramework\Doctrine\Config;
 use Doctrine\ORM\EntityManager;
 
-if(!defined("ROOT"))
-    define("ROOT", __DIR__."/../../../../..");
+if (!defined('ROOT')) {
+    define('ROOT', __DIR__.'/../../../../..');
+}
 
 /**
- * Conteneur d'injection de dépendances dans l'application
+ * Conteneur d'injection de dépendances dans l'application.
  */
-
 class DIC
 {
     private $dependances = [];
@@ -21,38 +21,37 @@ class DIC
 
     public function __construct()
     {
-        
     }
 
     public function get($name)
     {
-        if(!array_key_exists($name, $this->instances)){
-            if(!in_array($name, ["Doctrine\\ORM\\EntityManager", "Doctrine\\ORM\\EntityManagerInterface"])){
-            
-                if(array_key_exists($name, $this->dependances)){
+        if (!array_key_exists($name, $this->instances)) {
+            if (!in_array($name, ['Doctrine\\ORM\\EntityManager', 'Doctrine\\ORM\\EntityManagerInterface'])) {
+                if (array_key_exists($name, $this->dependances)) {
                     $callable = $this->dependances[$name];
                     $this->instances[$name] = $callable();
-                }else{
+                } else {
                     $this->dynamicInstanciation($name);
                 }
-            }else{
-                $database = $this->get(Configuration::class)->get("database");
+            } else {
+                $database = $this->get(Configuration::class)->get('database');
 
                 // database configuration parameters
-                $conn = array(
+                $conn = [
                     'driver' => 'pdo_mysql',
-                    'user' => $database["username"],
-                    'password' => $database["password"],
-                    'dbname' => $database["name"],
-                    'host' => $database["host"]
-                );
+                    'user' => $database['username'],
+                    'password' => $database['password'],
+                    'dbname' => $database['name'],
+                    'host' => $database['host'],
+                ];
                 $this->instances[$name] = EntityManager::create($conn, Config::getConfig());
             }
         }
+
         return $this->instances[$name];
     }
 
-    public function set(string $name, Callable $resolver)
+    public function set(string $name, callable $resolver)
     {
         $this->dependances[$name] = $resolver;
     }
@@ -61,21 +60,23 @@ class DIC
     {
         $reflectedClass = new \ReflectionClass($obj);
         $reflectedMethod = $reflectedClass->getMethod($method);
-        if($reflectedMethod){
+        if ($reflectedMethod) {
             $parameters = $reflectedMethod->getParameters();
             $parametersValues = [];
-            foreach($parameters as $param){
-                if(!array_key_exists($param->getName(), $defaultValues)){
-                    if($param->getClass())
+            foreach ($parameters as $param) {
+                if (!array_key_exists($param->getName(), $defaultValues)) {
+                    if ($param->getClass()) {
                         $parametersValues[] = $this->get($param->getClass()->getName());
-                    else
+                    } else {
                         $parametersValues[] = $param->getDefaultValue();
-                }else{
+                    }
+                } else {
                     $parametersValues[] = $defaultValues[$param->getName()];
                 }
             }
+
             return $obj->$method(...$parametersValues);
-        }else{
+        } else {
             throw new \Exception("La méthode $method n'existe pas dans la classe ".$obj->getClass());
         }
     }
@@ -84,21 +85,23 @@ class DIC
     {
         $reflectedClass = new \ReflectionClass($class);
         $reflectedMethod = $reflectedClass->getMethod($method);
-        if($reflectedMethod){
+        if ($reflectedMethod) {
             $parameters = $reflectedMethod->getParameters();
             $parametersValues = [];
-            foreach($parameters as $param){
-                if(!array_key_exists($param->getName(), $defaultValues)){
-                    if($param->getClass())
+            foreach ($parameters as $param) {
+                if (!array_key_exists($param->getName(), $defaultValues)) {
+                    if ($param->getClass()) {
                         $parametersValues[] = $this->get($param->getClass()->getName());
-                    else
+                    } else {
                         $parametersValues[] = $param->getDefaultValue();
-                }else{
+                    }
+                } else {
                     $parametersValues[] = $defaultValues[$param->getName()];
                 }
             }
+
             return $class::$method(...$parametersValues);
-        }else{
+        } else {
             throw new \Exception("La méthode $method n'existe pas dans la classe ".$class);
         }
     }
@@ -106,29 +109,32 @@ class DIC
     public function dynamicInstanciation($class)
     {
         $reflectedClass = new \ReflectionClass($class);
-        if($reflectedClass->isInstantiable()){
+
+        if ($reflectedClass->isInstantiable()) {
             $contructor = $reflectedClass->getConstructor();
-            if($contructor !== null){
+            if ($contructor !== null) {
                 $parameters = $contructor->getParameters();
                 $parametersValues = [];
-                foreach($parameters as $param){
-                    if($param->getClass())
+                foreach ($parameters as $param) {
+                    if ($param->getClass()) {
                         $parametersValues[] = $this->get($param->getClass()->getName());
-                    else
+                    } else {
                         $parametersValues[] = $param->getDefaultValue();
+                    }
                 }
-                $this->instances[$class] = $reflectedClass->newInstanceArgs($parametersValues);                    
-            }else{
-                $this->instances[$class] = new $class;
+                $this->instances[$class] = $reflectedClass->newInstanceArgs($parametersValues);
+            } else {
+                $this->instances[$class] = new $class();
             }
         }
     }
 
     public static function getInstance()
     {
-        if(self::$instance == null)
+        if (self::$instance == null) {
             self::$instance = new DIC();
+        }
+
         return self::$instance;
     }
-
 }

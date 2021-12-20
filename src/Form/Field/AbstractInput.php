@@ -16,4 +16,11 @@ abstract class AbstractInput extends AbstractField
 
     protected abstract function getType();
 
+    public function serialize()
+    {
+        return array_merge(parent::serialize(), [
+            'pattern' => $this->getPattern()
+        ]);
+    }
+
 }

@@ -9,7 +9,7 @@ class File extends AbstractField
     public function __construct($label, $name, $options = [])
     {
         $this
-            ->addOption("extensions", ["*"])
+            ->addOption("extensions", ["jpg", "png", "gif", "jpeg"])
             ->addOption("destFolder", ["."])
             ->addOption("save", null) //Accepted values : all_raw, all_new, name_raw, name_new, extension
             ->addOption("namePrefix", "") 
