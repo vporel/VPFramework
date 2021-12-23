@@ -2,7 +2,7 @@
 
 namespace VPFramework\Core;
 
-use VPFramework\Core\Configuration\Configuration;
+use VPFramework\Core\Configuration\AppConfiguration;
 use VPFramework\Utils\FlexibleClassTrait;
 
 class AppGlobals
@@ -11,7 +11,7 @@ class AppGlobals
 
     private $config;
     private $user = null;
-    public function __construct(Configuration $config)
+    public function __construct(AppConfiguration $config)
     {
         $this->config = $config;
     }

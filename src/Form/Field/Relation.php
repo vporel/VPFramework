@@ -70,7 +70,7 @@ class Relation extends AbstractField
             ];
             foreach ($associationFields as $field) {
                 $method = 'get'.ucfirst($field);
-                $option[$field] = $element->$method()->getId(); // On passe à chaque element les identifiants des champs associés pour ces éléménts
+                $option[$field] = ($element->$method() != null) ? $element->$method()->getId() : 0; // On passe à chaque element les identifiants des champs associés pour ces éléménts
             }
             $array[] = $option;
         }

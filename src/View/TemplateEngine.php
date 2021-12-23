@@ -1,11 +1,10 @@
 <?php
 namespace VPFramework\View;
 
-use Bes\Twig\Extension\MobileDetectExtension;
 use Twig\TwigFunction;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
-use VPFramework\Core\Configuration\Configuration;
+use VPFramework\Core\Configuration\ServiceConfiguration;
 use VPFramework\Core\DIC;
 use VPFramework\Core\Configuration\ServiceNotFoundException;
 
@@ -26,7 +25,7 @@ class TemplateEngine
     public function getTwig()
     {
         try{
-            $twigConfig = DIC::getInstance()->get(Configuration::class)->getService("twig");
+            $twigConfig = DIC::getInstance()->get(ServiceConfiguration::class)->getService("twig");
             if($twigConfig["activated"]){
        
                 $loader = new Twig_Loader_Filesystem(VIEW_DIR);

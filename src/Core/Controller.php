@@ -2,7 +2,7 @@
 
 namespace VPFramework\Core;
 
-use VPFramework\Core\Configuration\Configuration;
+use VPFramework\Core\Configuration\RouteConfiguration;
 use VPFramework\View\TemplateEngine;
 use VPFramework\View\View;
 
@@ -32,16 +32,13 @@ abstract class Controller
 
     /**
      * Redirection vers une autre route
-     * @param $controller
-     * @param $options
+     * @param string $routeName
+     * @param array $options
      */
     protected function redirectRoute($routeName, $options = [])
     {
-        $routes = DIC::getInstance()->get(Configuration::class)->getRoutes();
-        if(array_key_exists($routeName, $routes)) 
-            header("Location: ".$routes[$routeName]->getPath($options));
-        else
-            throw new \Exception("La route $routeName n'existe pas");
+        $route = DIC::getInstance()->get(RouteConfiguration::class)->getRoute($routeName);
+        header("Location: ".$route->getPath($options));
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace VPFramework\Core;
 
-use VPFramework\Core\Configuration\Configuration;
+use VPFramework\Core\Configuration\AppConfiguration;
 use VPFramework\Doctrine\Config;
 use Doctrine\ORM\EntityManager;
 
@@ -34,7 +34,7 @@ class DIC
                     $this->dynamicInstanciation($name);
                 }
             } else {
-                $database = $this->get(Configuration::class)->get('database');
+                $database = $this->get(AppConfiguration::class)->get('database');
 
                 // database configuration parameters
                 $conn = [

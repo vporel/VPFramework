@@ -1,6 +1,6 @@
 <?php
 
-namespace VPFramework\Security;
+namespace VPFramework\Service\Security;
 
 interface UserInterface
 {

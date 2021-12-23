@@ -8,7 +8,7 @@ use Twig\Extension\GlobalsInterface;
 use Twig\TwigFunction;
 use VPFramework\Core\DIC;
 use VPFramework\Core\AppGlobals;
-use VPFramework\Core\Configuration;
+use VPFramework\Core\RouteConfiguration;
 use VPFramework\Core\Request;
 
 define('ASSETS_DIR', DIC::getInstance()->get(AppGlobals::class)->getAssetsDir());
@@ -36,12 +36,9 @@ class VPFrameworkTwigExtension extends AbstractExtension implements GlobalsInter
     public function getUrl($name, $options = [])
     {
        // var_dump($options);
-        $routes = DIC::getInstance()->get(Configuration::class)->getRoutes();
-        if(array_key_exists($name, $routes)){
-            return $routes[$name]->getPath($options);
-        }else{
-            throw new \Exception("L'url pour $name n'a pas été trouvée. Vérifiez les routes de l'application");
-        }
+        $route = DIC::getInstance()->get(RouteCoif(array_key_exists($name, $routes)){
+        return $route->getPath($options);
+        
     }
 
     public function fromAssets($element){

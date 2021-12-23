@@ -1,6 +1,6 @@
 <?php
 
-namespace VPFramework\Security;
+namespace VPFramework\Service\Security;
 
 use VPFramework\Doctrine\Repository;
 use VPFramework\Form\AbstractFormUnique;

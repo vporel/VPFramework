@@ -3,7 +3,8 @@ namespace VPFramework\View;
 
 use VPFramework\Core\AppGlobals;
 use VPFramework\Core\Configuration\AppParameterNotFoundException;
-use VPFramework\Core\Configuration\Configuration;
+use VPFramework\Core\Configuration\AppConfiguration;
+use VPFramework\Core\Configuration\RouteConfiguration;
 use VPFramework\Core\DIC;
 
 define('ASSETS_DIR', DIC::getInstance()->get(AppGlobals::class)->getAssetsDir());
@@ -18,7 +19,7 @@ class View
     {
         $this->globals = ["app" => DIC::getInstance()->get(AppGlobals::class)];
         try{
-            $extensions = DIC::getInstance()->get(Configuration::class)->get("view_extensions");
+            $extensions = DIC::getInstance()->get(AppConfiguration::class)->get("view_extensions");
             foreach($extensions as $ext){
                 $extObj = new $ext();
                 $this->globals = array_merge($this->globals, $extObj->getGlobals());
@@ -44,13 +45,8 @@ class View
 
     public function url($name, $options = [])
     {
-       // var_dump($options);
-        $routes = DIC::getInstance()->get(Configuration::class)->getRoutes();
-        if(array_key_exists($name, $routes)){
-            return $routes[$name]->getPath($options);
-        }else{
-            throw new \Exception("L'url pour $name n'a pas été trouvée. Vérifiez les routes de l'application");
-        }
+        $route = DIC::getInstance()->get(RouteConfiguration::class)->getRoute($name);
+        return $route->getPath($options);
     }
 
     public function assets($element){

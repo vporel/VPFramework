@@ -2,7 +2,7 @@
 
 namespace VPFramework\Core;
 
-use VPFramework\Core\Configuration\Configuration;
+use VPFramework\Core\Configuration\RouteConfiguration;
 use VPFramework\Core\Route\Route;
 
 /**
@@ -20,7 +20,7 @@ class Request
      * Constructeur
      * @param array $parameters parametres de la requete
      */
-    public function __construct(Configuration $config)
+    public function __construct(RouteConfiguration $config)
     {
         $this->parameters = array_merge($_GET, $_POST);
         if(strpos($_SERVER["REQUEST_URI"], "?") > -1)
