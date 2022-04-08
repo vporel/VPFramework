@@ -15,6 +15,6 @@ namespace VPFramework\Form;
 class NoParametersException extends \Exception 
 {
     public function __construct(){
-        parent::__construct("Les parametres de la requête n'ont pas été passés au formulaire");
+        parent::__construct__("Les parametres de la requête n'ont pas été passés au formulaire");
     }
 }

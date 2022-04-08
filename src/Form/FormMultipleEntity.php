@@ -7,7 +7,7 @@ use VPFramework\View\View;
 
 abstract class FormMultipleEntity implements \Serializable
 {
-    public function getView(){
+    public static function getView(){
         return DIC::getInstance()->get(View::class);
     }
 

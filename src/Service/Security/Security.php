@@ -28,6 +28,7 @@ final class Security
                 $safeUrlsArray = preg_split('#, *#', $safeUrls);
                 foreach ($safeUrlsArray as $safeUrl) {
                     if (preg_match($safeUrl, $urlPath)) {
+                        
                         /**
                          * unnamed.
                          */
@@ -43,7 +44,7 @@ final class Security
                                 $_SESSION['URL-before-redirection'] = $_SESSION['URL-before-redirection'] ?? '';
                             }
                             if (isset($definition['redirection']) && $definition['redirection'] != '') {
-                                header('Location: '.$definition['redirection']);
+                               header('Location: '.$definition['redirection']);
                             } else {
                                 echo '<h1>Access denied</h1>';
 
@@ -63,10 +64,7 @@ final class Security
 
     public static function getURLBeforeRedirection()
     {
-        if (isset($_SESSION['URL-before-redirection'])) {
-            return $_SESSION['before-redirection'];
-        } else {
-            return '';
-        }
+        return $_SESSION['URL-before-redirection'] ?? "";
+        
     }
 }

@@ -1,0 +1,4 @@
+Reproduction de l'administration de django
+
+Amélioration de VPFRamework
+- Utilisation du système de django pour les routes (définir les routes dans un fichier php), utiliser une classe route (L'utilisateur pour ses routes créera donc des instance de cette classe et ces instance seront chargées au lancement du site. Les parametres peuvent eux aussi etres définis avec une classe

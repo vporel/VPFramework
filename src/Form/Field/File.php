@@ -10,7 +10,7 @@ class File extends AbstractField
     {
         $this
             ->addOption("extensions", ["jpg", "png", "gif", "jpeg"])
-            ->addOption("destFolder", ["."])
+            ->addOption("destFolder", ".")
             ->addOption("save", null) //Accepted values : all_raw, all_new, name_raw, name_new, extension
             ->addOption("namePrefix", "") 
             ->addOption("nameSuffix", "");
