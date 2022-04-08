@@ -1,4 +1,0 @@
-{
-    "home":{"path": "/", "action": "ControllerHome:index"},
-    "simpleForm":{"path": "/simpleform", "action": "ControllerComponent:simpleForm"}   
-}
