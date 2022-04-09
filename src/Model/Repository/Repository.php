@@ -70,18 +70,16 @@ abstract class Repository extends EntityRepository
             else
                 $queryBuilder->setParameter($realKey, $value);
         }
-        /*
-
         //Order
         if($orderBy != null && is_array($orderBy)){
             foreach($orderBy as $order){
-                if(strpos($order, "-") == 0){
+                if(strpos($order, "-") != false && strpos($order, "-") == 0){
                     $queryBuilder->orderBy("e.".substr($order, 1), "DESC");
                 }else{
                     $queryBuilder->orderBy("e.".$order, "ASC");
                 }
             }
-        }*/
+        }
 
         if(is_int($offset) && $offset >= 0){
             $queryBuilder->setFirstResult($offset);
