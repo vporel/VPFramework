@@ -3,7 +3,7 @@
 namespace VPFramework\Core;
 
 use VPFramework\Core\Configuration\RouteConfiguration;
-use VPFramework\Core\Route\Route;
+use VPFramework\Core\Routing\Route;
 
 /**
  * Classe qui modélise une requete et recoit dans son constructeur les parametres de cette requete
@@ -11,6 +11,7 @@ use VPFramework\Core\Route\Route;
 
 class Request
 {
+    public const DEFAULT_ROUTE_NAME = "default-vpframework-route";
     private 
         $parameters,
         $route = null,
@@ -28,17 +29,23 @@ class Request
         else
             $this->urlPath = $_SERVER["REQUEST_URI"];
         $routes = $config->getRoutes();
-        foreach($routes as $route){
-            if(preg_match( $route->getPathRegex(), $this->urlPath, $matches)){
-                $this->route = $route;
-                break;
+        if(count($routes) > 0){
+            foreach($routes as $route){
+                if(preg_match( $route->getPathRegex(), $this->urlPath, $matches)){
+                    $this->route = $route;
+                    break;
+                }
             }
+            if($this->route == null)
+                throw new \Exception("URL $this->urlPath non reconnue");
+            
+            //array_slice($matches, 1) car le premier resultat dans matches est la chaine complete
+            foreach($this->route->getData(array_slice($matches, 1)) as $key => $value)
+                $this->set($key, $value);
+        }else{
+            //Route par défaut définie par le framework
+            $this->route = new Route(self::DEFAULT_ROUTE_NAME, "", "", "");
         }
-        if($this->route == null)
-            throw new \Exception("URL $this->urlPath non reconnue");
-        
-        foreach($this->route->getData($matches) as $key => $value)
-            $this->set($key, $value);
 
     }
 

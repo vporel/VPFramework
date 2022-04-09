@@ -8,6 +8,10 @@ if(!defined("ROOT")){
      define("ROOT" , __DIR__."/../../../../..");
 }
 
+if(!defined("FRAMEWORK_ROOT")){
+    define("FRAMEWORK_ROOT" , __DIR__."/..");
+}
+
 session_start();
 
 class Router
@@ -21,8 +25,13 @@ class Router
 
     public function end(Security $security){
         if($security->checkSecurity($this->request->getUrlPath())){
-            $controller = DIC::getInstance()->get($this->request->getRoute()->getController());
-            echo DIC::getInstance()->invoke($controller, $this->request->getRoute()->getControllerAction());
+            $route = $this->request->getRoute();
+            if($route->getName() != Request::DEFAULT_ROUTE_NAME){
+                $controller = $route->getController();
+                echo DIC::getInstance()->invoke($controller, $this->request->getRoute()->getControllerMethod());
+            }else{
+                require FRAMEWORK_ROOT."/View/views/defaultView.php";
+            }
         }
     }
     

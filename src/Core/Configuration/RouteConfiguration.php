@@ -4,17 +4,24 @@ namespace VPFramework\Core\Configuration;
 
 use VPFramework\Core\Route\Route;
 
-const ROUTES_FILE = ROOT."/config/routes.json";
+//Chargement des routes
 class RouteConfiguration{
-    private $routes = null;
 
+    /**
+     * Tableau associatif dont les éléments ont pour clé le nom de la route et pour valeur la route correspondante
+     */
+    private $routes;
 
     public function getRoutes(): ?array
-    {
+    {        
         if($this->routes == null){
-            $this->routesArray = json_decode(file_get_contents(ROUTES_FILE), true);
-            foreach($this->routesArray as $name => $content){
-                $this->routes[$name] = new Route($content);
+            $routes = require ROOT."/config/routes.php";
+            if($routes === null || !is_array($routes)){
+                throw new VPFrameworkConfigurationException("La valeur retournée par le fichier routes.php est invalide");
+            }
+            $this->routes = [];
+            foreach($routes as $route){
+                $this->routes[$route->getName()] = $route;
             }
         }
         return $this->routes;
