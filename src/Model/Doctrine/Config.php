@@ -1,5 +1,5 @@
 <?php
-namespace VPFramework\Doctrine;
+namespace VPFramework\Model\Doctrine;
 
 use Doctrine\ORM\Tools\Setup;
 

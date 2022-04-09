@@ -3,7 +3,7 @@
 namespace VPFramework\Core;
 
 use VPFramework\Core\Configuration\AppConfiguration;
-use VPFramework\Doctrine\Config;
+use VPFramework\Model\Doctrine\Config;
 use Doctrine\ORM\EntityManager;
 
 if (!defined('ROOT')) {
