@@ -2,7 +2,7 @@
 
 namespace VPFramework\Core;
 
-use VPFramework\Service\Security\Security;
+use VPFramework\Core\Routing\Security\Security;
 
 if(!defined("ROOT")){
      define("ROOT" , __DIR__."/../../../../..");
@@ -24,7 +24,7 @@ class Router
     }
 
     public function end(Security $security){
-        if($security->checkSecurity($this->request->getUrlPath())){
+        if($security->requireAccess($this->request->getUrlPath())){
             $route = $this->request->getRoute();
             if($route->getName() != Request::DEFAULT_ROUTE_NAME){
                 $controller = $route->getController();
