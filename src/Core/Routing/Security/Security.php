@@ -31,26 +31,23 @@ final class Security
             foreach ($rule->getSafeUrls() as $safeUrl) {
                 if (preg_match("#$safeUrl#i", $urlPath)) { // Ajout des délimiteurs car dans le fichier de configuration ils ne sont pas mis
                     
-                    /**
-                     * unnamed.
-                     */
                     $user = DIC::getInstance()->get(AppGlobals::class)->getUser();
-                    if ($user == null || !in_array($user->getRole(), $definition['roles']) || !($user instanceof $definition['entity'])) {
-                        // unset($_SESSION["user"]);
-                        //Récupération de l'adresse précédente de la page avant la redirection
-                        $fullUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != '') ? 'https' : 'http';
-                        $fullUrl .= '://'.$_SERVER['HTTP_HOST'].$urlPath;
-                        if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != $fullUrl) {
-                            $_SESSION['URL-before-redirection'] = $_SERVER['HTTP_REFERER'];
-                        } else {
-                            $_SESSION['URL-before-redirection'] = $_SESSION['URL-before-redirection'] ?? '';
-                        }
-                        if (isset($definition['redirection']) && $definition['redirection'] != '') {
-                            header('Location: '.$definition['redirection']);
-                        } else {
-                            echo '<h1>Access denied</h1>';
-
-                            return false;
+                    foreach($rule->getEntitiesRoles() as $entity => $roles){
+                        if ($user == null || !in_array($user->getRole(), $roles) || !($user instanceof $entity)) {
+                            //Récupération de l'adresse précédente de la page avant la redirection
+                            $fullUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != '') ? 'https' : 'http';
+                            $fullUrl .= '://'.$_SERVER['HTTP_HOST'].$urlPath;
+                            if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != $fullUrl) {
+                                $_SESSION['URL-before-redirection'] = $_SERVER['HTTP_REFERER'];
+                            } else {
+                                $_SESSION['URL-before-redirection'] = $_SESSION['URL-before-redirection'] ?? '';
+                            }
+                            if ($rule->getRedirection() != null && $rule->getRedirection() != "") {
+                                header('Location: '.$rule->getRedirection());
+                            } else {
+                                require FRAMEWORK_ROOT."/View/views/accessDenied.php";
+                                return false;
+                            }
                         }
                     }
                     break;

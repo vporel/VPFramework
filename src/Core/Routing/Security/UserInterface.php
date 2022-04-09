@@ -5,10 +5,10 @@ namespace VPFramework\Core\Routing\Security;
 interface UserInterface
 {
     /**
-     * Les roles que possède une instance de l'entité
-     * @return array
+     * Le role que possède une instance de l'entité
+     * @return string
      */
-    public function getRoles();
+    public function getRole();
 
     /**
      * La clée permettant de vérifier l'authentification pour l'entité

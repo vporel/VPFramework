@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VPFramework Starting</title>
+    <title>Access denied</title>
     <style>
         :root{
             --primary-color:orange;
@@ -48,18 +48,12 @@
 </head>
 <body>
     <header>
-        <h1>VPFramework</h1>
+        <h1>Accès refusé</h1>
     </header>
     <div id="content">
         <h2>
-            Tout est <strong class="text-primary">OK</strong>
+            Vous n'avez pas accès à cette partie du site
         </h2>
-        <p class="text-center">
-            <i>Créez au moins une route pour commencer le développement de votre application</i>
-        </p>
-        <section>
-            <h3>Comment créer une route <font class="text-primary">?</font></h3>
-        </section>
     </div>
 </body>
 </html>
