@@ -3,8 +3,9 @@
 namespace VPFramework\Console\App\Element;
 
 use VPFramework\Console\Console;
+use VPFramework\Core\Constants;
 
-const FORM_DIR = ROOT."/app/Form";
+define("FORM_DIR", Constants::$APP_ROOT."/app/Form");
 if(!is_dir(FORM_DIR))
     mkdir(FORM_DIR, 0777, true);
 

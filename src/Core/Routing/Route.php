@@ -7,10 +7,9 @@ use VPFramework\Core\DIC;
 /**
  * Cette classe définit une route dans l'application
  */
-define("CONTROLLER_NAMESPACE", "App\\Controller");
 class Route
 {
-    private $name, $path, $controllerClassName, $controllerMethod, $pathParams;
+    private $name, $path, $controllerClass, $controllerMethod, $pathParams;
 
     private $pathRegex;
     private $controller;
@@ -19,22 +18,23 @@ class Route
      * __construct
      * Les paramètes (champ pathParams doivent suivre l'ordre d'apparition dans le chemin (path))
      * @param  mixed $name
-     * @param  mixed $controllerClassName
+     * @param  mixed $controllerClass Ex : HomeController::class
      * @param  mixed $controllerMethod
      * @param  mixed $path
      * @param  mixed $pathParams Un tableau associant à chaque paramètre du chemin une expression regulière pour vérifier sa validité. Ex : ["id" => "^[1-9][0-9]*$"] Pas d'options, pas de caractère de délimitation. par défaut, ces regex sont case insensitive
      * @return void
      */
-    public function __construct(string $name, string $controllerClassName, string $controllerMethod, string $path, array $pathParams = [])
+    public function __construct(string $name, string $controllerClass, string $controllerMethod, string $path, array $pathParams = [])
     {
         $this->name = $name;
         $this->path = $path;
-        $this->controllerClassName = $controllerClassName;
+        $this->controllerClass = $controllerClass;
         $this->controllerMethod = $controllerMethod;
         $this->pathParams = $pathParams;
         $this->optionsRegex = isset($content["options"]) ? $content["options"] : [];
         $this->pathRegex = "#^";
         $path = $this->path;
+
         //Construction de l'expression régulière à tester sur l'URL
         foreach($this->getAllPathParams() as $param){
             if(in_array($param, $this->pathParams)){
@@ -82,12 +82,14 @@ class Route
      */
     public function getController()
     {
-        if($this->controller === null){
-            $completeControllerClassName = CONTROLLER_NAMESPACE."\\".$this->controllerClassName;
-            if(!class_exists($completeControllerClassName)){
-                throw new ControllerNotFoundException($completeControllerClassName);
+        if($this->controller == null){
+            if(!class_exists($this->controllerClass, true)){
+                throw new ControllerNotFoundException($this->controllerClass);
             }else{
-                $this->controller = DIC::getInstance()->get($completeControllerClassName);
+                $this->controller = DIC::getInstance()->get($this->controllerClass);
+            }
+            if(!method_exists($this->controller, $this->controllerMethod)){
+                throw new ControllerMethodNotFoundException($this->controllerClass, $this->controllerMethod);
             }
         }
         return $this->controller;

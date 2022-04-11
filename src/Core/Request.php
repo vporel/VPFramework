@@ -43,6 +43,7 @@ class Request
             foreach($this->route->getData(array_slice($matches, 1)) as $key => $value)
                 $this->set($key, $value);
         }else{
+
             //Route par défaut définie par le framework
             $this->route = new Route(self::DEFAULT_ROUTE_NAME, "", "", "");
         }

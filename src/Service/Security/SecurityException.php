@@ -1,5 +1,5 @@
 <?php
-namespace VPFramework\Core\Routing\Security;
+namespace VPFramework\Service\Security;
 
 class SecurityException extends \Exception
 {

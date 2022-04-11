@@ -2,7 +2,7 @@
 
 namespace VPFramework\Service\Security;
 
-use VPFramework\Doctrine\Repository;
+use VPFramework\Model\Repository\Repository;
 use VPFramework\Form\AbstractFormUnique;
 
 abstract class AbstractLoginForm extends AbstractFormUnique

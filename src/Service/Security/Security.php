@@ -1,9 +1,11 @@
 <?php
 
-namespace VPFramework\Core\Routing\Security;
+namespace VPFramework\Service\Security;
 
 use VPFramework\Core\AppGlobals;
-use VPFramework\Core\Configuration\SecurityConfiguration;
+use VPFramework\Core\Configuration\ServiceConfiguration;
+use VPFramework\Core\Configuration\ServiceNotFoundException;
+use VPFramework\Core\Constants;
 use VPFramework\Core\DIC;
 
 /**
@@ -15,7 +17,7 @@ final class Security
 {
     private $config;
 
-    public function __construct(SecurityConfiguration $config)
+    public function __construct(ServiceConfiguration $config)
     {
         $this->config = $config;
     }
@@ -26,14 +28,20 @@ final class Security
      */
     public function requireAccess($urlPath)
     {
-        $rules = $this->config->getRules('security');
+        $rules = [];
+        try{
+            $rules = $this->config->getService("security");
+        }catch(ServiceNotFoundException $e){
+            //Le service security n'a pas été défini donc aucune règle définie
+            return true;
+        }
         foreach ($rules as $rule) {
             foreach ($rule->getSafeUrls() as $safeUrl) {
                 if (preg_match("#$safeUrl#i", $urlPath)) { // Ajout des délimiteurs car dans le fichier de configuration ils ne sont pas mis
                     
                     $user = DIC::getInstance()->get(AppGlobals::class)->getUser();
                     foreach($rule->getEntitiesRoles() as $entity => $roles){
-                        if ($user == null || !in_array($user->getRole(), $roles) || !($user instanceof $entity)) {
+                        if ($user == null || (count($roles) > 0 && !in_array($user->getRole(), $roles)) || !($user instanceof $entity)) {
                             //Récupération de l'adresse précédente de la page avant la redirection
                             $fullUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != '') ? 'https' : 'http';
                             $fullUrl .= '://'.$_SERVER['HTTP_HOST'].$urlPath;
@@ -45,7 +53,7 @@ final class Security
                             if ($rule->getRedirection() != null && $rule->getRedirection() != "") {
                                 header('Location: '.$rule->getRedirection());
                             } else {
-                                require FRAMEWORK_ROOT."/View/views/accessDenied.php";
+                                require Constants::FRAMEWORK_ROOT."/View/views/accessDenied.php";
                                 return false;
                             }
                         }

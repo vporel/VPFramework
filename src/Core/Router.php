@@ -2,15 +2,7 @@
 
 namespace VPFramework\Core;
 
-use VPFramework\Core\Routing\Security\Security;
-
-if(!defined("ROOT")){
-     define("ROOT" , __DIR__."/../../../../..");
-}
-
-if(!defined("FRAMEWORK_ROOT")){
-    define("FRAMEWORK_ROOT" , __DIR__."/..");
-}
+use VPFramework\Service\Security\Security;
 
 session_start();
 
@@ -30,7 +22,7 @@ class Router
                 $controller = $route->getController();
                 echo DIC::getInstance()->invoke($controller, $this->request->getRoute()->getControllerMethod());
             }else{
-                require FRAMEWORK_ROOT."/View/views/defaultView.php";
+                require Constants::FRAMEWORK_ROOT."/View/views/defaultView.php";
             }
         }
     }

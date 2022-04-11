@@ -6,10 +6,6 @@ use VPFramework\Core\Configuration\AppConfiguration;
 use VPFramework\Model\Doctrine\Config;
 use Doctrine\ORM\EntityManager;
 
-if (!defined('ROOT')) {
-    define('ROOT', __DIR__.'/../../../../..');
-}
-
 /**
  * Conteneur d'injection de dépendances dans l'application.
  */

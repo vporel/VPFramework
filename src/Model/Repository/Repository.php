@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Types\Types;
 use VPFramework\Core\DIC;
+use Doctrine\ORM\Tools\SchemaTool;
 
 /**
  * Classe repository
@@ -15,6 +16,8 @@ use VPFramework\Core\DIC;
  */
 abstract class Repository extends EntityRepository
 {
+    //Codes de quelques exceptions pouvant être lancées par PDO
+    const PDO_EXCEPTION_TABLE_NOT_FOUND = "42S02";
 
     public function __construct()
     {
@@ -92,14 +95,60 @@ abstract class Repository extends EntityRepository
         return $queryBuilder->getQuery();
     }
 
+    /**
+     * @return Entity[] Un tableau d'instance de la classe entité gérée par le repository
+     */
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null){
-        
-        return $this->buildQuery($criteria, $orderBy, $limit, $offset)->getResult();
+        try{
+            return $this->buildQuery($criteria, $orderBy, $limit, $offset)->getResult();
+        }catch(\Doctrine\DBAL\Exception $e){
+            $PDOException = $e->getPrevious();
+            $this->managePDOException($PDOException);
+            return [];
+        }
     }
 
+    /**
+     * @return Entity|null Une instance de la classe entité gérée par le repository
+     */
     public function findOneBy(array $criteria, array $orderBy = null)
     {
+        try{
+            return $this->buildQuery($criteria, $orderBy, null, null)->getSingleResult();
+        }catch(\Doctrine\DBAL\Exception $e){
+            $PDOException = $e->getPrevious();
+            $this->managePDOException($PDOException);
+            return null;
+        }
+    }
 
-        return $this->buildQuery($criteria, $orderBy, null, null)->getSingleResult();
+    public function findAll()
+    {
+        try{
+            return parent::findAll();
+        }catch(\Doctrine\DBAL\Exception $e){
+			$PDOException = $e->getPrevious();
+			$this->managePDOException($PDOException);
+            return [];
+		}
+    }
+
+    /**
+     * @return void
+     */
+    private function managePDOException($exception){
+        switch($exception->getCode()){
+            case Repository::PDO_EXCEPTION_TABLE_NOT_FOUND: $this->createTable();break;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function createTable(){
+        $em = $this->getEntityManager();
+        $tool = new SchemaTool($em);
+        $metaData = $em->getClassMetaData($this->getEntityClass());
+        $tool->createSchema([$metaData]);
     }
 }

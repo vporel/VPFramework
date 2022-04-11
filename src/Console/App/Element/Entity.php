@@ -3,10 +3,11 @@
 namespace VPFramework\Console\App\Element;
 
 use VPFramework\Console\Console;
+use VPFramework\Core\Constants;
 
 const FIELD_TYPES = [ "integer", "string", "text", "float", "datetime", "relation"];
-const ENTITY_DIR = ROOT."/app/Entity";
-const REPOSITORY_DIR = ROOT."/app/Repository";
+define("ENTITY_DIR", Constants::$APP_ROOT."/app/Entity");
+define("REPOSITORY_DIR", Constants::$APP_ROOT."/app/Repository");
 if(!is_dir(ENTITY_DIR))
     mkdir(ENTITY_DIR, 0777, true);
 if(!is_dir(REPOSITORY_DIR))

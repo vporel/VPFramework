@@ -7,10 +7,10 @@ use Twig_Loader_Filesystem;
 use VPFramework\Core\Configuration\ServiceConfiguration;
 use VPFramework\Core\DIC;
 use VPFramework\Core\Configuration\ServiceNotFoundException;
+use VPFramework\Core\Constants;
 
-if(!defined('ROOT'))
-    define('ROOT', __DIR__."/../../../../..");
-const VIEW_DIR = ROOT."/View";
+//Cette constante pourra aussi être utilisée dans les templates de l"application pour utliser un fichier du sossier View
+define("VIEW_DIR", Constants::$APP_ROOT."/View");
 class TemplateEngine
 {
     public function getEngine()

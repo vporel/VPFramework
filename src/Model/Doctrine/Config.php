@@ -2,8 +2,9 @@
 namespace VPFramework\Model\Doctrine;
 
 use Doctrine\ORM\Tools\Setup;
+use VPFramework\Core\Constants;
 
-require_once ROOT."/vendor/autoload.php";
+require_once Constants::$APP_ROOT."/vendor/autoload.php";
 
 class Config
 {
@@ -15,7 +16,7 @@ class Config
         $proxyDir = null;
         $cache = null;
         $useSimpleAnnotationReader = false;
-        $config = Setup::createAnnotationMetadataConfiguration(array(ROOT."/app"), $isDevMode, $proxyDir, $cache, $useSimpleAnnotationReader);
+        $config = Setup::createAnnotationMetadataConfiguration(array(Constants::$APP_ROOT."/app"), $isDevMode, $proxyDir, $cache, $useSimpleAnnotationReader);
         // or if you prefer yaml or XML
         // $config = Setup::createXMLMetadataConfiguration(array(__DIR__."/config/xml"), $isDevMode);
         //$config = Setup::createYAMLMetadataConfiguration(array(__DIR__."/config/yaml"), $isDevMode);

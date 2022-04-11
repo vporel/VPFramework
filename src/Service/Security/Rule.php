@@ -1,9 +1,8 @@
 <?php
-namespace VPFramework\Core\Routing\Security;
+namespace VPFramework\Service\Security;
 
 use VPFramework\Core\Configuration\RouteConfiguration;
 use VPFramework\Core\DIC;
-use VPFramework\Core\Routing\Security\UserInterface;
 
 class Rule{
 
@@ -25,7 +24,7 @@ class Rule{
      * Le chamin de redirection ne doit pas prendre de paramètres
      * @return void
      */
-    public function __construct($safeUrls, $entitiesRoles, $redirection = null)
+    public function __construct($safeUrls, array $entitiesRoles, $redirection = null)
     {
         $this->safeUrls = $safeUrls;
         $this->entitiesRoles = $entitiesRoles;

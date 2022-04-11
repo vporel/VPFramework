@@ -1,6 +1,6 @@
 <?php
 
-namespace VPFramework\Core\Routing\Security;
+namespace VPFramework\Service\Security;
 
 interface UserInterface
 {
