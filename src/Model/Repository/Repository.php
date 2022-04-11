@@ -55,8 +55,7 @@ abstract class Repository extends EntityRepository
                 $whereMethod = "andWhere";
             }
             if(count($dividedKey) < 2){ //Pas de paramètre particulier : recherche d'une égalité
-                if(!$alreadyHasWhereClose)
-                    $queryBuilder->$whereMethod("e.".$realKey." = :".$realKey);
+                $queryBuilder->$whereMethod("e.".$realKey." = :".$realKey);
             }else{
                 switch (strtolower($dividedKey[1])){
                     case "neq": $queryBuilder->$whereMethod("e.".$realKey." != :".$realKey); break;
@@ -101,6 +100,8 @@ abstract class Repository extends EntityRepository
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null){
         try{
             return $this->buildQuery($criteria, $orderBy, $limit, $offset)->getResult();
+        }catch(\Doctrine\ORM\NoResultException $e){
+            return [];
         }catch(\Doctrine\DBAL\Exception $e){
             $PDOException = $e->getPrevious();
             $this->managePDOException($PDOException);
@@ -115,11 +116,18 @@ abstract class Repository extends EntityRepository
     {
         try{
             return $this->buildQuery($criteria, $orderBy, null, null)->getSingleResult();
+        }catch(\Doctrine\ORM\NoResultException $e){
+            return null;
         }catch(\Doctrine\DBAL\Exception $e){
             $PDOException = $e->getPrevious();
             $this->managePDOException($PDOException);
             return null;
         }
+    }
+
+    public function exists(array $criteria)
+    {
+        return $this->findOneBy($criteria, null) != null; 
     }
 
     public function findAll()

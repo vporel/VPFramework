@@ -66,9 +66,17 @@ final class Security
         return true;
     }
 
+    
+    public static function authenticate($object, $repository){
+        $_SESSION['user'] = [];
+        $_SESSION['user']['id'] = $object->getId();
+        $_SESSION['user']['repository'] = $repository;
+    }
+
     public static function getURLBeforeRedirection()
     {
         return $_SESSION['URL-before-redirection'] ?? "";
         
     }
+
 }

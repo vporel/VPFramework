@@ -27,7 +27,7 @@ class Admin implements UserInterface
     /**
      * @ORM\Column(type="string", nullable = false)
      */
-    private $passwork;
+    private $password;
     
     /**
      * @ORM\Column(type="boolean", nullable = false)
@@ -56,6 +56,9 @@ class Admin implements UserInterface
         return $this->userName;
     }
 
+    /**
+     * @return Admin
+     */ 
     public function setUserName(string $userName)
     {
         $this->userName = $userName;
@@ -68,10 +71,12 @@ class Admin implements UserInterface
         return $this->password;
     }
 
+    /**
+     * @return Admin
+     */ 
     public function setPassword(string $password)
     {
         $this->password = $password;
-
         return $this;
     }
 

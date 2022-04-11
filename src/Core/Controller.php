@@ -15,18 +15,18 @@ abstract class Controller
      */
     protected function render($viewFile, $data = [])
     {
-        return DIC::getInstance()->get(TemplateEngine::class)->getEngine()->render($viewFile, $data);
+        return DIC::getInstance()->get(TemplateEngine::class, ["viewDir" => $this->getViewDir()])->getEngine()->render($viewFile, $data);
     }
     /* GLOBALS GETTERS */
-    public function getGlobal($name){
+    final public function getGlobal($name){
         return DIC::getInstance()->get(View::class)->getGlobal($name);
     }
 
-    public function getUser(){
+    final public function getUser(){
         return $this->getGlobal("app")->getUser();
     }
 
-    public function addFlash($key, $value){
+    final public function addFlash($key, $value){
         $this->getGlobal("app")->addFlash($key, $value); 
     }
 
@@ -35,7 +35,7 @@ abstract class Controller
      * @param string $routeName
      * @param array $options
      */
-    protected function redirectRoute($routeName, $options = [])
+    final protected function redirectRoute($routeName, $options = [])
     {
         $route = DIC::getInstance()->get(RouteConfiguration::class)->getRoute($routeName);
         header("Location: ".$route->getPath($options));
@@ -45,9 +45,17 @@ abstract class Controller
      * Redirection vers une URL
      * @param $url
      */
-    protected function redirect($url)
+    final protected function redirect($url)
     {   
         header("Location: $url");
+    }
+    
+    /**
+     * @return "Chemin relatif vers le dossier contenant les vues pour ce controller
+     */
+    protected function getViewDir()
+    {
+        return Constants::$APP_ROOT."/View";
     }
 
 }

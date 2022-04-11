@@ -9,17 +9,24 @@ use VPFramework\Core\DIC;
 use VPFramework\Core\Configuration\ServiceNotFoundException;
 use VPFramework\Core\Constants;
 
-//Cette constante pourra aussi être utilisée dans les templates de l"application pour utliser un fichier du sossier View
-define("VIEW_DIR", Constants::$APP_ROOT."/View");
 class TemplateEngine
 {
+    private $viewDir;
+    /**
+     * Contructeur
+     * @param string $viewDir Dossier contenant les vues
+     */
+    public function __construct($viewDir){
+        $this->viewDir = $viewDir;
+    }
+
     public function getEngine()
     {
         $twig = $this->getTwig();
         if($twig != null) {
             return $twig;
         }
-        return new ViewLoader(VIEW_DIR);
+        return new ViewLoader($this->viewDir);
     }
 
     public function getTwig()
@@ -28,7 +35,7 @@ class TemplateEngine
             $twigConfig = DIC::getInstance()->get(ServiceConfiguration::class)->getService("twig");
             if($twigConfig["activated"]){
        
-                $loader = new Twig_Loader_Filesystem(VIEW_DIR);
+                $loader = new Twig_Loader_Filesystem($this->viewDir);
                 $twig = new Twig_Environment($loader, $twigConfig);
                 foreach($twigConfig["extensions"] as $extension)
                     $twig->addExtension(new $extension());
