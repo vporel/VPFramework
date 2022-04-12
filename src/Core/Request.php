@@ -38,7 +38,7 @@ class Request
             }
             if($this->route == null)
                 throw new \Exception("URL $this->urlPath non reconnue");
-            
+            //Récupération des paramètres de la route
             //array_slice($matches, 1) car le premier resultat dans matches est la chaine complete
             foreach($this->route->getData(array_slice($matches, 1)) as $key => $value)
                 $this->set($key, $value);
@@ -86,5 +86,9 @@ class Request
     public function getRoute(): Route 
     {
         return $this->route;
+    }
+
+    public function getMethod(){
+        return $_SERVER["REQUEST_METHOD"];
     }
 }

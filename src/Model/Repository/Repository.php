@@ -75,7 +75,7 @@ abstract class Repository extends EntityRepository
         //Order
         if($orderBy != null && is_array($orderBy)){
             foreach($orderBy as $order){
-                if(strpos($order, "-") != false && strpos($order, "-") == 0){
+                if(substr($order, 0,1) == "-"){
                     $queryBuilder->orderBy("e.".substr($order, 1), "DESC");
                 }else{
                     $queryBuilder->orderBy("e.".$order, "ASC");

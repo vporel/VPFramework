@@ -3,6 +3,7 @@ namespace VPFramework\DefaultApp\App\Controller;
 
 use Doctrine\ORM\EntityManager;
 use PDOException;
+use VPFramework\Core\Configuration\ServiceConfiguration;
 use VPFramework\Core\Constants;
 use VPFramework\Core\Request;
 use VPFramework\DefaultApp\App\Entity\Admin;
@@ -12,13 +13,14 @@ use VPFramework\Service\Security\Security;
 
 class AdminController extends DefaultAppController
 {
-	private $em;
-	public function __construct(EntityManager $em){
+	private $em, $entitiesAdmin;
+	public function __construct(EntityManager $em, ServiceConfiguration $serviceConfig){
 		$this->em = $em;
+		$this->entitiesAdmin = $serviceConfig->getService("admin");
 	}
 
 	public function index(){
-		return "Administration";
+		return $this->render("admin/home.php", ["entitiesAdmin" => $this->entitiesAdmin]);
 	}
 
 	public function login(Request $request,AdminRepository $repo){
@@ -28,7 +30,7 @@ class AdminController extends DefaultAppController
 				$admin = $repo->findOneBy(["userName" => $request->get("username")]);
 				if($admin != null){
 					if($admin->getPassword() == sha1($request->get("password"))){
-						Security::authenticate($admin, AdminRepository::class);
+						Security::login($admin, AdminRepository::class);
 						$this->redirectRoute("admin");
 					}else{
 						$error = "Mot de passe incorrect";
@@ -39,7 +41,7 @@ class AdminController extends DefaultAppController
 			}	
 			return $this->render("admin/login.php", compact("error"));
 		}else{
-			$this->redirectRoute("firstAdmin");
+			$this->redirectRoute("admin-first-dmin");
 		}
 	}
 
@@ -59,8 +61,13 @@ class AdminController extends DefaultAppController
 			}	
 			return $this->render("admin/first-admin.php", compact("error"));
 		}else{
-			$this->redirectRoute("adminLogin");
+			$this->redirectRoute("admin-login");
 		}
+	}
+
+	public function logout(){
+		Security::logout();
+		$this->redirectRoute("admin-login");
 	}
 
 }

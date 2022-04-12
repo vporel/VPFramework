@@ -91,4 +91,9 @@ class Admin implements UserInterface
     public function getKeyField(){
         return "userName";
     }
+
+    public function __toString()
+    {
+        return $this->userName;
+    }
 }

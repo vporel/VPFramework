@@ -20,9 +20,9 @@ class ViewLoader
         extract($view->getFunctions());
         extract($view->getGlobals());
         extract($data);
-        function view($file){
-            VIEW_DIR."/".$file ;
-        }
+        $view = function($file){
+            return VIEW_DIR."/".$file ;
+        };
         require VIEW_DIR."/".$file;
     }
 

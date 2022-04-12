@@ -67,10 +67,15 @@ final class Security
     }
 
     
-    public static function authenticate($object, $repository){
+    public static function login($object, $repository){
         $_SESSION['user'] = [];
         $_SESSION['user']['id'] = $object->getId();
         $_SESSION['user']['repository'] = $repository;
+    }
+
+    public static function logout(){
+        session_unset();
+        session_destroy();
     }
 
     public static function getURLBeforeRedirection()

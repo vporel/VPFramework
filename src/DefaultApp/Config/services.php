@@ -4,6 +4,6 @@ use VPFramework\DefaultApp\App\Entity\Admin;
 
 return [
     "security" => [
-        new Rule(["^/admin"], [Admin::class => []], "adminLogin")
+        new Rule(["^/admin(?!/login)"], [Admin::class => []], "admin-login")
     ]
 ];
