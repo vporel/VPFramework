@@ -1,6 +1,6 @@
 <?php
-namespace VPFramework\DefaultApp\App\Controller;
 
+namespace VPFramework\DefaultApp\App\Controller;
 use Doctrine\ORM\EntityManager;
 use PDOException;
 use VPFramework\Core\Configuration\ServiceConfiguration;
@@ -41,7 +41,7 @@ class AdminController extends DefaultAppController
 			}	
 			return $this->render("admin/login.php", compact("error"));
 		}else{
-			$this->redirectRoute("admin-first-dmin");
+			$this->redirectRoute("admin-first-admin");
 		}
 	}
 

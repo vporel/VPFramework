@@ -20,7 +20,7 @@ class AppConfiguration
      */
     public function get($name){
         if($this->app === null){
-            $this->app = require Constants::$APP_ROOT."/config/app.php";
+            $this->app = require Constants::$APP_ROOT."/Config/app.php";
         }
         if($this->app !== null && array_key_exists($name, $this->app))
             return $this->app[$name];

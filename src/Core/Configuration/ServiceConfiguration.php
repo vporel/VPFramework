@@ -11,8 +11,8 @@ class ServiceConfiguration{
     public function getService($name){
         $name = strtolower($name);
         if($this->services === null){
-            $this->services = require Constants::$APP_ROOT."/config/services.php";
-            $this->defaultAppServices = require Constants::FRAMEWORK_ROOT."/DefaultApp/config/services.php";
+            $this->services = require Constants::$APP_ROOT."/Config/services.php";
+            $this->defaultAppServices = require Constants::FRAMEWORK_ROOT."/DefaultApp/Config/services.php";
         }
         if($this->services !== null && array_key_exists($name, $this->services)){
             

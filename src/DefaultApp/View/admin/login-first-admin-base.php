@@ -15,7 +15,7 @@
             font-family:calibri;
         }
         form{
-            width:35%;margin:auto;margin-top:150px;background:white;
+            width:35%;margin:auto;margin-top:120px;background:white;
         }
         form h2{
             background:var(--primary-color); color:white; text-shadow:1px 1px 1px black; text-align:center;

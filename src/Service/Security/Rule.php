@@ -35,8 +35,11 @@ class Rule{
             $this->redirection = $routeConfig->getRoute($redirection)->getPath();
         }
         foreach($entitiesRoles as $entity => $roles){
-            if(!class_exists($entity) || !in_array(UserInterface::class, class_implements($entity, true))){
-                throw new SecurityException("La classe entité $entity est inexistante ou n'implémente pas l'interface ".UserInterface::class);
+            if(class_exists($entity, true)){
+                if(!in_array(UserInterface::class, class_implements($entity, true)))
+                    throw new SecurityException("La classe entité $entity n'implémente pas l'interface ".UserInterface::class);
+            }else{
+                throw new SecurityException("La classe entité $entity n'existe pas");
             }
         }
     }

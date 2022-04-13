@@ -16,12 +16,12 @@ class RouteConfiguration{
     public function getRoutes(): ?array
     {        
         if($this->routes == null){
-            $routes = require Constants::$APP_ROOT."/config/routes.php";
+            $routes = require Constants::$APP_ROOT."/Config/routes.php";
             if($routes === null || !is_array($routes)){
                 throw new VPFrameworkConfigurationException("La valeur retournée par le fichier routes.php est invalide");
             }
             //Prise en compte des routes par défaut du framework (ex:/admin)
-            $routes = array_merge($routes, require Constants::FRAMEWORK_ROOT."/DefaultApp/config/routes.php");
+            $routes = array_merge($routes, require Constants::FRAMEWORK_ROOT."/DefaultApp/Config/routes.php");
             $this->routes = [];
             foreach($routes as $route){
                 $this->routes[$route->getName()] = $route;
