@@ -122,6 +122,9 @@ abstract class Repository extends EntityRepository
             $PDOException = $e->getPrevious();
             $this->managePDOException($PDOException);
             return null;
+        }catch(\PDOException $e){
+            $this->managePDOException($e);
+            return null;
         }
     }
 
@@ -133,21 +136,23 @@ abstract class Repository extends EntityRepository
     public function findAll()
     {
         try{
-            return parent::findAll();
+            return parent::findBy([]);
         }catch(\Doctrine\DBAL\Exception $e){
-			$PDOException = $e->getPrevious();
-			$this->managePDOException($PDOException);
+            $PDOException = $e->getPrevious();
+            $this->managePDOException($PDOException);
             return [];
-		}
+        }catch(\PDOException $e){
+            $this->managePDOException($e);
+            return [];
+        }
     }
 
     /**
      * @return void
      */
     private function managePDOException($exception){
-        switch($exception->getCode()){
-            case Repository::PDO_EXCEPTION_TABLE_NOT_FOUND: $this->createTable();break;
-        }
+        if($exception->getCode() == Repository::PDO_EXCEPTION_TABLE_NOT_FOUND || $exception->getCode() == 1146)
+            $this->createTable();
     }
 
     /**

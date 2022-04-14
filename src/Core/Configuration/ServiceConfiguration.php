@@ -16,9 +16,9 @@ class ServiceConfiguration{
         }
         if($this->services !== null && array_key_exists($name, $this->services)){
             
-            if($name == "security"){
+            if($name == "security" || $name == "admin"){
                 //Prise en compte des règles définies par le framework dans le dossier DefaultApp (Ex:pour l'administration)
-                $this->services[$name] = array_merge($this->services[$name], $this->defaultAppServices["security"]);
+                $this->services[$name] = array_merge($this->services[$name], $this->defaultAppServices[$name]);
             }
             return $this->services[$name];
         }else 

@@ -78,12 +78,12 @@
                 <h3>Application</h3>
                 <div>
                     <?php if(count($entitiesAdmin) > 0) { ?>
-                    <?php foreach($entitiesAdmin as $entityAdmin){ ?>
+                    <?php foreach($entitiesAdmin as $entityAdmin){ if(!$entityAdmin->isBuiltin){?>
                         <div class="element">
                             <a href="<?= $url("admin-entity-list", ["entityName" => $entityAdmin->getName()]) ?>" class="title"><?= $entityAdmin->getName() ?></a>
                             <a href="<?= $url("admin-entity-add", ["entityName" => $entityAdmin->getName()]) ?>">Ajouter</a>
                         </div>
-                    <?php } ?>
+                    <?php }} ?>
                     <?php }else{ ?>
                         <div class="alert">Aucune entité enregistrée pour le service d'administration</div>
                     <?php } ?>

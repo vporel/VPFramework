@@ -29,6 +29,7 @@ class AdminController extends DefaultAppController
 			if($request->get("username") != null){
 				$admin = $repo->findOneBy(["userName" => $request->get("username")]);
 				if($admin != null){
+					echo $admin->getPassword(), " - ", sha1($request->get("password"));
 					if($admin->getPassword() == sha1($request->get("password"))){
 						Security::login($admin, AdminRepository::class);
 						$this->redirectRoute("admin");
@@ -54,7 +55,7 @@ class AdminController extends DefaultAppController
 					$admin->setUserName($request->get("username"))->setPassword(sha1($request->get("password")));
 					$this->em->persist($admin);
 					$this->em->flush();
-					$this->redirectRoute("adminLogin");
+					$this->redirectRoute("admin-login");
 				}else{
 					$error = "Les mots de passe ne sont pas identiques";
 				}

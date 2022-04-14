@@ -58,4 +58,8 @@ class EntityAdmin
     public function getMetaData(EntityManager $entityManager){
         return $entityManager->getClassMetaData($this->getEntityClass());
     }
+
+    public function isBuiltin(){
+        return in_array($this->getName(), ["Admin", "AdminGroup"]);
+    }
 }

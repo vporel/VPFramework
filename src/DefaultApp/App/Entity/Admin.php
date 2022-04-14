@@ -34,6 +34,13 @@ class Admin implements UserInterface
      */
     private $isSuperAdmin;
 
+     /**
+      * 
+     * @ORM\ManyToOne(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroup", inversedBy = "admin")
+     * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable = false)
+     */
+    private $group;
+
     public function __construct(bool $isSuperAdmin)
     {
         $this->isSuperAdmin = $isSuperAdmin;
@@ -82,6 +89,18 @@ class Admin implements UserInterface
 
     public function isSuperAdmin(){
         return $this->isSuperAdmin;
+    }
+
+    /**
+     * @return AdminGroup
+     */
+    public function getGroup(){
+        return $this->group;
+    }
+
+    public function setGroup($group){
+        $this->group = $group;
+        return $this;
     }
 
     public function getRole(){
