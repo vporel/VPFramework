@@ -1,6 +1,6 @@
 {
     "name": "vporel/vpframework",
-    "description": "Simple PHP framework",
+    "description": "Simple and light PHP framework",
     "type": "library",
     "license": "MIT",
     "minimum-stability": "stable",
