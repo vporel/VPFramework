@@ -3,12 +3,12 @@
 namespace VPFramework\DefaultApp\App\Repository;
 
 use VPFramework\Model\Repository\Repository;
-use VPFramework\DefaultApp\App\Entity\Admin;
+use VPFramework\DefaultApp\App\Entity\AdminGroup;
 
-class AdminRepository extends Repository
+class AdminGroupRepository extends Repository
 {
 
     public function getEntityClass(){
-        return Admin::class;
+        return AdminGroup::class;
     }
 }

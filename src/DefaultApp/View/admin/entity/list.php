@@ -29,15 +29,15 @@
             <tr>
                 <th></th><!-- check case -->
                 <?php foreach($fields as $field){ ?>
-                    <th><?= $field ?></th>
+                    <th><?= $field["label"] ?></th>
                 <?php } ?>
                 <th>Actions</th>
             </tr>
             <?php foreach($elements as $element){ ?>
                 <tr>
                     <td><input type="checkbox"/></td>
-                    <?php foreach($fields as $field){ $get = "get".ucfirst($field); ?>
-                        <td><?= $element->$get() ?></td>
+                    <?php foreach($fields as $field){ $fieldName = $field["name"]; ?>
+                        <td><?= $element->$fieldName ?></td>
                     <?php } ?>
                     
                     <td>

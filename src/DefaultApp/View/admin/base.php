@@ -78,7 +78,7 @@
                 <h3>Application</h3>
                 <div>
                     <?php if(count($entitiesAdmin) > 0) { ?>
-                    <?php foreach($entitiesAdmin as $entityAdmin){ if(!$entityAdmin->isBuiltin){?>
+                    <?php foreach($entitiesAdmin as $entityAdmin){ if(!$entityAdmin->isBuiltin()){?>
                         <div class="element">
                             <a href="<?= $url("admin-entity-list", ["entityName" => $entityAdmin->getName()]) ?>" class="title"><?= $entityAdmin->getName() ?></a>
                             <a href="<?= $url("admin-entity-add", ["entityName" => $entityAdmin->getName()]) ?>">Ajouter</a>
@@ -95,6 +95,14 @@
                     <div class="element">
                         <a href="<?= $url("admin-entity-list", ["entityName" => "Admin"]) ?>" class="title">Administrateurs</a>
                         <a href="<?= $url("admin-entity-add", ["entityName" => "Admin"]) ?>">Ajouter</a>
+                    </div>
+                    <div class="element">
+                        <a href="<?= $url("admin-entity-list", ["entityName" => "AdminGroup"]) ?>" class="title">Groupes d'aministrateurs</a>
+                        <a href="<?= $url("admin-entity-add", ["entityName" => "AdminGroup"]) ?>">Ajouter</a>
+                    </div>
+                    <div class="element">
+                        <a href="<?= $url("admin-entity-list", ["entityName" => "AdminGroupPermission"]) ?>" class="title">Permissions des groupes</a>
+                        <a href="<?= $url("admin-entity-add", ["entityName" => "AdminGroupPermission"]) ?>">Ajouter</a>
                     </div>
                 </div>
             </section>

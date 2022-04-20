@@ -5,6 +5,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 use Doctrine\ORM\Mapping as ORM;
+use VPFramework\Utils\FlexibleClassTrait;
 
 /**
  * @ORM\Entity
@@ -12,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class AdminGroup
 {
+    use FlexibleClassTrait;
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -22,7 +24,7 @@ class AdminGroup
     /**
      * @ORM\Column(type="string", nullable = false)
      */
-    private $name;
+    private $name = "";
 
     /**
      * @ORM\OneToMany(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroupPermission", mappedBy="admingroup", cascade={"all"}, orphanRemoval=true)
@@ -30,7 +32,7 @@ class AdminGroup
     private $permissions;
 
     /**
-     * @ORM\OneToMany(targetEntity="AVPFramework\DefaultApp\App\Entity\Admin", mappedBy="admingroup", cascade={"all"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="VPFramework\DefaultApp\App\Entity\Admin", mappedBy="admingroup", cascade={"all"}, orphanRemoval=true)
      */
     private $admins;
     

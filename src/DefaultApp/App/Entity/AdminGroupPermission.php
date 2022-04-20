@@ -4,6 +4,7 @@ namespace VPFramework\DefaultApp\App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use VPFramework\Utils\FlexibleClassTrait;
+use VPFramework\Model\Entity\Annotations\{EnumField, RelationField, Field};
 
 /**
  * @ORM\Entity
@@ -17,31 +18,37 @@ class AdminGroupPermission
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue
      */
-    private $id;
+    private $id = null;
 
     /**
+     * @EnumField(label="Entité", class="VPFramework\DefaultApp\App\Entity\ManagedEntitiesEnum")
      * @ORM\Column(type="string", nullable = false)
      */
-    private $entityClass;
+    private $entityClass = "";
 
     /**
-     * @ORM\Column(type="bool", nullable = false, defaultValue=true)
+     * @Field(label="Lecture")
+     * @ORM\Column(type="boolean", nullable = false, options={"default":true})
      */
-    private $canRead;
+    private $canRead = true;
     /**
-    * @ORM\Column(type="bool", nullable = false, defaultValue=false)
+     * @Field(label="Ajout")
+    * @ORM\Column(type="boolean", nullable = false, options={"default":false})
     */
-    private $canAdd;
+    private $canAdd = false;
     /**
-     * @ORM\Column(type="bool", nullable = false, defaultValue=false)
+     * @Field(label="Modification")
+     * @ORM\Column(type="boolean", nullable = false, options={"default":false})
      */
-    private $canUpdate;
+    private $canUpdate = false;
     /**
-     * @ORM\Column(type="bool", nullable = false, defaultValue=false)
+     * @Field(label="Suppression")
+     * @ORM\Column(type="boolean", nullable = false, options={"default":false})
      */
-    private $canDelete;
+    private $canDelete = false;
 
     /**
+     * @RelationField(label="Groupe", repositoryClass="VPFramework\DefaultApp\App\Repository\AdminGroupRepository")
      * @ORM\ManyToOne(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroup", inversedBy = "admingrouppermission")
      * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable = false)
      */
@@ -125,6 +132,6 @@ class AdminGroupPermission
     
     public function __toString()
     {
-        return $this->entityClass+" [".$this->canRead.", ".$this->canAdd.", ".$this->canUpdate.", ".$this->canDelete."]";
+        return $this->group." - ".$this->entityClass." [".$this->canRead.", ".$this->canAdd.", ".$this->canUpdate.", ".$this->canDelete."]";
     }
 }

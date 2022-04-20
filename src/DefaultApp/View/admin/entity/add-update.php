@@ -56,18 +56,47 @@
     <?php if($msg != ""){ ?> 
         <div class="alert"><?= $msg ?></div>
     <?php }?>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <div>
-            <?php foreach($fields as $fieldName => $type){ $get = "get".ucfirst($fieldName); $value = $element->$get() ?? ""; ?>
+            <?php foreach($fields as $field){
+                $fieldName = $field["name"];
+                $type = $field["type"];
+                $value = $element->$fieldName ?? ""; ?>
             <span>
-                <label><?= $fieldName ?> : </label>
+                <label><?= $field["label"] ?> : </label>
                 <?php 
                     if($fieldName == "id"){
                         echo "<strong>$value</strong>";
                     }else{
                         switch($type){
                             case "integer": echo "<input type='number' name='$fieldName' value='$value'/>";break;
+                            case "NumberField": echo "<input type='number' name='$fieldName' value='$value'/>";break;
+                            case "PasswordField": echo "<input type='password' name='$fieldName'/>";break;
                             case "text": echo "<textarea name='$fieldName'>$value</textarea>";break;
+                            case "FileField": echo "<input type='file' name='$fieldName'/><br><i>Actuel : $value</i>";break;
+                            case "RelationField": 
+                                echo "<select name='$fieldName'>";
+                                echo "<option value=''>Sélectionnez un élément</option>";
+                                foreach($field["customAnnotation"]->getElements() as $optionElement){
+                                    echo "<option value='".$optionElement->id."' ";
+                                    if(is_object($value) and $value->getId() == $optionElement->id)
+                                        echo "selected";
+                                    echo ">$optionElement</option>";
+                                }
+                                echo "</select>";
+                            break;
+                            case "EnumField": 
+                                echo "<select name='$fieldName'>";
+                                echo "<option value=''>Sélectionnez un élément</option>";
+                                foreach($field["customAnnotation"]->getElements() as $optionElement){
+                                    echo "<option value='$optionElement' ";
+                                    if($value == $optionElement)
+                                        echo "selected";
+                                    echo ">$optionElement</option>";
+                                }
+                                echo "</select>";
+                            break;
+                            case "boolean": echo "<input type='checkbox' name='$fieldName'".(($value==true) ? "checked":"")."/>";break;
                             default: echo "<input type='text' name='$fieldName' value='$value'/>";break;
                         }
                     }

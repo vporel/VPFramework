@@ -2,9 +2,10 @@
 
 namespace VPFramework\DefaultApp\App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use VPFramework\Model\Entity\Annotations\{RelationField, PasswordField};
 use VPFramework\Service\Security\UserInterface;
+use VPFramework\Utils\FlexibleClassTrait;
 
 /**
  * @ORM\Entity
@@ -12,6 +13,7 @@ use VPFramework\Service\Security\UserInterface;
  */
 class Admin implements UserInterface
 {
+    use FlexibleClassTrait;
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -22,22 +24,24 @@ class Admin implements UserInterface
     /**
      * @ORM\Column(type="string", nullable = false)
      */
-    private $userName;
+    private $userName = "";
 
     /**
+     * @PasswordField()
      * @ORM\Column(type="string", nullable = false)
      */
-    private $password;
+    private $password ="";
     
     /**
      * @ORM\Column(type="boolean", nullable = false)
      */
-    private $isSuperAdmin;
+    private $isSuperAdmin = false;
 
-     /**
-      * 
+    /**
+     * Si c'est un superAdmin, alors ce champ n"est pas indispensable
+     * @RelationField(label="Groupe", repositoryClass="VPFramework\DefaultApp\App\Repository\AdminGroupRepository")
      * @ORM\ManyToOne(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroup", inversedBy = "admin")
-     * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable = false)
+     * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable = true)
      */
     private $group;
 
