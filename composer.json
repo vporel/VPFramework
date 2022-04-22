@@ -20,7 +20,7 @@
 
         "doctrine/orm": "^2.9",
         "symfony/yaml": "^4.4",
-        "symfony/cache": "^4.4"
+        "symfony/cache": "^4.4",
         "doctrine/annotations": "^1.13"
     }
 }
