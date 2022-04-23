@@ -27,11 +27,6 @@ class AdminGroupPermission
     private $entityClass = "";
 
     /**
-     * @Field(label="Lecture")
-     * @ORM\Column(type="boolean", nullable = false, options={"default":true})
-     */
-    private $canRead = true;
-    /**
      * @Field(label="Ajout")
     * @ORM\Column(type="boolean", nullable = false, options={"default":false})
     */
@@ -49,11 +44,17 @@ class AdminGroupPermission
 
     /**
      * @RelationField(label="Groupe", repositoryClass="VPFramework\DefaultApp\App\Repository\AdminGroupRepository")
-     * @ORM\ManyToOne(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroup", inversedBy = "admingrouppermission")
+     * @ORM\ManyToOne(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroup", inversedBy = "permissions")
      * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable = false)
      */
     private $group;
     
+    public function __construct(bool $canAdd, bool $canUpdate, bool $canDelete)
+    {
+        $this->canAdd = $canAdd;
+        $this->canUpdate = $canUpdate;
+        $this->canDelete = $canDelete;
+    }
     
     public function getId()
     {
@@ -82,40 +83,16 @@ class AdminGroupPermission
         return $this;
     }
 
-    public function canRead(){
-        return $this->canRead;
-    }
-
-    public function setCanRead(bool $val){
-        $this->canRead = $val;
-        return $this;
-    }
-
     public function canAdd(){
         return $this->canAdd;
-    }
-    
-    public function setCanAdd(bool $val){
-        $this->canAdd = $val;
-        return $this;
     }
 
     public function canUpdate(){
         return $this->canUpdate;
     }
-    
-    public function setCanUpdate(bool $val){
-        $this->canUpdate = $val;
-        return $this;
-    }
 
     public function canDelete(){
         return $this->canDelete;
-    }
-    
-    public function setCanDelete(bool $val){
-        $this->canDelete = $val;
-        return $this;
     }
 
     /**
@@ -132,6 +109,6 @@ class AdminGroupPermission
     
     public function __toString()
     {
-        return $this->group." - ".$this->entityClass." [".$this->canRead.", ".$this->canAdd.", ".$this->canUpdate.", ".$this->canDelete."]";
+        return $this->group." - ".$this->entityClass." [".$this->canAdd.", ".$this->canUpdate.", ".$this->canDelete."]";
     }
 }

@@ -1,6 +1,6 @@
 
 <?php
-    $_title = ($mode == "add") ? $entityAdmin." | Ajout" : $element." | Modification";
+    $_title = ($mode == "add") ? $entityAdmin->name." | Ajout" : $element." | Modification";
 ?>
 
 <?php ob_start(); ?>
@@ -57,6 +57,11 @@
         <div class="alert"><?= $msg ?></div>
     <?php }?>
     <form method="post" enctype="multipart/form-data">
+        <?php 
+            $readonly = "";
+            if(!$adminGroupPermission->canUpdate) 
+                $readonly = " readonly"
+        ?>
         <div>
             <?php foreach($fields as $field){
                 $fieldName = $field["name"];
@@ -69,13 +74,17 @@
                         echo "<strong>$value</strong>";
                     }else{
                         switch($type){
-                            case "integer": echo "<input type='number' name='$fieldName' value='$value'/>";break;
-                            case "NumberField": echo "<input type='number' name='$fieldName' value='$value'/>";break;
-                            case "PasswordField": echo "<input type='password' name='$fieldName'/>";break;
-                            case "text": echo "<textarea name='$fieldName'>$value</textarea>";break;
-                            case "FileField": echo "<input type='file' name='$fieldName'/><br><i>Actuel : $value</i>";break;
+                            case "integer": echo "<input type='number' name='$fieldName' value='$value' $readonly/>";break;
+                            case "NumberField": echo "<input type='number' name='$fieldName' value='$value' $readonly/>";break;
+                            case "PasswordField": echo "<input type='password' name='$fieldName' $readonly/>";break;
+                            case "text": echo "<textarea name='$fieldName' $readonly>$value</textarea>";break;
+                            case "FileField": 
+                                if($readonly == "")
+                                    echo "<input type='file' name='$fieldName'/><br>";
+                                echo "<i>Actuel : $value</i>";
+                            break;
                             case "RelationField": 
-                                echo "<select name='$fieldName'>";
+                                echo "<select name='$fieldName' $readonly>";
                                 echo "<option value=''>Sélectionnez un élément</option>";
                                 foreach($field["customAnnotation"]->getElements() as $optionElement){
                                     echo "<option value='".$optionElement->id."' ";
@@ -86,7 +95,7 @@
                                 echo "</select>";
                             break;
                             case "EnumField": 
-                                echo "<select name='$fieldName'>";
+                                echo "<select name='$fieldName' $readonly>";
                                 echo "<option value=''>Sélectionnez un élément</option>";
                                 foreach($field["customAnnotation"]->getElements() as $optionElement){
                                     echo "<option value='$optionElement' ";
@@ -97,7 +106,7 @@
                                 echo "</select>";
                             break;
                             case "boolean": echo "<input type='checkbox' name='$fieldName'".(($value==true) ? "checked":"")."/>";break;
-                            default: echo "<input type='text' name='$fieldName' value='$value'/>";break;
+                            default: echo "<input type='text' name='$fieldName' value='$value' $readonly/>";break;
                         }
                     }
                 ?>
@@ -105,10 +114,12 @@
             <?php } ?>
         </div>
         <div id="buttons">
-            <?php if($mode != "add") { ?>
-                <a class="btn btn-bad" href="<?= $url("admin-entity-delete", ["entityName" => $entityAdmin, "id" => $element->getId()]) ?>">Supprimer</a>
+            <?php if($mode != "add" && $adminGroupPermission->canDelete) { ?>
+                <a class="btn btn-bad" href="<?= $url("admin-entity-delete", ["entityName" => $entityAdmin->name, "id" => $element->getId()]) ?>">Supprimer</a>
             <?php } ?>
-            <input class="btn" value="<?= ($mode == "add") ? "Terminer" : "Enregistrer" ?>" type="submit"/>
+            <?php if($adminGroupPermission->canUpdate) { ?>
+                <input class="btn" value="<?= ($mode == "add") ? "Ajouter" : "Modifier" ?>" type="submit"/>
+            <?php } ?>
         </div>
     </form>
 <?php $_main = ob_get_clean(); ?>

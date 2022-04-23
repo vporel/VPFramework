@@ -31,6 +31,7 @@
             justify-content: space-between;align-items: center;position: sticky;top:0;
         }
         header h2{margin:0;color:white;text-shadow:1px 1px 1px black;}
+        header h2 a{color:inherit;}
         
         header nav{display: flex;align-items: center;justify-content: flex-end;}
         header nav a{color:white;margin:0 5px;}
@@ -64,7 +65,7 @@
 </head>
 <body>
     <header>
-        <h2>Administration VPFramework</h2>
+        <h2><a href="/admin">Administration VPFramework</a></h2>
         <nav>
             <h4>Bienvenu <?= $app->user ?>, </h4>
             <a href="/">Aller au site</a> / 
@@ -78,17 +79,37 @@
                 <h3>Application</h3>
                 <div>
                     <?php if(count($entitiesAdmin) > 0) { ?>
-                    <?php foreach($entitiesAdmin as $entityAdmin){ if(!$entityAdmin->isBuiltin()){?>
-                        <div class="element">
-                            <a href="<?= $url("admin-entity-list", ["entityName" => $entityAdmin->getName()]) ?>" class="title"><?= $entityAdmin->getName() ?></a>
-                            <a href="<?= $url("admin-entity-add", ["entityName" => $entityAdmin->getName()]) ?>">Ajouter</a>
-                        </div>
-                    <?php }} ?>
-                    <?php }else{ ?>
-                        <div class="alert">Aucune entité enregistrée pour le service d'administration</div>
-                    <?php } ?>
+                    <?php 
+                        $haveOneReadPermission = false;
+                        foreach($entitiesAdmin as $entityAdmin){ 
+                            if(!$entityAdmin->isBuiltin()){
+                                $permission = $app->user->getPermission($entityAdmin->getEntityClass());
+                                if($permission != null){ //Droit de lecture
+                                    $haveOneReadPermission = true;
+                        ?>
+                            <div class="element">
+                                <a href="<?= $url("admin-entity-list", ["entityName" => $entityAdmin->getName()]) ?>" class="title"><?= $entityAdmin->getName() ?></a>
+                                <?php 
+                                    if($permission->canAdd) { 
+                                ?>
+                                    <a href="<?= $url("admin-entity-add", ["entityName" => $entityAdmin->getName()]) ?>">Ajouter</a>
+                            </div>
+                        <?php 
+                                    }
+                                }
+                            }
+                        } 
+                        if(!$haveOneReadPermission)
+                            echo "<div class='alert'>Vous n'avez le droit de lecture sur aucune des entités présentes</div>";
+                        }else{
+                            echo "<div class='alert'>Aucune entité enregistrée pour le service d'administration</div>";
+                        }
+                    ?>
                 </div>
             </section>
+            <?php 
+                if($app->user->isSuperAdmin) { 
+            ?>
             <section>
                 <h3>Administration</h3>
                 <div>
@@ -106,6 +127,7 @@
                     </div>
                 </div>
             </section>
+            <?php } ?>
         </aside>
         <main>
             <?= $_main ?? "" ?>

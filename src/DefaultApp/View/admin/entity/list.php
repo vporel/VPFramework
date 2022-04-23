@@ -1,6 +1,6 @@
 
 <?php
-    $_title = $entityAdmin." | Liste";
+    $_title = $entityAdmin->name." | Liste";
 ?>
 
 <?php ob_start(); ?>
@@ -19,6 +19,7 @@
             background:var(--secondary-color);
             color:white;
             padding:5px;
+            margin:2px;
         }
     </style>
 <?php $_styles = ob_get_clean(); ?>
@@ -41,8 +42,10 @@
                     <?php } ?>
                     
                     <td>
-                        <a href="<?= $url("admin-entity-update", ["entityName" => $entityAdmin, "id" => $element->getId()]) ?>" class="action">Modifier</a>
-                        <a href="<?= $url("admin-entity-delete", ["entityName" => $entityAdmin, "id" => $element->getId()]) ?>" class="action">Supprimer</a>
+                        <a href="<?= $url("admin-entity-update", ["entityName" => $entityAdmin->name, "id" => $element->getId()]) ?>" class="action">Afficher</a>
+                        <?php if($adminGroupPermission->canDelete){ ?>
+                            <a href="<?= $url("admin-entity-delete", ["entityName" => $entityAdmin->name, "id" => $element->getId()]) ?>" class="action">Supprimer</a>
+                        <?php } ?>
                     </td>
                 </tr>
             <?php } ?>

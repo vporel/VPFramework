@@ -15,10 +15,11 @@ use VPFramework\Model\Entity\Annotations\RelationField;
 use VPFramework\Model\Entity\Annotations\TextLineField;
 use VPFramework\Utils\AnnotationReader;
 use VPFramework\Utils\FileUpload;
+use VPFramework\Utils\FileUploadException;
 
 class EntityAdminController extends DefaultAppController
 {
-	private $em, $entitiesAdmin, $entityAdmin, $request;
+	private $em, $entitiesAdmin, $entityAdmin, $request, $adminGroupPermission;
 	public function __construct(EntityManager $em, ServiceConfiguration $serviceConfig, Request $request){
 		$this->em = $em;
 		$this->request = $request;
@@ -26,6 +27,12 @@ class EntityAdminController extends DefaultAppController
 		foreach($this->entitiesAdmin as $entityAdmin){
 			if($entityAdmin->getName() == $this->request->get("entityName"))
 				$this->entityAdmin = $entityAdmin;
+		}
+		if(
+			$this->entityAdmin == null || 
+			($this->adminGroupPermission = $this->getUser()->getPermission($this->entityAdmin->getEntityClass())) == null
+		){
+			$this->redirectRoute("admin");
 		}
 	}
 
@@ -41,8 +48,9 @@ class EntityAdminController extends DefaultAppController
 		}
 		$elements = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findBy([], ["-id"]);
 		return $this->render("admin/entity/list.php", [
-			"entityAdmin" => $this->entityAdmin->getName(), 
+			"entityAdmin" => $this->entityAdmin, 
 			"entitiesAdmin" => $this->entitiesAdmin, 
+			"adminGroupPermission" => $this->adminGroupPermission, 
 			"fields" => $fields,
 			"elements" => $elements
 		]);
@@ -69,8 +77,9 @@ class EntityAdminController extends DefaultAppController
 		}
 		return $this->render("admin/entity/add-update.php", [
 			"mode" => "add",
-			"entityAdmin" => $this->entityAdmin->getName(), 
+			"entityAdmin" => $this->entityAdmin, 
 			"entitiesAdmin" => $this->entitiesAdmin, 
+			"adminGroupPermission" => $this->adminGroupPermission, 
 			"fields" => $fields,
 			"element" => $element,
 			"msg"=>$msg
@@ -95,8 +104,9 @@ class EntityAdminController extends DefaultAppController
 		}
 		return $this->render("admin/entity/add-update.php", [
 			"mode" => "update",
-			"entityAdmin" => $this->entityAdmin->getName(), 
+			"entityAdmin" => $this->entityAdmin, 
 			"entitiesAdmin" => $this->entitiesAdmin, 
+			"adminGroupPermission" => $this->adminGroupPermission, 
 			"fields" => $fields,
 			"element" => $element,
 			"msg"=>$msg
@@ -129,9 +139,15 @@ class EntityAdminController extends DefaultAppController
 				$value = $this->request->get($fieldName);
 				$customFieldAnnotation = $field["customAnnotation"];
 				if($customFieldAnnotation instanceof FileField){
-					$fileBaseName = FileUpload::upload($fieldName, $customFieldAnnotation->folder, $customFieldAnnotation->extensions); 
-					if($fileBaseName != ""){
-						$metaData->setFieldValue($object, $fieldName, $fileBaseName);
+					try{
+						$fileBaseName = FileUpload::upload($fieldName, $customFieldAnnotation->folder, $customFieldAnnotation->extensions); 
+						if($fileBaseName != ""){
+							$metaData->setFieldValue($object, $fieldName, $fileBaseName);
+						}
+					}catch(FileUploadException $e){
+						if($e->getCode() == FileUploadException::FILE_NOT_RECEIVED && !$field["nullable"]){
+							$msg = "Choisissez un fichier pour le champ ".$field["label"];
+						}
 					}
 				}elseif($customFieldAnnotation instanceof RelationField){
 					if($value != null)

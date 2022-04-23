@@ -27,12 +27,12 @@ class AdminGroup
     private $name = "";
 
     /**
-     * @ORM\OneToMany(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroupPermission", mappedBy="admingroup", cascade={"all"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroupPermission", mappedBy="group", cascade={"all"}, orphanRemoval=true)
      */
     private $permissions;
 
     /**
-     * @ORM\OneToMany(targetEntity="VPFramework\DefaultApp\App\Entity\Admin", mappedBy="admingroup", cascade={"all"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="VPFramework\DefaultApp\App\Entity\Admin", mappedBy="group", cascade={"all"}, orphanRemoval=true)
      */
     private $admins;
     
@@ -74,6 +74,31 @@ class AdminGroup
     public function getPermissions(): Collection
     {
         return $this->permissions;
+    }
+
+    /**
+     * Retourne la permission du groupe concernant l'enttité passée en paramètre
+     * Si la valeur retournée est NULL, alors, le groupe n'a mème pas le droit de lire cette entité
+     * @return AdminGroupPermission|null 
+     */
+    public function getPermission(string $entityClass): ?AdminGroupPermission
+    {
+        $permission = null;
+        foreach($this->permissions->getIterator() as $i => $p){
+            if($p->getEntityClass() == $entityClass){
+                $permission = $p;
+            }
+        }
+
+        return $permission;
+    }
+
+    /**
+     * @return bool true si le groupe a la permission de lire l'entité et éventuellement de modifier ses instances
+     */
+    public function canRead(string $entityClass): bool
+    {
+        return $this->getPermission($entityClass) != null;
     }
 
     public function getAdmins(): Collection

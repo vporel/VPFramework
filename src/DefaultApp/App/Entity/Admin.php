@@ -119,4 +119,19 @@ class Admin implements UserInterface
     {
         return $this->userName;
     }
+
+    /**
+     * Retourne la permission du groupe concernant l'enttité passée en paramètre
+     * Si la valeur retournée est NULL, alors, le groupe n'a mème pas le droit de lire cette entité
+     * @return AdminGroupPermission|null 
+     */
+    public function getPermission(string $entityClass): ?AdminGroupPermission
+    {
+        if($this->isSuperAdmin){
+            return new AdminGroupPermission(true, true, true);
+        }else{
+            return $this->group->getPermission($entityClass);
+        }
+    }
+
 }

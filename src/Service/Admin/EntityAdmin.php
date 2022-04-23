@@ -14,9 +14,12 @@ use VPFramework\Model\Entity\Annotations\EnumField;
 use VPFramework\Model\Entity\Annotations\NumberField;
 use VPFramework\Model\Entity\Annotations\PasswordField;
 use VPFramework\Model\Entity\Annotations\TextLineField;
+use VPFramework\Utils\FlexibleClassTrait;
 
 class EntityAdmin
 {  
+    use FlexibleClassTrait;
+
     private $entityClass, $repositoryClass, $mainFields;  
     /**
      * __construct
