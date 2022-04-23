@@ -15,4 +15,5 @@ return [
     new Route("admin-entity-add", EntityAdminController::class, "add", "/admin/{entityName}/add"),
     new Route("admin-entity-update", EntityAdminController::class, "update", "/admin/{entityName}/{id}/update"),
     new Route("admin-entity-delete", EntityAdminController::class, "delete", "/admin/{entityName}/{id}/delete"),
+    new Route("admin-entity-delete-many", EntityAdminController::class, "deleteMany", "/admin/{entityName}/delete-many"),
 ];

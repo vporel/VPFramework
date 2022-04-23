@@ -12,10 +12,16 @@
             --secondary-color:rgb(60,0,150);
         }
         a{text-decoration: none;}
-        .btn{padding:5px 10px;background:var(--primary-color);border:0; color:white;font-size:16px;}
+        .btn{padding:5px 10px;background:var(--primary-color);border:0; color:white;
+            font-size:16px;}
         .btn:hover{background:var(--primary-color-lighten);}
         .btn-bad{background:rgb(200,0, 0);}
         .btn-bad:hover{background:rgb(230,0, 0);}
+        .btn-secondary{background:var(--secondary-color);}
+        .btn-secondary:hover{background:rgb(80,0, 180);}
+        .btn-disable{background:lightgray;}
+        .btn-disable:hover{background:lightgray;}
+        .cursor-pointer{cursor: pointer;}
         
         .alert{
             width:100%;margin:auto;padding:10px;margin-top:10px;

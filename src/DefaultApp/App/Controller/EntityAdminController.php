@@ -65,12 +65,23 @@ class EntityAdminController extends DefaultAppController
 		else
 			$element = new $class();
 		$msg = "";
+		$continueAdd = false;
 		if($this->request->getMethod() == "POST"){
 			$result = $this->hydrateObject($element);
+			$continueAdd = $this->request->get("continueAdd") ?? false;
 			if($result == ""){
 				$this->em->persist($element);
 				$this->em->flush();
-				return $this->redirectRoute("admin-entity-update", ["entityName" => $this->entityAdmin->getName(), "id"=>$element->getId()]);
+				if(!$continueAdd)
+					return $this->redirectRoute("admin-entity-update", ["entityName" => $this->entityAdmin->getName(), "id"=>$element->getId()]);
+				else{
+					//Réinitialisation
+					$msg = "Elément ajouté avec succès";
+					if($this->entityAdmin->getEntityClass() == Admin::class)
+						$element = new Admin(false);
+					else
+						$element = new $class();
+				}
 			}else{
 				$msg = $result;
 			}
@@ -82,7 +93,8 @@ class EntityAdminController extends DefaultAppController
 			"adminGroupPermission" => $this->adminGroupPermission, 
 			"fields" => $fields,
 			"element" => $element,
-			"msg"=>$msg
+			"msg"=>$msg,
+			"continueAdd"=> $continueAdd
 		]);
 	}
 
@@ -115,9 +127,18 @@ class EntityAdminController extends DefaultAppController
 
 	public function delete(){
 		
-		$fields = $this->entityAdmin->getFields($this->em);
 		$element = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->find($this->request->get("id"));
 		$this->em->remove($element);
+		$this->em->flush();
+		return $this->redirectRoute("admin-entity-list", ["entityName" => $this->entityAdmin->getName()]);
+	}
+
+	public function deleteMany(){
+		$ids = explode("-", $this->request->get("ids"));
+		foreach($ids as $id){
+			$element = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->find($id);
+			$this->em->remove($element);
+		}
 		$this->em->flush();
 		return $this->redirectRoute("admin-entity-list", ["entityName" => $this->entityAdmin->getName()]);
 	}

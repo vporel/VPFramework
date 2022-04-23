@@ -44,9 +44,10 @@
         display:flex;
         justify-content: flex-end;
         margin-top:10px;
+        align-items:center;
     }
     form #buttons *{
-        margin:0 3px
+        margin:0 3px;
     }
 </style>
 <?php $_styles = ob_get_clean(); ?>
@@ -114,11 +115,16 @@
             <?php } ?>
         </div>
         <div id="buttons">
+            
+            <?php if($mode == "add") {
+                echo "<input name='continueAdd' type='checkbox'".(($continueAdd) ? "checked":"")."/><label>Continuer l'ajout</label>";
+                } 
+            ?>
+            <?php if($adminGroupPermission->canUpdate) { ?>
+                <input class="btn" value="<?= ($mode == "add") ? "Enregistrer" : "Modifier" ?>" type="submit"/>
+            <?php } ?>
             <?php if($mode != "add" && $adminGroupPermission->canDelete) { ?>
                 <a class="btn btn-bad" href="<?= $url("admin-entity-delete", ["entityName" => $entityAdmin->name, "id" => $element->getId()]) ?>">Supprimer</a>
-            <?php } ?>
-            <?php if($adminGroupPermission->canUpdate) { ?>
-                <input class="btn" value="<?= ($mode == "add") ? "Ajouter" : "Modifier" ?>" type="submit"/>
             <?php } ?>
         </div>
     </form>
