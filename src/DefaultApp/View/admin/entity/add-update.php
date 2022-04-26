@@ -84,9 +84,11 @@
                             case "RelationField": 
                                 echo "<select name='$fieldName' $readonly>";
                                 echo "<option value=''>Sélectionnez un élément</option>";
+                                $keyField = $field["customAnnotation"]->keyField;
                                 foreach($field["customAnnotation"]->getElements() as $optionElement){
-                                    echo "<option value='".$optionElement->id."' ";
-                                    if(is_object($value) and $value->getId() == $optionElement->id)
+                                    
+                                    echo "<option value='".$optionElement->$keyField."' ";
+                                    if(is_object($value) and $value->$keyField == $optionElement->$keyField)
                                         echo "selected";
                                     echo ">$optionElement</option>";
                                 }
@@ -95,11 +97,11 @@
                             case "EnumField": 
                                 echo "<select name='$fieldName' $readonly>";
                                 echo "<option value=''>Sélectionnez un élément</option>";
-                                foreach($field["customAnnotation"]->getElements() as $optionElement){
-                                    echo "<option value='$optionElement' ";
-                                    if($value == $optionElement)
+                                foreach($field["customAnnotation"]->getElements() as $key => $label){
+                                    echo "<option value='$key' ";
+                                    if($value == $key)
                                         echo "selected";
-                                    echo ">$optionElement</option>";
+                                    echo ">$label</option>";
                                 }
                                 echo "</select>";
                             break;

@@ -10,7 +10,8 @@ interface Enum
 {
     /**
      * Liste des valeurs de l'énumération
-     * @return array
+     * Les clés sont les valeurs gardées et les valeurs associées aux clés sont affichées dans les formulaires
+     * @return array<int|string, string>
      */
     public function list() :array;
 }

@@ -39,7 +39,7 @@ class Admin extends Entity implements UserInterface
      */
     private $group; 
 
-    public function __construct(bool $isSuperAdmin)
+    public function __construct(bool $isSuperAdmin = false)
     {
         $this->isSuperAdmin = $isSuperAdmin;
     }

@@ -11,9 +11,11 @@ class ManagedEntitiesEnum implements Enum
         $list = [];
         $serviceConfig = DIC::getInstance()->get("VPFramework\Core\Configuration\ServiceConfiguration");
         $this->entitiesAdmin = $serviceConfig->getService("admin");
+        $i = 0;
 		foreach($this->entitiesAdmin as $entityAdmin){
             if(!$entityAdmin->isBuiltin())
-			$list[] = $entityAdmin->getEntityClass();
+			$list[$entityAdmin->getEntityClass()] = $entityAdmin->getName();
+            $i++;
 		}
         return $list;
     }

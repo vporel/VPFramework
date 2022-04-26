@@ -125,7 +125,15 @@
                 <tr>
                     <td><input type="checkbox" class="line-checkbox" data-id="<?= $element->id ?>"/></td>
                     <?php foreach($fields as $field){ $fieldName = $field["name"]; ?>
-                        <td class="<?= $fieldName ?>"><?= $element->$fieldName ?></td>
+                        <td class="<?= $fieldName ?>">
+                            <?php
+                                if($field["type"] == "EnumField")
+                                    echo $field["customAnnotation"]->getElements()[$element->$fieldName];
+                                else 
+                                    echo $element->$fieldName;
+                                    
+                            ?>
+                        </td>
                     <?php } ?>
                     
                     <td>

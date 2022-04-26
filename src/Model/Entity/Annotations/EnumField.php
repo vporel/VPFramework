@@ -9,6 +9,7 @@ use VPFramework\Core\DIC;
  */
 class EnumField extends Field
 {
+    private $elements;
 
     /**
      * Une classe implémentant l'interface VPFramework\Model\Entity\Enum
@@ -21,8 +22,9 @@ class EnumField extends Field
      */
     public function getElements()
     {
-        $classObject = DIC::getInstance()->get($this->class);
-        return $classObject->list();
+        if($this->elements === null)
+            $this->elements = DIC::getInstance()->get($this->class)->list();
+        return $this->elements;
     }
 
 }

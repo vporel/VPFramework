@@ -52,10 +52,7 @@ class EntityAdminController extends DefaultAppController
 		
 		$fields = $this->entityAdmin->getFields($this->em);
 		$class = $this->entityAdmin->getEntityClass();
-		if($this->entityAdmin->getEntityClass() == Admin::class)
-			$element = new Admin(false);
-		else
-			$element = new $class();
+		$element = new $class();
 		$msg = "";
 		$continueAdd = false;
 		if($this->request->getMethod() == "POST"){

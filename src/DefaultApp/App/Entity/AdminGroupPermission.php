@@ -30,17 +30,17 @@ class AdminGroupPermission
      * @Field(label="Ajout")
     * @ORM\Column(type="boolean", nullable = false, options={"default":false})
     */
-    private $canAdd = false;
+    private $canAdd;
     /**
      * @Field(label="Modification")
      * @ORM\Column(type="boolean", nullable = false, options={"default":false})
      */
-    private $canUpdate = false;
+    private $canUpdate;
     /**
      * @Field(label="Suppression")
      * @ORM\Column(type="boolean", nullable = false, options={"default":false})
      */
-    private $canDelete = false;
+    private $canDelete;
 
     /**
      * @RelationField(label="Groupe", repositoryClass="VPFramework\DefaultApp\App\Repository\AdminGroupRepository")
@@ -49,7 +49,7 @@ class AdminGroupPermission
      */
     private $group;
     
-    public function __construct(bool $canAdd, bool $canUpdate, bool $canDelete)
+    public function __construct(bool $canAdd = false, bool $canUpdate = false, bool $canDelete = false)
     {
         $this->canAdd = $canAdd;
         $this->canUpdate = $canUpdate;
