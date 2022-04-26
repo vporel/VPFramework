@@ -20,7 +20,9 @@ class EntityAdmin
 {  
     use FlexibleClassTrait;
 
-    private $entityClass, $repositoryClass, $mainFields;  
+    private $entityClass, $repositoryClass, $mainFieldsNames;
+
+    private $filterFieldsNames;  
     /**
      * __construct
      * 
@@ -28,14 +30,18 @@ class EntityAdmin
      *
      * @param string $entityClass Ex : User::class
      * @param string $repositoryClass Ex : UserRepository::class
-     * @param array $mainFields La liste des champs qui seront affichés lorsqu'on présentera la liste des éléments
+     * @param array $mainFieldsNames La liste des champs qui seront affichés lorsqu'on présentera la liste des éléments
+     * @param array $filterFieldsNames La liste des champs qui seront utilisés comme critère pour le filtre
+     * Les éléments du filterFieldsNames qui sont du type text (pour textarea) ne seront pas pris en compte
+     * Si le paramètre $mainFields n'est pas vide, les éléments du $filterFieldsNames qui n'y figurent pas ne seront pas pris en compte
      * @return void
      */
-    public function __construct(string $entityClass, string $repositoryClass, array $mainFields = [])
+    public function __construct(string $entityClass, string $repositoryClass, array $mainFieldsNames = [], array $filterFieldsNames = [])
     {
         $this->entityClass = $entityClass;
         $this->repositoryClass = $repositoryClass;
-        $this->mainFields = $mainFields;
+        $this->mainFieldsNames = $mainFieldsNames;
+        $this->filterFieldsNames = $filterFieldsNames;
     }
 
     public function getEntityClass(){
@@ -46,8 +52,32 @@ class EntityAdmin
         return $this->repositoryClass;
     }
 
-    public function getMainFields(){
-        return $this->mainFields;
+    /**
+     * @param EntityManager $em
+     * @return array
+     */
+    public function getMainFields($em){
+        $fields = [];
+        foreach($this->getFields($em) as $field){
+            if(in_array($field["name"], $this->mainFieldsNames))
+                $fields[] = $field;
+        }
+		return (count($fields) > 0) ? $fields : $this->getFields($em);
+    }
+
+    /**
+     * Retourne les champs utilisés pour le filtre, 
+     * Il s'agira des éléments de la propriété mainFieldsNames qui apparaisent dans la propriété filterFieldsNames
+     * @param EntityManager $em
+     * @return array
+     */
+    public function getFilterFields($em){
+        $fields = [];
+        foreach($this->getMainFields($em) as $field){
+            if(in_array($field["name"], $this->filterFieldsNames))
+                $fields[] = $field;
+        }
+		return $fields;
     }
 
     /**

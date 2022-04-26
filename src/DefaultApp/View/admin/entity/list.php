@@ -21,16 +21,96 @@
             padding:5px;
             margin:2px;
         }
+        main{
+            position:relative;
+        }
+        #filter-pane{
+            width:100%;
+        }
+        #filter-pane #filters{
+            background:white;display:none;
+            border-left: 3px solid var(--primary-color);
+            padding:5px;
+        }
+        #list{
+
+        }
+        #filter-pane h3{
+            margin: 0;padding:5px 0;
+            display:flex;
+            justify-content: space-between;
+        }
+        #filter-pane h3 span{
+            cursor:pointer;
+            transition:all .2s ease;margin-right:5px;
+        }
+        #filter-pane h3 span:hover{
+            color:var(--primary-color);
+            transform:scale(1.7);
+        }
+        #filter-pane label{
+            display:inline-block;width:120px;vertical-align: center;
+        }
+        #filter-pane select, #filter-pane input[type="text"], #filter-pane input[type="password"], #filter-pane input[type="number"]{
+            height: 30px;
+            font-family:calibri;
+            width:200px;
+        }
+
+        #filter-pane select:hover, #filter-pane input[type="text"]:hover, #filter-pane input[type="password"]:hover, #filter-pane input[type="number"]:hover,
+        #filter-pane select:focus, #filter-pane input[type="text"]:focus, #filter-pane input[type="password"]:focus, #filter-pane input[type="number"]:focus{
+            color:var(--primary-color);
+        }
+        .filter{
+            margin:3px 0;
+        }
+
     </style>
 <?php $_styles = ob_get_clean(); ?>
 
 <?php ob_start(); ?>
+    <?php if(count($filterFields) > 0){ ?>
+    <div id="filter-pane">
+        <h3><font>Filtres</font> <span>&#10095;&#10095;</span><span style="display:none">&#10094;&#10094;</span></h3>
+        <div id="filters">
+            <?php 
+                foreach($filterFields as $field){ 
+                $fieldName = $field["name"];
+            ?>
+                <div class="filter" data-type="<?= $field["type"] ?>" data-field-name="<?= $fieldName ?>">
+                    <label><?= $field["label"] ?> : </label>
+                    <?php 
+                    if($field["type"] ==  "integer" || $field["type"] ==  "NumberField"){
+                        echo " >= <input type='number' data-type='min'/>";
+                        echo " ET <= <input type='number' data-type='max'/>";
+                    }elseif($field["type"] ==  "RelationField" || $field["type"] ==  "EnumField"){ 
+                        echo "<select>";
+                        echo "<option value=''>Peu importe</option>";
+                        foreach($field["customAnnotation"]->getElements() as $optionElement){
+                            echo "<option value='$optionElement'>$optionElement</option>";
+                        }
+                        echo "</select>";
+                    }elseif($field["type"] ==  "boolean"){
+                        echo "<select>";
+                        echo "<option value=''>Peu importe</option>";
+                        echo "<option value='1'>Vrai</option>";
+                        echo "<option value='0'>Faux</option>";
+                        echo "</select>";
+                    }else{
+                        echo "<input type='text'/>";
+                    } 
+                     ?>
+                </div>
+            <?php } ?>
+        </div>
+    </div>
+    <?php } ?>
     <table id="list" cellspacing="0" cellpadding="3">
         <thead>
             <tr><!-- Top -->
-                <tr colspan="<?= count($fields)+2 ?>">
+                <td colspan="<?= count($fields)+2 ?>">
                     <button id="deleteSelectionBtn" class="btn btn-disable cursor-pointer" style="margin: 3px 0">Supprimer la selection</button>
-                </tr>
+                </td>
             </tr>
             <tr>
                 <th></th><!-- check case -->
@@ -45,7 +125,7 @@
                 <tr>
                     <td><input type="checkbox" class="line-checkbox" data-id="<?= $element->id ?>"/></td>
                     <?php foreach($fields as $field){ $fieldName = $field["name"]; ?>
-                        <td><?= $element->$fieldName ?></td>
+                        <td class="<?= $fieldName ?>"><?= $element->$fieldName ?></td>
                     <?php } ?>
                     
                     <td>
@@ -65,6 +145,78 @@
         <?php include ASSETS."/js/jquery.js"; ?>
     </script>
     <script type="text/javascript">
+
+
+        $('#filter-pane h3 span').click(function(){
+            $('#filter-pane #filters').slideToggle(500);
+            $('#filter-pane h3 span').toggle(-1);
+        });
+        /**
+         * object {fieldName: function(value)}
+         */
+        let filtersRules = {};
+        $('.filter').each(function(){
+            let type = $(this).attr("data-type");
+            let fieldName = $(this).attr("data-field-name");
+            if(type ==  "integer" || type ==  "NumberField"){
+                let $minInput = $(this).find("input[data-type='min']");
+                let $maxInput = $(this).find("input[data-type='max']");
+                $minInput.keyup(applyFilter);
+                $maxInput.keyup(applyFilter);
+                filtersRules[fieldName] = function(value){
+                    value = parseFloat(value);
+                    if($minInput.val() == "" && $maxInput.val() == "")
+                        return true;
+                    else if($minInput.val() != "" && $maxInput.val() == "")
+                        return value >= parseFloat($minInput.val());
+                    else if($minInput.val() == "" && $maxInput.val() != "")
+                        return value <= parseFloat($maxInput.val());
+                    else
+                        return value >= min && value <= max;
+                }
+            }else if(type ==  "RelationField" || type ==  "EnumField"){ 
+                let $select = $(this).find("select");
+                $select.change(applyFilter);
+                filtersRules[fieldName] = function(value){
+                    if($select.val() == '')
+                        return true;
+                    return value == $select.val();
+                }
+            }else if(type ==  "boolean"){
+                let $select = $(this).find("select");
+                $select.change(applyFilter);
+                filtersRules[fieldName] = function(value){
+                    if($select.val() == '')
+                        return true;
+                    return (value == $select.val()) || (value == '' && $select.val() == "0");
+                }
+            }else{
+                let $input = $(this).find("input");
+                $input.keyup(applyFilter);
+                filtersRules[fieldName] = function(value){
+                    return (new RegExp($input.val(), "i")).test(value);
+                }
+            } 
+        });
+        function applyFilter(){
+            $("#list tbody tr").each(function(){
+                let correct = true;
+                for(fieldName in filtersRules){
+                    if(!filtersRules[fieldName]($(this).find("."+fieldName).text())){
+                        correct = false;
+                        break;
+                    }
+                }
+                if(correct){
+                    $(this).show(-1);
+                }else{
+                    $(this).hide(-1);
+                }
+            });
+        }
+        applyFilter();
+
+
         let nbCheckedLines = 0;
         $('.line-checkbox').each(function(){
             $(this).click(function(){

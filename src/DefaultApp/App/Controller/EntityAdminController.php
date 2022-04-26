@@ -37,21 +37,13 @@ class EntityAdminController extends DefaultAppController
 	}
 
 	public function list(){
-		$fields = [];
-		if(count($this->entityAdmin->getMainFields()) > 0){
-			foreach($this->entityAdmin->getFields($this->em) as $field){
-				if(in_array($field["name"], $this->entityAdmin->getMainFields()))
-					$fields[] = $field;
-			}
-		}else{
-			$fields = $this->entityAdmin->getFields($this->em);
-		}
 		$elements = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findBy([], ["-id"]);
 		return $this->render("admin/entity/list.php", [
 			"entityAdmin" => $this->entityAdmin, 
 			"entitiesAdmin" => $this->entitiesAdmin, 
 			"adminGroupPermission" => $this->adminGroupPermission, 
-			"fields" => $fields,
+			"fields" => $this->entityAdmin->getMainFields($this->em),
+			"filterFields" => $this->entityAdmin->getFilterFields($this->em),
 			"elements" => $elements
 		]);
 	}
@@ -167,7 +159,9 @@ class EntityAdminController extends DefaultAppController
 						}
 					}catch(FileUploadException $e){
 						if($e->getCode() == FileUploadException::FILE_NOT_RECEIVED && !$field["nullable"]){
-							$msg = "Choisissez un fichier pour le champ ".$field["label"];
+							$msg = "Choisissez un fichier pour le champ <b>".$field["label"]."</b>";
+						}elseif($e->getCode() == FileUploadException::WRONG_EXTENSION){
+							$msg = "Champ <b>".$field["label"]."</b> invalide - <i>Mauvaise extension (".implode(", ", $customFieldAnnotation->extensions).")</i>";
 						}
 					}
 				}elseif($customFieldAnnotation instanceof RelationField){
@@ -175,7 +169,7 @@ class EntityAdminController extends DefaultAppController
 						$metaData->setFieldValue($object, $fieldName, $customFieldAnnotation->getRepository()->find($value));
 					else{
 						if(!$field["nullable"])
-							$msg = "Renseignez le champ <b>$fieldName</b>";
+							$msg = "Renseignez le champ <b>".$field["label"]."</b>";
 					}
 				}elseif($customFieldAnnotation instanceof TextLineField){
 					if(strlen($value) >= $customFieldAnnotation->minLength){
@@ -220,12 +214,12 @@ class EntityAdminController extends DefaultAppController
 					if($value != null){
 						if(!$metaData->isNullable($fieldName) && trim($value) == ""){
 							
-							$msg = "Renseignez le champ <b>$fieldName</b>";
+							$msg = "Renseignez le champ <b>".$field["label"]."</b>";
 						}
 						$metaData->setFieldValue($object, $fieldName, $value);
 					}else{
 						if(!$metaData->isNullable($fieldName)){
-							$msg = "Renseignez le champ <b>$fieldName</b>";
+							$msg = "Renseignez le champ <b>".$field["label"]."</b>";
 						}
 					}
 				}

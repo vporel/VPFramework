@@ -12,6 +12,7 @@ class Config
     public static function getConfig()
     {
         // Create a simple "default" Doctrine ORM configuration for Annotations
+
         $isDevMode = true;
         $proxyDir = null;
         $cache = null;

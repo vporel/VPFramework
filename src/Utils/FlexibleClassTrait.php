@@ -18,7 +18,7 @@ trait FlexibleClassTrait
                 //Utilisation de l'API de reflection
                 $reflecProperty = new ReflectionProperty(get_called_class(), $property);
                 $reflecProperty->setAccessible(true);
-                return $reflecProperty->getValue();
+                return $reflecProperty->getValue($this);
             }
         }
     }

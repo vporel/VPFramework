@@ -23,9 +23,7 @@
     form label{
         display:inline-block;width:150px;vertical-align: top;
     }
-    form input[type="text"], form textarea{
-        background:none;border-radius:5px;
-        border:1px solid lightgray;
+    form select, form input[type="text"], form input[type="password"], form input[type="number"], form textarea{
         height: 30px;
         font-family:calibri;
         width:500px;
@@ -34,10 +32,9 @@
         min-height: 100px;
     }
 
-    form input[type="text"]:hover, form textarea:hover,
-    form input[type="text"]:focus, form textarea:focus{
+    form select:hover, form input[type="text"]:hover, form input[type="password"]:hover, form input[type="number"]:hover, form textarea:hover,
+    form select:focus, form input[type="text"]:focus, form input[type="password"]:focus, form input[type="number"]:focus, form textarea:focus{
         color:var(--primary-color);
-        border-color:var(--primary-color);
     }
 
     form #buttons{

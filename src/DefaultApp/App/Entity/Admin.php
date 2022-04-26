@@ -38,9 +38,9 @@ class Admin implements UserInterface
     private $isSuperAdmin = false;
 
     /**
-     * Si c'est un superAdmin, alors ce champ n"est pas indispensable
+     * Si c'est un superAdmin, alors ce champ n'est pas indispensable
      * @RelationField(label="Groupe", repositoryClass="VPFramework\DefaultApp\App\Repository\AdminGroupRepository")
-     * @ORM\ManyToOne(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroup", inversedBy = "admin")
+     * @ORM\ManyToOne(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroup", inversedBy = "admins")
      * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable = true)
      */
     private $group;
