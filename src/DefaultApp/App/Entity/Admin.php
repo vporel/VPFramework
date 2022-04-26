@@ -4,6 +4,7 @@ namespace VPFramework\DefaultApp\App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use VPFramework\Model\Entity\Annotations\{RelationField, PasswordField};
+use VPFramework\Model\Entity\Entity;
 use VPFramework\Service\Security\UserInterface;
 use VPFramework\Utils\FlexibleClassTrait;
 
@@ -11,16 +12,9 @@ use VPFramework\Utils\FlexibleClassTrait;
  * @ORM\Entity
  * @ORM\Table(name="vpframework_admins")
  */
-class Admin implements UserInterface
+class Admin extends Entity implements UserInterface
 {
     use FlexibleClassTrait;
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue
-     */
-    private $id;
-
     /**
      * @ORM\Column(type="string", nullable = false)
      */
@@ -48,18 +42,6 @@ class Admin implements UserInterface
     public function __construct(bool $isSuperAdmin)
     {
         $this->isSuperAdmin = $isSuperAdmin;
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id)
-    {
-        $this->id = $id;
-
-        return $this;
     }
 
     public function getUserName(): string
