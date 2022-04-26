@@ -43,7 +43,7 @@ class Admin implements UserInterface
      * @ORM\ManyToOne(targetEntity="VPFramework\DefaultApp\App\Entity\AdminGroup", inversedBy = "admins")
      * @ORM\JoinColumn(name="group_id", referencedColumnName="id", nullable = true)
      */
-    private $group;
+    private $group; 
 
     public function __construct(bool $isSuperAdmin)
     {
