@@ -7,6 +7,7 @@ use VPFramework\Core\Configuration\ServiceConfiguration;
 use VPFramework\Core\Configuration\ServiceNotFoundException;
 use VPFramework\Core\Constants;
 use VPFramework\Core\DIC;
+use VPFramework\Model\Entity\Entity;
 
 /**
  * Classe permettant de sécurisé certaines parties de l'applciation
@@ -51,6 +52,7 @@ final class Security
                                 $_SESSION['URL-before-redirection'] = $_SESSION['URL-before-redirection'] ?? '';
                             }
                             if ($rule->getRedirection() != null && $rule->getRedirection() != "") {
+                                $_SESSION['security-rule-name'] = $rule->getName();
                                 header('Location: '.$rule->getRedirection());
                             } else {
                                 require Constants::FRAMEWORK_ROOT."/View/views/accessDenied.php";
@@ -67,10 +69,10 @@ final class Security
     }
 
     
-    public static function login($object, $repository){
+    public static function login(Entity $object, string $repositoryClass){
         $_SESSION['user'] = [];
         $_SESSION['user']['id'] = $object->getId();
-        $_SESSION['user']['repository'] = $repository;
+        $_SESSION['user']['repository'] = $repositoryClass;
     }
 
     public static function logout(){
@@ -81,6 +83,15 @@ final class Security
     public static function getURLBeforeRedirection()
     {
         return $_SESSION['URL-before-redirection'] ?? "";
+        
+    }
+
+    public static function getRuleName()
+    {
+        if(isset($_SESSION['security-rule-name']))
+            return $_SESSION['security-rule-name'];
+        else
+            throw new SecurityException("Aucune règle de sécurité n'a été appelée");
         
     }
 

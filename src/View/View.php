@@ -72,7 +72,7 @@ class View
                 else{
                     $html = '';
                     foreach($element as $src){
-                        $html .= '<script language="javascript" src="'.ASSETS_DIR.'/'.$src.'"></script>';
+                        $html .= '<script type="text/javascript" src="'.ASSETS_DIR.'/'.$src.'"></script>';
                     }
                     return $html;
                 }
