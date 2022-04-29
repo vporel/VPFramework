@@ -10,7 +10,7 @@ use VPFramework\Service\Admin\EntityAdmin;
 
 return [
     "security" => [
-        new Rule(["^/admin(?!/login|/first-admin)"], [Admin::class => []], "admin-login")
+        new Rule("", ["^/admin(?!/login|/first-admin)"], [Admin::class => []], "admin-login")
     ],
     "admin" => [
         new EntityAdmin(Admin::class, AdminRepository::class),
