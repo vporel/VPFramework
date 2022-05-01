@@ -2,6 +2,8 @@
 namespace VPFramework\Model\Entity\Annotations;
 
 use VPFramework\Core\DIC;
+use VPFramework\Model\Entity\Entity;
+use VPFramework\Model\Repository\Repository;
 
 /**
  * @Annotation
@@ -16,12 +18,6 @@ class RelationField extends Field
      */
     public $repositoryClass;
 
-    /**
-     * Le champ de l"entité dont la valeur sera conservée
-     * @default "id"
-     */
-    public $keyField = "id";
-
     public function getElements()
     {
         if($this->elements === null)
@@ -32,6 +28,10 @@ class RelationField extends Field
     public function getRepository()
     {
         return DIC::getInstance()->get($this->repositoryClass);
+    }
+
+    public function getKeyProperty(){
+        return Entity::getEntityKeyProperty(Repository::getRepositoryEntityClass($this->repositoryClass));
     }
 
 }

@@ -43,7 +43,10 @@ class FileUpload
     }
 
     private static function absoluteDestinationFolder($destinationFolder){
-        return Constants::$APP_ROOT."/Public/".$destinationFolder;
+        if($destinationFolder != null && $destinationFolder != "")
+            return Constants::$PUBLIC_FOLDER."/".$destinationFolder;
+        else
+            return Constants::$PUBLIC_FOLDER;
     }
 
     /**

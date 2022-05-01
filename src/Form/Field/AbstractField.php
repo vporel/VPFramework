@@ -8,8 +8,9 @@ abstract class AbstractField implements \Serializable
     protected $name;
     protected $options = [
             'default' => '',
-            'required' => false,
-            'isIgnored' => false, // Cette option est mise à "true" sur un champ n'étant pas un attribut de la classe entité à la quelle le formulaire est lié
+            'ignored' => false, // Cette option est mise à "true" sur un champ n'étant pas un attribut de la classe entité à la quelle le formulaire est lié
+            'nullable' => true, 
+            'readOnly' => false
         ];
     protected $error = '';
 
@@ -79,6 +80,10 @@ abstract class AbstractField implements \Serializable
         return $this->name;
     }
 
+    public function hasError()
+    {
+        return $this->error != "";
+    }
     public function getError()
     {
         return $this->error;
@@ -88,26 +93,42 @@ abstract class AbstractField implements \Serializable
     {
         return $value;
     }
+    
+    /**
+     * Code HTML du champ sans le cadre et le label
+     * Ex : return <input ...>
+     */
+    abstract protected function getCustomHTML($value);
 
-    abstract public function getFieldHTML();
-
-    public function createHTML()
+    public function getHTML($value)
     {
         /*
             Cette function est faite pour être redéfinie par la class Password uniquement
          */
         return '
             <div class="form-group">
-                <label class="form-label" for="'.$this->name.'">'.$this->label.'</label>
-                '.$this->getFieldHTML().'
+                <label class="form-label" for="'.$this->getName().'">'.$this->getLabel().'</label>
+                '.$this->getCustomHTML($value).' 
                 <span class="form-field-error text-error">'.$this->error.'</span>
+            </div>
+        ';
+    }
+
+    abstract protected function getCustomHTMLForFilter():string;
+
+    public function getHTMLForFilter(){
+        $calledClassArray = explode("\\", get_called_class());
+        return '
+            <div class="filter" data-field-class="'.end($calledClassArray).'" data-field-name="'.$this->getName().'">
+                <label>'.$this->getLabel().'</label>
+                '.$this->getCustomHTMLForFilter().' 
             </div>
         ';
     }
 
     public function isValid($value)
     {
-        if ($this->isRequired()) {
+        if (!$this->isNullable()) {
             if (trim($value) != '') {
                 return true;
             } else {
@@ -115,11 +136,16 @@ abstract class AbstractField implements \Serializable
 
                 return false;
             }
-        } else {
-            return true;
         }
+        return true;
+        
     }
 
+    /**
+     * Retourne un tableau avec les informations importantes pour le champ
+     * Cette fonction peut être appelée si par exemple, un script javascript doit utliser ces informations
+     * @return array
+     */
     public function serialize()
     {
         $calledClassArray = explode("\\", get_called_class());

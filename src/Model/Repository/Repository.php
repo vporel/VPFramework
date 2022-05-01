@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Types\Types;
 use VPFramework\Core\DIC;
 use Doctrine\ORM\Tools\SchemaTool;
+use VPFramework\DefaultApp\App\Repository\AdminRepository;
 
 /**
  * Classe repository
@@ -163,5 +164,30 @@ abstract class Repository extends EntityRepository
         $tool = new SchemaTool($em);
         $metaData = $em->getClassMetaData($this->getEntityClass());
         $tool->createSchema([$metaData]);
+    }
+
+    /**
+     * Retourne la classe entité gérée par le repository passé en paramètre
+     */
+    public static function getRepositoryEntityClass(string $repositoryClass)
+    {
+        $reflectedClass = new \ReflectionClass($repositoryClass);
+
+        if ($reflectedClass->isInstantiable()) {
+            $constructor = $reflectedClass->getConstructor();
+            if ($constructor !== null) {
+                $object = $reflectedClass->newInstanceArgs([]);
+            } else {
+                $object = new $repositoryClass();
+            }
+
+            if(is_a($object, Repository::class)){
+                return $object->getEntityClass();
+            }else{
+                throw new \Exception("La Classe $repositoryClass n'est pas une sous classe de la classe Repository");
+            }
+        }else{
+            throw new EntityException("Classe $entityClass non instanciable");
+        }
     }
 }

@@ -30,10 +30,11 @@ class Router
     /**
      * @param string $APP_ROOT Le dossier racine de l'application
      */
-    public static function start(string $APP_ROOT){
+    public static function start(string $PUBLIC_FOLDER){
         \Doctrine\Common\Annotations\AnnotationRegistry::registerLoader("class_exists");
         //Initialisation de la propriété $APP_ROOT
-        Constants::$APP_ROOT = $APP_ROOT;
+        Constants::$PUBLIC_FOLDER = $PUBLIC_FOLDER;
+        Constants::$APP_ROOT = $PUBLIC_FOLDER."/..";
         $DIC = DIC::getInstance();
         $router = $DIC->get(Router::class);
         $DIC->invoke($router, "end");

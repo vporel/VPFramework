@@ -3,9 +3,9 @@
 namespace VPFramework\Form\Field;
 
 
-class TextLine extends AbstractInput
+class TextLine extends AbstractTextLine
 {
     
-    protected function getType(){ return "text"; }
+    protected function getInputType(){ return "text"; }
 
 }

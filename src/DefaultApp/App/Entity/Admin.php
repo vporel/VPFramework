@@ -4,7 +4,7 @@ namespace VPFramework\DefaultApp\App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use VPFramework\Model\Entity\Annotations\{RelationField, PasswordField};
-use VPFramework\Model\Entity\Entity;
+use VPFramework\Model\Entity\EntityWithId;
 use VPFramework\Service\Security\UserInterface;
 use VPFramework\Utils\FlexibleClassTrait;
 
@@ -12,7 +12,7 @@ use VPFramework\Utils\FlexibleClassTrait;
  * @ORM\Entity
  * @ORM\Table(name="vpframework_admins")
  */
-class Admin extends Entity implements UserInterface
+class Admin extends EntityWithId implements UserInterface
 {
     use FlexibleClassTrait;
     /**

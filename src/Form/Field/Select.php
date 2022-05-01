@@ -19,38 +19,43 @@ class Select extends AbstractField
         }
     }
 
-    public function getElementsValueText()
+    protected function getCustomHTML($value)
     {
-        $array = [];
-
-        foreach ($this->getElements() as $value => $text) {
-            $array[] = [
-                'value' => $value,
-                'text' => $text,
-            ];
-        }
-
-        return $array;
-    }
-
-    public function getFieldHTML()
-    {
+        $value = $value ?? $this->getDefault();
         $select = '
                 <select name="'.$this->name.'">
         ';
-        foreach ($this->getElements() as $value => $text) {
-            $select .= '<option value="'.$value.'" '.($value == $this->getDefault() ? 'selected' : '').'>'.$text.'</option>';
+        foreach ($this->getElements() as $key => $text) {
+            $select .= '<option value="'.$key.'" '.($key == $value ? 'selected' : '').'>'.$text.'</option>';
         }
-
         $select .= '</select>';
 
         return $select;
     }
 
+    protected function getCustomHTMLForFilter():string
+    {
+        $html = "<select>";
+        $html .= "<option value=''>Peu importe</option>";
+        foreach($this->getElements() as $option){
+            $html .=  "<option value='$option'>$option</option>";
+        }
+        $html = "</select>";
+        return $html;
+    }
+
     public function serialize()
     {
+        $elementsValuesTexts = [];
+
+        foreach ($this->getElements() as $value => $text) {
+            $elementsValuesTexts[] = [
+                'value' => $value,
+                'text' => $text,
+            ];
+        }
         return array_merge(parent::serialize(), [
-            'elements' => $this->getElementsValueText(),
+            'elements' => $elementsValuesTexts,
         ]);
     }
 }

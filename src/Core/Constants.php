@@ -8,6 +8,8 @@ class Constants{
      * Si cette initialisation n'est pas faite, bon nombre de classes ne fonctionneront pas
      */
     public static $APP_ROOT;
+    
+    public static $PUBLIC_FOLDER;
 
     const FRAMEWORK_ROOT = __DIR__."/..";
 }

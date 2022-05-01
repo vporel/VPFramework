@@ -7,8 +7,10 @@ use VPFramework\Form\Field\Field;
 class TextArea extends AbstractField
 {
     
-    public function getFieldHTML(){
-        return '<textarea name="'.$this->name.'" class="form-control" id="'.$this->name.'">'.$this->getDefault().'</textarea>';
+    protected function getCustomHTMLForFilter(): string{}
+    public function getCustomHTML($value){
+        $value = $value ?? $this->getDefault();
+        return '<textarea name="'.$this->name.'" class="form-control" id="'.$this->name.'">'.$value.'</textarea>';
     }
 
 }

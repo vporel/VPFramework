@@ -74,48 +74,24 @@
         <h3><font>Filtres</font> <span>&#10095;&#10095;</span><span style="display:none">&#10094;&#10094;</span></h3>
         <div id="filters">
             <?php 
-                foreach($filterFields as $field){ 
-                $fieldName = $field["name"];
+                foreach($filterFields as $fieldName){ 
+                    echo $formFields[$fieldName]->getHTMLForFilter();
+                } 
             ?>
-                <div class="filter" data-type="<?= $field["type"] ?>" data-field-name="<?= $fieldName ?>">
-                    <label><?= $field["label"] ?> : </label>
-                    <?php 
-                    if($field["type"] ==  "integer" || $field["type"] ==  "NumberField"){
-                        echo " >= <input type='number' data-type='min'/>";
-                        echo " ET <= <input type='number' data-type='max'/>";
-                    }elseif($field["type"] ==  "RelationField" || $field["type"] ==  "EnumField"){ 
-                        echo "<select>";
-                        echo "<option value=''>Peu importe</option>";
-                        foreach($field["customAnnotation"]->getElements() as $optionElement){
-                            echo "<option value='$optionElement'>$optionElement</option>";
-                        }
-                        echo "</select>";
-                    }elseif($field["type"] ==  "boolean"){
-                        echo "<select>";
-                        echo "<option value=''>Peu importe</option>";
-                        echo "<option value='1'>Vrai</option>";
-                        echo "<option value='0'>Faux</option>";
-                        echo "</select>";
-                    }else{
-                        echo "<input type='text'/>";
-                    } 
-                     ?>
-                </div>
-            <?php } ?>
         </div>
     </div>
     <?php } ?>
     <table id="list" cellspacing="0" cellpadding="3">
         <thead>
             <tr><!-- Top -->
-                <td colspan="<?= count($fields)+2 ?>">
+                <td colspan="<?= count($mainFields)+2 ?>">
                     <button id="deleteSelectionBtn" class="btn btn-disable cursor-pointer" style="margin: 3px 0">Supprimer la selection</button>
                 </td>
             </tr>
             <tr>
                 <th></th><!-- check case -->
-                <?php foreach($fields as $field){ ?>
-                    <th><?= $field["label"] ?></th>
+                <?php foreach($mainFields as $fieldName => $field){ ?>
+                    <th><?= $formFields[$fieldName]->getLabel(); ?></th>
                 <?php } ?>
                 <th>Actions</th>
             </tr>
@@ -124,11 +100,11 @@
             <?php foreach($elements as $element){ ?>
                 <tr>
                     <td><input type="checkbox" class="line-checkbox" data-id="<?= $element->id ?>"/></td>
-                    <?php foreach($fields as $field){ $fieldName = $field["name"]; ?>
+                    <?php foreach($mainFields as $fieldName => $field){ ?>
                         <td class="<?= $fieldName ?>">
                             <?php
                                 if($field["type"] == "EnumField")
-                                    echo $field["customAnnotation"]->getElements()[$element->$fieldName];
+                                    echo $formFields[$fieldName]->getElements()[$element->$fieldName];
                                 else 
                                     echo $element->$fieldName;
                                     

@@ -14,7 +14,7 @@ class Password extends AbstractInput
         parent::__construct($label, $name, $options);        
     }
 
-    protected function getType(){ return "password";}
+    protected function getInputType(){ return "password";}
 
     public function getConfirmName(){ return "confirm-".$this->name;}
 
@@ -24,8 +24,10 @@ class Password extends AbstractInput
         else
             throw new \Exception("L'option hashFunction n'a pas été renseignée");
     }
+
     
-    public function createHTML(){
+    
+    public function getHTML($value){
         $html = '
             <div class="form-group">
                 <label class="form-label" for="'.$this->name.'">'.$this->label.'</label>

@@ -4,31 +4,36 @@ namespace VPFramework\Form\Field;
 
 use Doctrine\ORM\EntityManager;
 use VPFramework\Core\DIC;
+use VPFramework\Model\Entity\Entity;
+use VPFramework\Model\Repository\Repository;
+use VPFramework\Utils\ObjectReflection;
 
 /**
  * Cette classe n'est pas utilisable dans un contexte différent de celui de VPFramework et de Doctrine
  * Car elle ne peut fonctionner sans les classes : Doctrine\ORM\EntityManager et VPFramework\Core\DIC;.
  */
-class Relation extends AbstractField
+class Relation extends Select
 {
-    private $repository;
+
+    private $entityClass, $keyProperty;
 
     public function __construct($label, $name, $options = [])
     {
-        $this->addOption('elements', null);
         $this->addOption('entityClass', null);
-        $this->addOption('nullable', false);
         $this->addOption('repositoryClass', null);
         parent::__construct($label, $name, $options);
+        $this->entityClass = Repository::getRepositoryEntityClass($this->getRepositoryClass());
+        $this->keyProperty = Entity::getEntityKeyProperty($this->entityClass);
     }
 
     public function getEntityClass()
     {
-        if ($this->options['entityClass'] !== null) {
-            return $this->options['entityClass'];
-        } else {
-            throw new \Exception('Aucune classe Entity passée dans les options pour la relation');
-        }
+        return $this->entityClass;
+    }
+
+    public function getKeyProperty()
+    {
+        return $this->keyProperty;
     }
 
     public function getRepositoryClass()
@@ -40,22 +45,25 @@ class Relation extends AbstractField
         }
     }
 
-    public function getRepository()
+    /**
+     * Ne retourne pas un tableau d'objets tels que passés dans les options
+     * Retourne un tableau associatif
+     * Ce tableau associe la valeur de la propriété 'keyProperty' des objets à la chaine correspondante via la méthode toString
+     */
+    public function getElements()
     {
-        if ($this->repository == null) {
-            $this->repository = DIC::getInstance()->get($this->getRepositoryClass());
+        $array = [];
+        foreach($this->options["elements"] as $element){
+            $array[ObjectReflection::getPropertyValue($element, $this->getKeyProperty())] = (string) $element;
         }
-
-        return $this->repository;
     }
 
     public function getElementsAndAssociationsFields()
     {
         $array = [];
         if ($this->isNullable()) {
-            $array[] = ['value' => 0, 'text' => 'Aucun'];
+            $array[] = ['value' => '', 'text' => 'Aucun'];
         }
-        $elements = $this->getRepository()->findAll();
         $metadata = DIC::getInstance()->get(EntityManager::class)->getClassMetadata($this->getEntityClass());
         $associationFields = [];
         foreach ($metadata->associationMappings as $field) {
@@ -63,14 +71,14 @@ class Relation extends AbstractField
                 $associationFields[] = $field['fieldName'];
             }
         }
-        foreach ($elements as $element) {
+        foreach ($this->options["elements"] as $element) {
             $option = [
-                'value' => $element->getId(),
-                'text' => $element->getName(),
+                'value' => ObjectReflection::getPropertyValue($element, $this->getKeyProperty()),
+                'text' => (string) $element
             ];
             foreach ($associationFields as $field) {
-                $method = 'get'.ucfirst($field);
-                $option[$field] = ($element->$method() != null) ? $element->$method()->getId() : 0; // On passe à chaque element les identifiants des champs associés pour ces éléménts
+                $linkedObject = ObjectReflection::getPropertyValue($element, $field);
+                $option[$field] = ($linkedObject != null) ? ObjectReflection::getPropertyValue($linkedObject, Entity::getEntityKeyProperty(get_class($linkedObject))) : ''; // On passe à chaque element les identifiants des champs associés pour ces éléménts
             }
             $array[] = $option;
         }
@@ -78,14 +86,17 @@ class Relation extends AbstractField
         return ['associationFields' => $associationFields, 'elements' => $array];
     }
 
-    public function getFieldHTML()
+    protected function getCustomHTML($value)
     {
+        $value = $value ?? $this->getDefault();
+        if(is_object($value))
+            $value = ObjectReflection::getPropertyValue($value, $this->getKeyProperty());
         $select = '
-                <select name="'.$this->name.'">
+                <select name="'.$this->name.'" id="'.$this->name.'>
         ';
-        $elements = $this->getRepository()->findAll();
-        foreach ($elements as $element) {
-            $select .= '<option value="'.$element->getId().'" '.($element->getId() == $this->getDefault() ? 'selected' : '').'>'.$element->getName().'</option>';
+        foreach ($this->options["elements"] as $element) {
+            $elementValue = ObjectReflection::getPropertyValue($element, $this->getKeyProperty());
+            $select .= '<option value="'.$elementValue.'" '.($elementValue == $value ? 'selected' : '').'>'. (string) $element.'</option>';
         }
 
         $select .= '</select>';
@@ -95,15 +106,16 @@ class Relation extends AbstractField
 
     public function getRealValue($value)
     {
-        if ((int) $value > 0) {
-            return $this->getRepository()->find($value);
-        } else {
-            if (!$this->isNullable()) {
-                throw new \Exception('La valeur pour un champ de type Relation doit être un id (entier). Ou alors définissez ce champ comme nullable');
-            } else {
-                return null;
+        $element = null;
+        foreach($this->options["elements"] as $el){
+            if(ObjectReflection::getPropertyValue($el, $this->getKeyProperty()) == $value){
+                $element = $el;
             }
         }
+        if ($element == null & !$this->isNullable()) {
+            throw new \Exception('La valeur pour un champ de type Relation doit être un id (entier). Ou alors définissez ce champ comme nullable');
+        } 
+        return $element;
     }
 
     public function serialize()

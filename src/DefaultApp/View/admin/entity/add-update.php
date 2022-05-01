@@ -61,57 +61,7 @@
                 $readonly = " readonly"
         ?>
         <div>
-            <?php foreach($fields as $field){
-                $fieldName = $field["name"];
-                $type = $field["type"];
-                $value = $element->$fieldName ?? ""; ?>
-            <span>
-                <label><?= $field["label"] ?> : </label>
-                <?php 
-                    if($fieldName == "id"){
-                        echo "<strong>$value</strong>";
-                    }else{
-                        switch($type){
-                            case "integer": echo "<input type='number' name='$fieldName' value='$value' $readonly/>";break;
-                            case "NumberField": echo "<input type='number' name='$fieldName' value='$value' $readonly/>";break;
-                            case "PasswordField": echo "<input type='password' name='$fieldName' $readonly/>";break;
-                            case "text": echo "<textarea name='$fieldName' $readonly>$value</textarea>";break;
-                            case "FileField": 
-                                if($readonly == "")
-                                    echo "<input type='file' name='$fieldName'/><br>";
-                                echo "<i>Actuel : $value</i>";
-                            break;
-                            case "RelationField": 
-                                echo "<select name='$fieldName' $readonly>";
-                                echo "<option value=''>Sélectionnez un élément</option>";
-                                $keyField = $field["customAnnotation"]->keyField;
-                                foreach($field["customAnnotation"]->getElements() as $optionElement){
-                                    
-                                    echo "<option value='".$optionElement->$keyField."' ";
-                                    if(is_object($value) and $value->$keyField == $optionElement->$keyField)
-                                        echo "selected";
-                                    echo ">$optionElement</option>";
-                                }
-                                echo "</select>";
-                            break;
-                            case "EnumField": 
-                                echo "<select name='$fieldName' $readonly>";
-                                echo "<option value=''>Sélectionnez un élément</option>";
-                                foreach($field["customAnnotation"]->getElements() as $key => $label){
-                                    echo "<option value='$key' ";
-                                    if($value == $key)
-                                        echo "selected";
-                                    echo ">$label</option>";
-                                }
-                                echo "</select>";
-                            break;
-                            case "boolean": echo "<input type='checkbox' name='$fieldName'".(($value==true) ? "checked":"")."/>";break;
-                            default: echo "<input type='text' name='$fieldName' value='$value' $readonly/>";break;
-                        }
-                    }
-                ?>
-            </span>
-            <?php } ?>
+            <?= $form->createHTML(true) ?>
         </div>
         <div id="buttons">
             

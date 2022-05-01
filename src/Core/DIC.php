@@ -5,6 +5,7 @@ namespace VPFramework\Core;
 use VPFramework\Core\Configuration\AppConfiguration;
 use VPFramework\Model\Doctrine\Config;
 use Doctrine\ORM\EntityManager;
+use ReflectionClass;
 
 /**
  * Conteneur d'injection de dépendances dans l'application.

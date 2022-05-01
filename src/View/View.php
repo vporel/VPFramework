@@ -9,8 +9,24 @@ use VPFramework\Core\DIC;
 
 define('ASSETS_DIR', DIC::getInstance()->get(AppGlobals::class)->getAssetsDir());
 
-class View
 
+
+/**
+ * Classe offrant aux vues de l'application des variables globales et des fonctions 
+ * 
+ * Des extensions peuvent êtres définies afin d'offir plus de fonctions ou de variables globales 
+ * selon l'application
+ * 
+ * Ces extensions personnalisées doivent hériter de la classe VPFramework\View\ViewExtension
+ * Elles seront alors listées dans le fichier Config\app.php
+ * Ex : 
+ *      "view_extensions" => [
+ *         "App\ViewExtensions\MyViewExtension"
+ *      ]
+ * 
+ * @author Porel Nkouanang (dev.vporel@gmail.com)
+ */
+class View
 {
     private $globals = null;
     private $functions = [];
@@ -29,7 +45,7 @@ class View
                 $this->functions = array_merge($this->functions, $extObj->getFunctions());
             }
         }catch(AppParameterNotFoundException $e){
-
+            //Aucune extension définie
         }
     }
 
@@ -46,6 +62,10 @@ class View
             throw new GlobalNotFoundException($name);
     }
 
+    /**
+     * Fonctions définies dans la classes
+     * En effet, d'autres fonctions peuvent être définies à partir des extensions
+     */
     public function getBuiltinFunctions(){
         return [
             "url" => function($name, $options = []){
