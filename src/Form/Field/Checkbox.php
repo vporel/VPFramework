@@ -13,9 +13,9 @@ class Checkbox extends AbstractField
     public function getRealValue($value)
     {
         if($value != null){
-            return $value;
+            return true;
         }else{
-            false;
+            return false;
         }
     }
 
@@ -31,7 +31,15 @@ class Checkbox extends AbstractField
     }
 
     protected function getCustomHTML($value){
-        return '<input type="checkbox" name="'.$this->name.'" class="form-control" id="'.$this->name.'" '.(($value == 1 || $value == true) ? "checked" : "").'/>';
+        if($this->isReadOnly()){
+            if($this->getRealValue($value)){
+                return "<span class='form-read-only-value'>Vrai</span>";
+            }else{
+                return "<span class='form-read-only-value'>Faux</span>";
+            }
+        }else{
+            return '<input type="checkbox" name="'.$this->name.'" class="form-control" id="'.$this->name.'" '.(($value == 1 || $value == true) ? "checked" : "").' />';
+        }
     }
 
 }

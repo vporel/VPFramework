@@ -8,6 +8,9 @@ use VPFramework\Core\Constants;
 use VPFramework\Core\Request;
 use VPFramework\DefaultApp\App\Entity\Admin;
 use VPFramework\DefaultApp\App\Repository\AdminRepository;
+use VPFramework\Form\Field\Password;
+use VPFramework\Form\Form;
+use VPFramework\Model\Entity\Annotations\PasswordField;
 use VPFramework\Model\Repository\Repository;
 use VPFramework\Service\Security\Security;
 
@@ -68,6 +71,32 @@ class AdminController extends DefaultAppController
 	public function logout(){
 		Security::logout();
 		$this->redirectRoute("admin-login");
+	}
+
+	public function updatePassword(ServiceConfiguration $serviceConfig){
+		$form = new Form("update-password");
+		$currentPasswordField = new Password("Mot de passe actuel", "currentPassword", $options = ["nullable" => false]);
+		$currentPasswordField->addValidationRule("Mot de passe actuel incorrect", function($value){
+			
+			return sha1($value) == $this->getUser()->getPassword();
+		});
+		$form->addfield($currentPasswordField);
+		$form->addfield(new Password("Nouveau Mot de passe", "newPassword", $options = [
+			"isDouble" => true,
+			"secondLabel" => "Confirmer le nouveau mot de passe",
+			"nullable" => false
+		]));
+		$msg = "";
+		if($form->isSubmitted() && $form->isValid()){
+			$admin = $this->getUser();
+			if($form->get("currentPassword") == $admin->getPassword()){
+				$admin->setPassword($form->get("newPassword"));
+				$this->em->flush();
+				$msg = "Mot de passe modifié";
+			}
+		}
+		$entitiesAdmin = $serviceConfig->getService("admin");
+		return $this->render("admin/update-password.php", compact("form", "entitiesAdmin", "msg"));
 	}
 
 }

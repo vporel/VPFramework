@@ -52,21 +52,24 @@ abstract class Entity {
 		$entityMetaData = $entityManager->getClassMetaData($entityClass);
         $fields = [];
         foreach($entityMetaData->getFieldNames() as $fieldName){
-            $field = [];
-            $field["name"] = $fieldName;
-            $field["label"] = $fieldName;
-            $field["type"] = $entityMetaData->getTypeOfField($fieldName);
-            $field["nullable"] = $entityMetaData->isNullable($fieldName);
-            $field["VPFAnnotation"] = null;
-            $VPFFieldAnnotation = self::getVPFFieldAnnotation($entityClass, $fieldName);
-            if($VPFFieldAnnotation != null){
-                if($VPFFieldAnnotation["annotation"]->label != "")
-                    $field["label"] = $VPFFieldAnnotation["annotation"]->label;
-                if($VPFFieldAnnotation["type"] !== null)
-                    $field["type"] = $VPFFieldAnnotation["type"];
-                $field["VPFAnnotation"] = $VPFFieldAnnotation["annotation"];
+            if($fieldName != self::getEntityKeyProperty($entityClass)){
+                //LE champ clé primaire n'est pas retourné dans la liste
+                $field = [];
+                $field["name"] = $fieldName;
+                $field["label"] = $fieldName;
+                $field["type"] = $entityMetaData->getTypeOfField($fieldName);
+                $field["nullable"] = $entityMetaData->isNullable($fieldName);
+                $field["VPFAnnotation"] = null;
+                $VPFFieldAnnotation = self::getVPFFieldAnnotation($entityClass, $fieldName);
+                if($VPFFieldAnnotation != null){
+                    if($VPFFieldAnnotation["annotation"]->label != "")
+                        $field["label"] = $VPFFieldAnnotation["annotation"]->label;
+                    if($VPFFieldAnnotation["type"] !== null)
+                        $field["type"] = $VPFFieldAnnotation["type"];
+                    $field["VPFAnnotation"] = $VPFFieldAnnotation["annotation"];
+                }
+                $fields[$field["name"]] = $field;
             }
-            $fields[$field["name"]] = $field;
         }
         foreach($entityMetaData->getAssociationMappings() as $fieldName => $assocMapping){
             if($assocMapping["type"] == ClassMetadataInfo::MANY_TO_ONE || $assocMapping["type"] == ClassMetadataInfo::ONE_TO_ONE){

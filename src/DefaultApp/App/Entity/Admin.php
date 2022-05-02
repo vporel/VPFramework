@@ -27,7 +27,7 @@ class Admin extends EntityWithId implements UserInterface
     private $password ="";
     
     /**
-     * @ORM\Column(type="boolean", nullable = false)
+     * @ORM\Column(type="boolean", nullable = true)
      */
     private $isSuperAdmin = false;
 

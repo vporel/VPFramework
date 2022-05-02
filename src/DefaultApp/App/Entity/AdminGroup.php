@@ -5,22 +5,16 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 use Doctrine\ORM\Mapping as ORM;
+use VPFramework\Model\Entity\EntityWithId;
 use VPFramework\Utils\FlexibleClassTrait;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="vpframework_admins_groups")
  */
-class AdminGroup
+class AdminGroup extends EntityWithId
 {
     use FlexibleClassTrait;
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue
-     */
-    private $id;
-
     /**
      * @ORM\Column(type="string", nullable = false)
      */
@@ -40,18 +34,6 @@ class AdminGroup
     {
         $this->permissions = new ArrayCollection();
         $this->admins = new ArrayCollection();
-
-        return $this;
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id)
-    {
-        $this->id = $id;
 
         return $this;
     }

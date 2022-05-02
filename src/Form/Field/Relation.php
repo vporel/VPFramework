@@ -19,7 +19,6 @@ class Relation extends Select
 
     public function __construct($label, $name, $options = [])
     {
-        $this->addOption('entityClass', null);
         $this->addOption('repositoryClass', null);
         parent::__construct($label, $name, $options);
         $this->entityClass = Repository::getRepositoryEntityClass($this->getRepositoryClass());
@@ -56,6 +55,7 @@ class Relation extends Select
         foreach($this->options["elements"] as $element){
             $array[ObjectReflection::getPropertyValue($element, $this->getKeyProperty())] = (string) $element;
         }
+        return $array;
     }
 
     public function getElementsAndAssociationsFields()
@@ -88,20 +88,33 @@ class Relation extends Select
 
     protected function getCustomHTML($value)
     {
+
         $value = $value ?? $this->getDefault();
         if(is_object($value))
             $value = ObjectReflection::getPropertyValue($value, $this->getKeyProperty());
-        $select = '
-                <select name="'.$this->name.'" id="'.$this->name.'>
-        ';
-        foreach ($this->options["elements"] as $element) {
-            $elementValue = ObjectReflection::getPropertyValue($element, $this->getKeyProperty());
-            $select .= '<option value="'.$elementValue.'" '.($elementValue == $value ? 'selected' : '').'>'. (string) $element.'</option>';
+        if($this->isReadOnly()){
+            $textToShow = "";
+            foreach ($this->options["elements"] as $element) {
+                $elementValue = ObjectReflection::getPropertyValue($element, $this->getKeyProperty());
+                if($elementValue == $value){
+                    $textToShow = (string) $element;
+                    break;
+                }
+            }
+            return "<span class='form-read-only-value'>$textToShow</span>";
+        }else{
+            $select = '
+                    <select name="'.$this->name.'" id="'.$this->name.'" '.$this->getReadOnlyText().'>
+            ';
+            foreach ($this->options["elements"] as $element) {
+                $elementValue = ObjectReflection::getPropertyValue($element, $this->getKeyProperty());
+                $select .= '<option value="'.$elementValue.'" '.($elementValue == $value ? 'selected' : '').'>'. (string) $element.'</option>';
+            }
+
+            $select .= '</select>';
+
+            return $select;
         }
-
-        $select .= '</select>';
-
-        return $select;
     }
 
     public function getRealValue($value)
@@ -113,7 +126,7 @@ class Relation extends Select
             }
         }
         if ($element == null & !$this->isNullable()) {
-            throw new \Exception('La valeur pour un champ de type Relation doit être un id (entier). Ou alors définissez ce champ comme nullable');
+            throw new \Exception($this->getName()." : La valeur $value ne correspond à aucun élément. Ou alors définissez ce champ comme nullable");
         } 
         return $element;
     }

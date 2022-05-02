@@ -5,21 +5,15 @@ namespace VPFramework\DefaultApp\App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use VPFramework\Utils\FlexibleClassTrait;
 use VPFramework\Model\Entity\Annotations\{EnumField, RelationField, Field};
+use VPFramework\Model\Entity\EntityWithId;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="vpframework_admins_groups_permissions")
  */
-class AdminGroupPermission
+class AdminGroupPermission extends EntityWithId
 {
     use FlexibleClassTrait;
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue
-     */
-    private $id = null;
-
     /**
      * @EnumField(label="Entité", class="VPFramework\DefaultApp\App\Entity\ManagedEntitiesEnum")
      * @ORM\Column(type="string", nullable = false)
@@ -28,17 +22,17 @@ class AdminGroupPermission
 
     /**
      * @Field(label="Ajout")
-    * @ORM\Column(type="boolean", nullable = false, options={"default":false})
+    * @ORM\Column(type="boolean", nullable = true, options={"default":false})
     */
     private $canAdd;
     /**
      * @Field(label="Modification")
-     * @ORM\Column(type="boolean", nullable = false, options={"default":false})
+     * @ORM\Column(type="boolean", nullable = true, options={"default":false})
      */
     private $canUpdate;
     /**
      * @Field(label="Suppression")
-     * @ORM\Column(type="boolean", nullable = false, options={"default":false})
+     * @ORM\Column(type="boolean", nullable = true, options={"default":false})
      */
     private $canDelete;
 
@@ -56,18 +50,6 @@ class AdminGroupPermission
         $this->canDelete = $canDelete;
     }
     
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
     public function getEntityClass(): string
     {
         return $this->entityClass;

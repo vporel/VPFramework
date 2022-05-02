@@ -42,6 +42,24 @@ class FileUpload
         return "";
     }
 
+    /**
+     * Exécute un suite de tests
+     * Si une exception ets lancée, le fichier n'est pas envoyé ou est invalide
+     */
+    public static function testValidity(string $key, $extensions = []):void
+    {
+        if(isset($_FILES[$key]["name"]) && $_FILES[$key]["name"] != ""){ 
+            $fileName = $_FILES[$key]["name"];
+            $pathinfo = pathinfo($fileName);
+            $extension = strtolower($pathinfo["extension"]);
+            if(count($extensions) != 0 && !in_array($extension, $extensions)){
+               throw new FileUploadException(FileUploadException::WRONG_EXTENSION, $extension);
+            }
+        }else{
+            throw new FileUploadException(FileUploadException::FILE_NOT_RECEIVED, $key);
+        }
+    }
+
     private static function absoluteDestinationFolder($destinationFolder){
         if($destinationFolder != null && $destinationFolder != "")
             return Constants::$PUBLIC_FOLDER."/".$destinationFolder;

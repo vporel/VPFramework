@@ -14,13 +14,21 @@ class File extends AbstractField
             ->addOption("extensions", [])
             ->addOption("folder", "");
             
-        parent::__construct($label, $name, $options);        
+        parent::__construct($label, $name, $options);       
     }
 
     protected function getCustomHTMLForFilter(): string{}
 
     public function getCustomHTML($value){
-        return '<input type="file" name="'.$this->name.'" class="form-control" id="'.$this->name.'" accept=".'.implode(',.', $this->getExtensions()).'"/>';
+        if($this->isReadOnly())
+            return '
+                <span class="file-current-value">'.$value.'</span>
+            ';
+        else
+            return '
+                <input type="file" name="'.$this->name.'" class="form-control" id="'.$this->name.'" '.((count($this->getExtensions())>0) ?  'accept=".'.implode(',.', $this->getExtensions()).'"' : "").'/>
+                <span class="file-current-value">'.$value.'</span>
+            ';
     }
 
     public function getRealValue($value){
@@ -38,12 +46,28 @@ class File extends AbstractField
         }catch(FileUploadException $e){
             if($e->getCode() == FileUploadException::FILE_NOT_RECEIVED){
                 if(!$this->isNullable()){
-                    $this->error = $e->getMessage();
+                    $this->error = "Choisissez un fichier";
                 }
             }else{                
                 $this->error = $e->getMessage();
             }
             return "";
+        }
+    }
+
+    public function isValid($value):bool{
+        try{
+            FileUpload::testValidity($this->name, $this->getExtensions());
+            return true;
+        }catch(FileUploadException $e){
+            if($e->getCode() == FileUploadException::FILE_NOT_RECEIVED){
+                if(!$this->isNullable()){
+                    $this->error = "Choisissez un fichier";
+                }
+            }else{                
+                $this->error = $e->getMessage();
+            }
+            return false;
         }
     }
 }

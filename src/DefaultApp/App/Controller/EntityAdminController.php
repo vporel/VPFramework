@@ -23,6 +23,7 @@ use VPFramework\Utils\ObjectReflection;
 class EntityAdminController extends DefaultAppController
 {
 	private $em, $entitiesAdmin, $entityAdmin, $request, $adminGroupPermission;
+	private $keyProperty;
 	public function __construct(EntityManager $em, ServiceConfiguration $serviceConfig, Request $request){
 		$this->em = $em;
 		$this->request = $request;
@@ -37,16 +38,18 @@ class EntityAdminController extends DefaultAppController
 		){
 			$this->redirectRoute("admin");
 		}
+		$this->keyProperty = Entity::getEntityKeyProperty($this->entityAdmin->getEntityClass());
 	}
 
 	public function list(){
-		$elements = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findBy([], ["-id"]);
+		$elements = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findBy([], ["-".$this->keyProperty]);
 		
 		$form = new Form("entity-add-form", $this->entityAdmin->getEntityClass());
 		return $this->render("admin/entity/list.php", [
 			"entityAdmin" => $this->entityAdmin, 
 			"entitiesAdmin" => $this->entitiesAdmin, 
 			"adminGroupPermission" => $this->adminGroupPermission, 
+			"keyProperty" => $this->keyProperty,
 			"formFields" => $form->getFields(),
 			"mainFields" => $this->entityAdmin->getMainFields(),
 			"filterFields" => array_keys($this->entityAdmin->getFilterFields()),
@@ -56,10 +59,9 @@ class EntityAdminController extends DefaultAppController
 
 	public function add(){
 		
-		$fields = $this->entityAdmin->getFields();
 		$class = $this->entityAdmin->getEntityClass();
 		$element = new $class();
-		$form = new Form("entity-add-form", $this->entityAdmin->getEntityClass(), $element);
+		$form = new Form("entity-add", $class, $element);
 
 		$msg = "";
 		$continueAdd = false;
@@ -68,12 +70,13 @@ class EntityAdminController extends DefaultAppController
 			$continueAdd = $this->request->get("continueAdd") ?? false;
 			$this->em->persist($element);
 			$this->em->flush();
-			if(!$continueAdd)
-				return $this->redirectRoute("admin-entity-update", ["entityName" => $this->entityAdmin->getName(), "id"=>$element->getId()]);
-			else{
+			if(!$continueAdd){
+				$keyProperty = $this->keyProperty;
+				return $this->redirectRoute("admin-entity-update", ["entityName" => $this->entityAdmin->getName(), "key"=>$element->$keyProperty]);
+			}else{
 				//Réinitialisation
 				$msg = "Elément ajouté avec succès";
-				$element = new $class();
+				$form->setObject(new $class());
 			}
 		}
 		return $this->render("admin/entity/add-update.php", [
@@ -81,8 +84,8 @@ class EntityAdminController extends DefaultAppController
 			"entityAdmin" => $this->entityAdmin, 
 			"entitiesAdmin" => $this->entitiesAdmin, 
 			"adminGroupPermission" => $this->adminGroupPermission, 
-			"fields" => $fields,
 			"element" => $element,
+			"keyProperty" => $this->keyProperty,
 			"form" => $form,
 			"msg"=>$msg,
 			"continueAdd"=> $continueAdd
@@ -91,10 +94,12 @@ class EntityAdminController extends DefaultAppController
 
 	public function update(){
 		
-		$fields = $this->entityAdmin->getFields();
-		$element = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->find($this->request->get("id"));
+		$element = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findOneBy([$this->keyProperty => $this->request->get("key")]);
 		
-		$form = new Form("entity-add-form", $this->entityAdmin->getEntityClass(), $element);
+		$form = new Form("entity-update", $this->entityAdmin->getEntityClass(), $element);
+
+		if(!$this->adminGroupPermission->canUpdate) 
+			$form->setFormReadOnly(true);
 		$msg = "";
 		if($form->isSubmitted() && $form->isValid()){
 			$form->updateObject();
@@ -107,7 +112,7 @@ class EntityAdminController extends DefaultAppController
 			"entityAdmin" => $this->entityAdmin, 
 			"entitiesAdmin" => $this->entitiesAdmin, 
 			"adminGroupPermission" => $this->adminGroupPermission, 
-			"fields" => $fields,
+			"keyProperty" => $this->keyProperty,
 			"element" => $element,
 			"form" => $form,
 			"msg"=>$msg
@@ -116,16 +121,16 @@ class EntityAdminController extends DefaultAppController
 
 	public function delete(){
 		
-		$element = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->find($this->request->get("id"));
+		$element = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findOneBy([$this->keyProperty => $this->request->get("key")]);
 		$this->em->remove($element);
 		$this->em->flush();
 		return $this->redirectRoute("admin-entity-list", ["entityName" => $this->entityAdmin->getName()]);
 	}
 
 	public function deleteMany(){
-		$ids = explode("-", $this->request->get("ids"));
-		foreach($ids as $id){
-			$element = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->find($id);
+		$keys = explode("-", $this->request->get("keys"));
+		foreach($keys as $key){
+			$element = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findOneBy([$this->keyProperty => $key]);
 			$this->em->remove($element);
 		}
 		$this->em->flush();

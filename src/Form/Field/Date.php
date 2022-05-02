@@ -6,9 +6,14 @@ use DateTime;
 
 class Date extends AbstractInput
 {
-    protected function getType()
+    protected function getInputType()
     {
         return 'date';
+    }
+
+    protected function getCustomHTMLForFilter(): string
+    {
+        
     }
     public function getRealValue($value)
     {

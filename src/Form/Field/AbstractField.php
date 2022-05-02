@@ -12,6 +12,7 @@ abstract class AbstractField implements \Serializable
             'nullable' => true, 
             'readOnly' => false
         ];
+    private $validationRules = [];
     protected $error = '';
 
     /**
@@ -26,12 +27,24 @@ abstract class AbstractField implements \Serializable
         $this->label = $label;
         $this->name = $name;
         $this->options = array_slice(array_merge($this->options, $options), 0, count($this->options));
+        $this->addValidationRule('Ce champ doit être renseigné', function($value){
+            return $this->isNullable() || trim($value) != '';
+        });
     }
 
     protected function addOption(string $name, $value)
     {
         $this->options[$name] = $value;
 
+        return $this;
+    }
+
+    /**
+     * @param callable $rule
+     */
+    public function addValidationRule(string $message, callable $rule)
+    {
+        $this->validationRules[] = new ValidationRule($message, $rule);
         return $this;
     }
 
@@ -128,17 +141,18 @@ abstract class AbstractField implements \Serializable
 
     public function isValid($value)
     {
-        if (!$this->isNullable()) {
-            if (trim($value) != '') {
-                return true;
-            } else {
-                $this->error = 'Ce champ doit être renseigné';
-
+        foreach($this->validationRules as $rule){
+            if(!$rule->getRule()($value)){
+                $this->error = $rule->getMessage();
                 return false;
             }
         }
         return true;
         
+    }
+
+    protected function getReadOnlyText(){
+        return $this->isReadOnly() ? "readonly" : "";
     }
 
     /**
@@ -155,6 +169,7 @@ abstract class AbstractField implements \Serializable
             'name' => $this->getName(),
             "default" => $this->getDefault(),
             'required' => $this->isRequired(),
+            'readOnly' => $this->isReadOnly(),
             "class"=> end($calledClassArray)
         ];
     }

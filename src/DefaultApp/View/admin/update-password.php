@@ -1,6 +1,6 @@
 
 <?php
-    $_title = ($mode == "add") ? $entityAdmin->name." | Ajout" : $element." | Modification";
+    $_title = "Modification du mot de passe | ".$app->user;
 ?>
 
 <?php ob_start(); ?>
@@ -46,6 +46,7 @@
     form #buttons *{
         margin:0 3px;
     }
+
     .form-field-error{
         display:block;
         color:red;
@@ -56,7 +57,7 @@
 <?php $_styles = ob_get_clean(); ?>
 
 <?php ob_start(); ?>
-    <h3 id="element-title"><?= ($mode == "add") ? "Ajout d'un élément" : $element ?></h3> 
+    <h3 id="element-title">Modification du mot de passe | <?= $app->user ?></h3> 
     <?php if($msg != ""){ ?> 
         <div class="alert"><?= $msg ?></div>
     <?php }?>
@@ -65,17 +66,8 @@
             <?= $form->createHTML() ?>
         </div>
         <div id="buttons">
+            <input class="btn" value="Terminer" type="submit"/>
             
-            <?php if($mode == "add") {
-                echo "<input name='continueAdd' id='continueAdd' type='checkbox'".(($continueAdd) ? "checked":"")."/><label for='continueAdd'>Continuer l'ajout</label>";
-                } 
-            ?>
-            <?php if($adminGroupPermission->canUpdate) { ?>
-                <input class="btn" value="<?= ($mode == "add") ? "Enregistrer" : "Modifier" ?>" type="submit"/>
-            <?php } ?>
-            <?php if($mode != "add" && $adminGroupPermission->canDelete) { ?>
-                <a class="btn btn-bad" href="<?= $url("admin-entity-delete", ["entityName" => $entityAdmin->name, "key" => $element->getId()]) ?>">Supprimer</a>
-            <?php } ?>
         </div>
     </form>
 <?php $_main = ob_get_clean(); ?>

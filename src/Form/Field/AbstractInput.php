@@ -9,7 +9,10 @@ abstract class AbstractInput extends AbstractField
         $this->addOption("pattern", "#^(.[\s]*.*)*$#");
         $this->addOption("patternMessage", "Ne respecte pas le motif défini");
         
-        parent::__construct($label, $name, $options);      
+        parent::__construct($label, $name, $options);  
+        $this->addValidationRule($this->getPatternMessage(), function($value){
+            return preg_match($this->getPattern(), $value);
+        });    
     }
 
     /**
@@ -20,17 +23,7 @@ abstract class AbstractInput extends AbstractField
 
     public function getCustomHTML($value){
         $value = $value ?? $this->getDefault();
-        return '<input  value="'.$value.'" type="'.$this->getInputType().'" name="'.$this->name.'" class="form-control" id="'.$this->name.'" '.(!$this->isNullable() ? 'required': '').'>';
-    }
-
-    public function isValid($value){
-        if(parent::isValid($value)){
-           if(!preg_match($this->getPattern(), $value)){
-                $this->error = $this->getPatternMessage();
-                return false;
-            }
-        }
-        return true;
+        return '<input  value="'.$value.'" type="'.$this->getInputType().'" name="'.$this->name.'" class="form-control" id="'.$this->name.'" '.(!$this->isNullable() ? 'required': '').' '.$this->getReadOnlyText().'>';
     }
 
     public function serialize()

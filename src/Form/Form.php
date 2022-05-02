@@ -14,7 +14,6 @@ use VPFramework\Form\Field\AbstractField;
 use VPFramework\Form\Field\File;
 use VPFramework\Form\Field\Password;
 use VPFramework\Utils\ObjectReflection;
-use Doctrine\ORM\EntityManager;
 use VPFramework\Form\Field\Checkbox;
 use VPFramework\Form\Field\Number;
 use VPFramework\Form\Field\Relation;
@@ -76,6 +75,14 @@ class Form
     }
 
     /**
+     * 
+     */
+    public function setObject(Entity $object)
+    {
+        $this->object = $object;
+    }
+
+    /**
      * Mettre les champs $fieldsNames en mode lecture seule
      */
     public function setReadOnly(array $fieldsNames, bool $readOnly)
@@ -109,13 +116,23 @@ class Form
                 case "boolean": $field = new Checkbox($rawField["label"],$rawField["name"]);break;
                 case "integer": $field = new Number($rawField["label"],$rawField["name"]);break;
                 case "NumberField": $field = new Number($rawField["label"],$rawField["name"]);break;
-                case "PasswordField": $field = new Password($rawField["label"],$rawField["name"]);break;
-                case "FileField": $field = new File($rawField["label"],$rawField["name"]);break;
+                case "PasswordField": 
+                    $field = new Password($rawField["label"],$rawField["name"], $options = [
+                        "hashFunction" => $rawField["VPFAnnotation"]->hashFunction,
+                    ]);
+                break;
+                case "FileField": 
+                    $field = new File($rawField["label"],$rawField["name"], $options = [
+                        "extensions" => $rawField["VPFAnnotation"]->extensions,
+                        "folder" => $rawField["VPFAnnotation"]->folder,
+                    ]);
+                break;
                 case "RelationField": 
                     $field = new Relation($rawField["label"],$rawField["name"], $options = [
                         "elements" => $rawField["VPFAnnotation"]->getElements(),
                         "repositoryClass" => $rawField["VPFAnnotation"]->repositoryClass,
                     ]);
+                break;
                 case "EnumField": 
                     $field = new Select($rawField["label"],$rawField["name"], $options = [
                         "elements" => $rawField["VPFAnnotation"]->getElements()
@@ -186,11 +203,10 @@ class Form
             $html .= '<div class="form-error alert alert-warning">'.$this->error.'</div>';
         }
         foreach ($this->fields as $field) {
-        
-            $value = $this->parameters[$this->name] ?? null;
-            if (!$field->isIgnored() && !($field instanceof Password || $field instanceof File))
-                $value = ($this->object != null) ? ObjectReflection::getPropertyValue($this->object, $field->getName()) : null;
-            
+            $value = null;
+            if (!$field->isIgnored() && !($field instanceof Password) && $this->object != null)
+                $value = ObjectReflection::getPropertyValue($this->object, $field->getName());
+            $value = $this->parameters[$field->getName()] ?? $value;
             $html .= $field->getHTML($value);
         }
         return $html;
@@ -200,34 +216,42 @@ class Form
     {
         $valid = true;
         foreach ($this->fields as $field) {
-            if (!($field instanceof File)) {
-                if ($field instanceof Password) {
-                    if ($field->isDouble() && !$field->isValid($this->parameters[$field->getName()], $this->parameters[$field->getConfirmName()])) {
-                        $valid = false;
-                        break;
-                    }
-                } elseif (!$field->isValid($this->parameters[$field->getName()])) {
+            if ($field instanceof Password && $field->isDouble()) {
+                if (!$field->isValid($this->parameters[$field->getName()], $this->parameters[$field->getConfirmName()])) {
                     $valid = false;
                 }
+            } elseif (!$field->isValid($this->parameters[$field->getName()] ?? null)) {
+                $valid = false;
             }
         }
         return $valid;
 
     }
 
+    /**
+     * @param string $fieldName
+     * @return Valeur du champ $fieldName
+     */
+    public function get(string $fieldName){
+        $field = $this->fields[$fieldName];
+        if ($field instanceof File) {
+            $value = $field->getFileBaseName();
+        }else{
+            $value = $field->getRealValue($this->parameters[$field->getName()] ?? null);
+        }
+        return $value;
+    }
+
     public function updateObject()
     {
-        foreach ($this->fields as $field) {
-            if (!$field->isIgnored()) {
-                if ($field instanceof File) {
-                    $value = $field->getFileBaseName();
-                }else{
-                    $value = $field->getRealValue($this->parameters[$field->getName()]);
+        if($this->object != null){
+            foreach ($this->fields as $field) {
+                if (!$field->isIgnored()) {
+                    ObjectReflection::setPropertyValue($this->object, $field->getName(), $this->get($field->getName()));
                 }
-                ObjectReflection::setPropertyValue($this->object, $field->getName(), $value);
-            } else {
-                
             }
+        }else{
+            throw new FormException("Aucun objet n'est géré par le formulaire (\$object = null)");
         }
     }
 }

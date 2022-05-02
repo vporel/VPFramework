@@ -99,7 +99,7 @@
         <tbody>
             <?php foreach($elements as $element){ ?>
                 <tr>
-                    <td><input type="checkbox" class="line-checkbox" data-id="<?= $element->id ?>"/></td>
+                    <td><input type="checkbox" class="line-checkbox" data-key="<?= $element->$keyProperty ?>"/></td>
                     <?php foreach($mainFields as $fieldName => $field){ ?>
                         <td class="<?= $fieldName ?>">
                             <?php
@@ -113,9 +113,9 @@
                     <?php } ?>
                     
                     <td>
-                        <a href="<?= $url("admin-entity-update", ["entityName" => $entityAdmin->name, "id" => $element->getId()]) ?>" class="action">Afficher</a>
+                        <a href="<?= $url("admin-entity-update", ["entityName" => $entityAdmin->name, "key" => $element->$keyProperty]) ?>" class="action">Afficher</a>
                         <?php if($adminGroupPermission->canDelete){ ?>
-                            <a href="<?= $url("admin-entity-delete", ["entityName" => $entityAdmin->name, "id" => $element->getId()]) ?>" class="action">Supprimer</a>
+                            <a href="<?= $url("admin-entity-delete", ["entityName" => $entityAdmin->name, "key" => $element->$keyProperty]) ?>" class="action">Supprimer</a>
                         <?php } ?>
                     </td>
                 </tr>
@@ -140,9 +140,9 @@
          */
         let filtersRules = {};
         $('.filter').each(function(){
-            let type = $(this).attr("data-type");
+            let type = $(this).attr("data-field-class");
             let fieldName = $(this).attr("data-field-name");
-            if(type ==  "integer" || type ==  "NumberField"){
+            if(type ==  "Number"){
                 let $minInput = $(this).find("input[data-type='min']");
                 let $maxInput = $(this).find("input[data-type='max']");
                 $minInput.keyup(applyFilter);
@@ -156,23 +156,24 @@
                     else if($minInput.val() == "" && $maxInput.val() != "")
                         return value <= parseFloat($maxInput.val());
                     else
-                        return value >= min && value <= max;
+                        return value >= parseFloat($minInput.val()) && value <= parseFloat($maxInput.val());
                 }
-            }else if(type ==  "RelationField" || type ==  "EnumField"){ 
+            }else if(type ==  "Select" || type ==  "Relation"){ 
                 let $select = $(this).find("select");
                 $select.change(applyFilter);
                 filtersRules[fieldName] = function(value){
                     if($select.val() == '')
                         return true;
-                    return value == $select.val();
+                    return value.trim() == $select.val().trim();
                 }
-            }else if(type ==  "boolean"){
+            }else if(type ==  "Checkbox"){
                 let $select = $(this).find("select");
                 $select.change(applyFilter);
                 filtersRules[fieldName] = function(value){
+                    console.log(value);
                     if($select.val() == '')
                         return true;
-                    return (value == $select.val()) || (value == '' && $select.val() == "0");
+                    return (value.trim() == $select.val()) || (value.trim() == '' && $select.val() == "0");
                 }
             }else{
                 let $input = $(this).find("input");
@@ -224,10 +225,10 @@
                     let selectedIds = [];
                     $('.line-checkbox').each(function(){
                         if($(this).prop("checked")){
-                            selectedIds.push($(this).attr("data-id"));
+                            selectedIds.push($(this).attr("data-key"));
                         }
                     });
-                    window.location="<?= $url("admin-entity-delete-many", ["entityName" => $entityAdmin->name]) ?>?ids="+selectedIds.join("-");
+                    window.location="<?= $url("admin-entity-delete-many", ["entityName" => $entityAdmin->name]) ?>?keys="+selectedIds.join("-");
             
                 }    
             }

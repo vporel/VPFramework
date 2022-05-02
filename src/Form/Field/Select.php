@@ -22,15 +22,26 @@ class Select extends AbstractField
     protected function getCustomHTML($value)
     {
         $value = $value ?? $this->getDefault();
-        $select = '
-                <select name="'.$this->name.'">
-        ';
-        foreach ($this->getElements() as $key => $text) {
-            $select .= '<option value="'.$key.'" '.($key == $value ? 'selected' : '').'>'.$text.'</option>';
-        }
-        $select .= '</select>';
+        if($this->isReadOnly()){
+            $textToShow = "";
+            foreach ($this->getElements() as $key => $text) {
+                if($key == $value){
+                    $textToShow = $text;
+                    break;
+                }
+            }
+            return "<span class='form-read-only-value'>$textToShow</span>";
+        }else{
+            $select = '
+                    <select name="'.$this->name.'"  id="'.$this->name.'">
+            ';
+            foreach ($this->getElements() as $key => $text) {
+                $select .= '<option value="'.$key.'" '.($key == $value ? 'selected' : '').'>'.$text.'</option>';
+            }
+            $select .= '</select>';
 
-        return $select;
+            return $select;
+        }
     }
 
     protected function getCustomHTMLForFilter():string
@@ -40,7 +51,7 @@ class Select extends AbstractField
         foreach($this->getElements() as $option){
             $html .=  "<option value='$option'>$option</option>";
         }
-        $html = "</select>";
+        $html .= "</select>";
         return $html;
     }
 
