@@ -11,12 +11,15 @@ use VPFramework\Utils\AnnotationReader;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use ReflectionClass;
 use VPFramework\Model\Entity\Annotations\RelationField;
+use VPFramework\Utils\FlexibleClassTrait;
 
 /**
  * @author VPOREL-DEV
  *
  */
 abstract class Entity {
+    use FlexibleClassTrait;
+
     public abstract function getKeyProperty();
 
     public static function getEntityKeyProperty(string $entityClass){
