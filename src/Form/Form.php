@@ -109,38 +109,40 @@ class Form
         $rawFields = Entity::getFields($entityClass);
         $fields = [];
         foreach($rawFields as $rawField){
-            $field = null;
-            switch($rawField["type"]){
-                case "string": $field = new TextLine($rawField["label"],$rawField["name"]);break;
-                case "text": $field = new TextArea($rawField["label"],$rawField["name"]);break;
-                case "boolean": $field = new Checkbox($rawField["label"],$rawField["name"]);break;
-                case "integer": $field = new Number($rawField["label"],$rawField["name"]);break;
-                case "NumberField": $field = new Number($rawField["label"],$rawField["name"]);break;
-                case "PasswordField": 
-                    $field = new Password($rawField["label"],$rawField["name"], $options = [
-                        "hashFunction" => $rawField["VPFAnnotation"]->hashFunction,
-                    ]);
-                break;
-                case "FileField": 
-                    $field = new File($rawField["label"],$rawField["name"], $options = [
-                        "extensions" => $rawField["VPFAnnotation"]->extensions,
-                        "folder" => $rawField["VPFAnnotation"]->folder,
-                    ]);
-                break;
-                case "RelationField": 
-                    $field = new Relation($rawField["label"],$rawField["name"], $options = [
-                        "elements" => $rawField["VPFAnnotation"]->getElements(),
-                        "repositoryClass" => $rawField["VPFAnnotation"]->repositoryClass,
-                    ]);
-                break;
-                case "EnumField": 
-                    $field = new Select($rawField["label"],$rawField["name"], $options = [
-                        "elements" => $rawField["VPFAnnotation"]->getElements()
+            if(count($fieldsToBuild) == 0 || in_array($rawField["name"], $fieldsToBuild)){
+                $field = null;
+                switch($rawField["type"]){
+                    case "string": $field = new TextLine($rawField["label"],$rawField["name"]);break;
+                    case "text": $field = new TextArea($rawField["label"],$rawField["name"]);break;
+                    case "boolean": $field = new Checkbox($rawField["label"],$rawField["name"]);break;
+                    case "integer": $field = new Number($rawField["label"],$rawField["name"]);break;
+                    case "NumberField": $field = new Number($rawField["label"],$rawField["name"]);break;
+                    case "PasswordField": 
+                        $field = new Password($rawField["label"],$rawField["name"], $options = [
+                            "hashFunction" => $rawField["VPFAnnotation"]->hashFunction,
                         ]);
-                break;
+                    break;
+                    case "FileField": 
+                        $field = new File($rawField["label"],$rawField["name"], $options = [
+                            "extensions" => $rawField["VPFAnnotation"]->extensions,
+                            "folder" => $rawField["VPFAnnotation"]->folder,
+                        ]);
+                    break;
+                    case "RelationField": 
+                        $field = new Relation($rawField["label"],$rawField["name"], $options = [
+                            "elements" => $rawField["VPFAnnotation"]->getElements(),
+                            "repositoryClass" => $rawField["VPFAnnotation"]->repositoryClass,
+                        ]);
+                    break;
+                    case "EnumField": 
+                        $field = new Select($rawField["label"],$rawField["name"], $options = [
+                            "elements" => $rawField["VPFAnnotation"]->getElements()
+                            ]);
+                    break;
+                }
+                $field->setNullable($rawField["nullable"]);
+                $fields[$field->getName()] = $field;
             }
-            $field->setNullable($rawField["nullable"]);
-            $fields[$field->getName()] = $field;
         }
         return $fields;
     }
