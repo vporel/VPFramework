@@ -9,7 +9,7 @@ use VPFramework\Model\Entity\Annotations\NumberField;
 use VPFramework\Model\Entity\Annotations\PasswordField;
 use VPFramework\Utils\AnnotationReader;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use ReflectionClass;
+use VPFramework\Model\Entity\Annotations\Field;
 use VPFramework\Model\Entity\Annotations\RelationField;
 use VPFramework\Utils\FlexibleClassTrait;
 
@@ -100,6 +100,7 @@ abstract class Entity {
 
     /**
      * Retourne l'objet annotation de VPFramework sur le champ
+     * Si plusieurs annoations ont été définies, seule la première sera renvoyée
      * VPF = VPFramework
      * @return null|Object
      */
