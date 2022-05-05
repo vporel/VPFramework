@@ -42,4 +42,9 @@ class Checkbox extends AbstractField
         }
     }
 
+    public function isValid($value)
+    {
+        return true;
+    }
+
 }
