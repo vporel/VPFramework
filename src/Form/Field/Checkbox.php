@@ -38,7 +38,7 @@ class Checkbox extends AbstractField
                 return "<span class='form-read-only-value'>Faux</span>";
             }
         }else{
-            return '<input type="checkbox" name="'.$this->name.'" class="form-control" id="'.$this->name.'" '.(($value == 1 || $value == true) ? "checked" : "").' />';
+            return '<input type="checkbox" name="'.$this->name.'" class="form-check-input" id="'.$this->name.'" '.(($value == 1 || $value == true) ? "checked" : "").' />';
         }
     }
 
