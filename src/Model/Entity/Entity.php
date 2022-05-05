@@ -81,7 +81,7 @@ abstract class Entity {
                 $field["label"] = $fieldName;
                 $field["type"] = null;
                 $joinColumnAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $fieldName, ORM\JoinColumn::class);
-                $field["nullable"] = $joinColumnAnnotation->nullable;
+                $field["nullable"] = ($joinColumnAnnotation == null) ? false : $joinColumnAnnotation->nullable;
                 $field["VPFAnnotation"] = null;
                 $VPFFieldAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $fieldName, RelationField::class);
                 if($VPFFieldAnnotation != null){
