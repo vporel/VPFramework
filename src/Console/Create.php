@@ -8,7 +8,7 @@ abstract class Create extends Command
     {
         $elements = $this->getElements();
         if(count($this->parameters) < 1){
-            $elementToCreate = Console::input("What do you want to create (".implode(", ", array_keys($elements)).") ? : ");
+            $elementToCreate = Console::input("Que voulez-vous créer ? (".implode(", ", array_keys($elements)).") ? : ");
             
         } else{
             $elementToCreate = $this->parameters[0]; 
@@ -16,8 +16,10 @@ abstract class Create extends Command
         if(array_key_exists($elementToCreate, $elements)){
             $elements[$elementToCreate]();
         }else{
-            echo "\nThis element ('$elementToCreate') is not known\n";
+            echo "\nL'élément ('$elementToCreate') n'est pas reconnu\n";
+            echo "\nLes éléments reconnus sont : ".implode(", ", array_keys($elements));
         }
+        
     }
     
     /**

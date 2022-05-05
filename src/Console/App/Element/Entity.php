@@ -6,8 +6,8 @@ use VPFramework\Console\Console;
 use VPFramework\Core\Constants;
 
 const FIELD_TYPES = [ "integer", "string", "text", "float", "datetime", "relation"];
-define("ENTITY_DIR", Constants::$APP_ROOT."/app/Entity");
-define("REPOSITORY_DIR", Constants::$APP_ROOT."/app/Repository");
+define("ENTITY_DIR", APP_ROOT."/app/Entity");
+define("REPOSITORY_DIR", APP_ROOT."/app/Repository");
 if(!is_dir(ENTITY_DIR))
     mkdir(ENTITY_DIR, 0777, true);
 if(!is_dir(REPOSITORY_DIR))

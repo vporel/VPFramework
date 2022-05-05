@@ -29,7 +29,7 @@
             background:rgba(60,0,150,.3);
             border-radius:10px;
         }
-        body{background:rgb(245,245,245);font-family:calibri;padding:0;margin:0;}
+        body{background:rgb(245,245,245);font-family:sans-serif, calibri, "century gothic";padding:0;margin:0;}
         #page{width:95%;margin:auto;margin-top:10px;display:flex;justify-content: space-between;}
 
         header{

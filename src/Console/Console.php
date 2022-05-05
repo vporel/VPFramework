@@ -2,33 +2,47 @@
 
 namespace VPFramework\Console;
 
+use VPFramework\Console\App\Create;
+
 class Console
 {
 
     /**
      * To manage any command in console
-     * @param array $associations Structure [ ["commandName" => ["class" => "...", "description" => "..."]] ]
      */
-    public static function manageConsole(array $associations){
+    public static function run(){
+
+        $commands = [
+            "create" => [
+                "class" => Create::class,
+                "description" => "Creer un élément(controller, formulaire, ...) dans l'application"
+            ]
+        ];
         global $argv;
         if(count($argv) > 1){
-
-        
+                    
             for($i = 0; $i<count($argv);$i++){
                 $argv[$i] = strtolower($argv[$i]);
             }
             $commandName = $argv[1];
-        
-            if(array_key_exists($commandName, $associations)){
-                $command = new $associations[$commandName]["class"](array_slice($argv, 2, count($argv)));
-                $command->execute();
-            }else{
-                echo "\nThe command '$commandName' doesn't exist\n";
+
+            if($commandName != "help"){
+            
+                if(array_key_exists($commandName, $commands)){
+                    $command = new $commands[$commandName]["class"](array_slice($argv, 2, count($argv)));
+                    $command->execute();
+                }else{
+                    echo "\nLa commande '$commandName' n'existe pas\n";
+                }
+                return;
             }
-        }else{
-            foreach($associations as $command => $infos){
-                echo $command." - ".$infos["description"];
-            }
+        }
+    
+        //Affichage de la liste des commandes
+        echo "Console - VPFramework\n";
+        echo "--- Liste des commandes ---\n";
+        foreach($commands as $command => $infos){
+            echo "\t $command - ".$infos["description"]."\n";
         }
     }
 
@@ -43,16 +57,20 @@ class Console
     }
 
     public static function createFile($path, $content){
-        try{            
-            $file = fopen($path, "w+");
-            fputs($file, $content);
-            fclose($file);
-            echo "\t- The file $path has been successfully created\n";
-            return true;;
-        }catch(\Exception $e){
-            echo $e->getMessage();
-            echo "\nThe creation of $path has failed\n";
-            return false;
+        if(!file_exists($path)){
+            try{            
+                $file = fopen($path, "w+");
+                fputs($file, $content);
+                fclose($file);
+                echo "\t- Le fichier $path a été crée avec succès\n";
+                return true;;
+            }catch(\Exception $e){
+                echo $e->getMessage();
+                echo "\nLa création de $path a échouée\n";
+                return false;
+            }
+        }else{
+            echo "Le fichier $path existe déjà";
         }
     }
 }
