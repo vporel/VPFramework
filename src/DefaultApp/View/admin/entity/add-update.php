@@ -14,11 +14,17 @@
         padding:5px 0;
     }
 
-    form div{
-        display:block;
+    form .form-group{
+        display:flex;
         padding:10px 0;
         border-bottom:1px solid lightgray;
         padding-left:20px;
+    }
+    form .input-div *{
+        margin-bottom:2px;
+    }
+    form .input-div *:not(:first-child) {
+        margin-top:2px;
     }
     form label{
         display:inline-block;width:150px;vertical-align: top;

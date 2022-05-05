@@ -28,6 +28,9 @@ abstract class AbstractField implements \Serializable
         $this->name = $name;
         $this->options = array_slice(array_merge($this->options, $options), 0, count($this->options));
         $this->addValidationRule('Ce champ doit être renseigné', function($value){
+            if(is_array($value)){
+                return $this->isNullable() || count($this->getRealValue($value)) > 0;
+            }
             return $this->isNullable() || trim($value) != '';
         });
     }
@@ -121,8 +124,10 @@ abstract class AbstractField implements \Serializable
         return '
             <div class="form-group">
                 <label class="form-label" for="'.$this->getName().'">'.$this->getLabel().'</label>
-                '.$this->getCustomHTML($value).' 
-                <span class="form-field-error text-error">'.$this->error.'</span>
+                <div class="input-div">
+                    '.$this->getCustomHTML($value).' 
+                    <span class="form-field-error text-error">'.$this->error.'</span>
+                </div>
             </div>
         ';
     }

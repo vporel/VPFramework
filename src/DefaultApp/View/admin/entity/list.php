@@ -105,8 +105,10 @@
                             <?php
                                 if($field["type"] == "EnumField")
                                     echo $formFields[$fieldName]->getElements()[$element->$fieldName];
-                                else 
-                                    echo $element->$fieldName;
+                                else{
+                                    $value = $element->$fieldName;
+                                    echo (is_array($value)) ? implode(" | ",$value) : $value;
+                                }
                                     
                             ?>
                         </td>

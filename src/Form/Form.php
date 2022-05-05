@@ -10,17 +10,9 @@ namespace VPFramework\Form;
 
 use VPFramework\Core\DIC;
 use VPFramework\Core\Request;
-use VPFramework\Form\Field\AbstractField;
-use VPFramework\Form\Field\File;
-use VPFramework\Form\Field\Password;
-use VPFramework\Utils\ObjectReflection;
-use VPFramework\Form\Field\Checkbox;
-use VPFramework\Form\Field\Number;
-use VPFramework\Form\Field\Relation;
-use VPFramework\Form\Field\Select;
-use VPFramework\Form\Field\TextArea;
-use VPFramework\Form\Field\TextLine;
+use VPFramework\Form\Field;
 use VPFramework\Model\Entity\Entity;
+use VPFramework\Utils\ObjectReflection;
 
 /**
  * Classe créeant un formulaire qui pourra être affiché dans une page
@@ -111,34 +103,52 @@ class Form
         foreach($rawFields as $rawField){
             if(count($fieldsToBuild) == 0 || in_array($rawField["name"], $fieldsToBuild)){
                 $field = null;
-                switch($rawField["type"]){
-                    case "string": $field = new TextLine($rawField["label"],$rawField["name"]);break;
-                    case "text": $field = new TextArea($rawField["label"],$rawField["name"]);break;
-                    case "boolean": $field = new Checkbox($rawField["label"],$rawField["name"]);break;
-                    case "integer": $field = new Number($rawField["label"],$rawField["name"]);break;
-                    case "NumberField": $field = new Number($rawField["label"],$rawField["name"]);break;
-                    case "PasswordField": 
-                        $field = new Password($rawField["label"],$rawField["name"], $options = [
-                            "hashFunction" => $rawField["VPFAnnotation"]->hashFunction,
-                        ]);
-                    break;
-                    case "FileField": 
-                        $field = new File($rawField["label"],$rawField["name"], $options = [
-                            "extensions" => $rawField["VPFAnnotation"]->extensions,
-                            "folder" => $rawField["VPFAnnotation"]->folder,
-                        ]);
-                    break;
-                    case "RelationField": 
-                        $field = new Relation($rawField["label"],$rawField["name"], $options = [
-                            "elements" => $rawField["VPFAnnotation"]->getElements(),
-                            "repositoryClass" => $rawField["VPFAnnotation"]->repositoryClass,
-                        ]);
-                    break;
-                    case "EnumField": 
-                        $field = new Select($rawField["label"],$rawField["name"], $options = [
-                            "elements" => $rawField["VPFAnnotation"]->getElements()
+                if(in_array($rawField["type"], ["integer", "smallint", "bigint", "NumberField"])){
+                    $field = new Field\Number($rawField["label"],$rawField["name"]);
+                    if($rawField["type"] == "NumberField"){
+                        $field->setMin($rawField["VPFAnnotation"]->min);
+                        $field->setMax($rawField["VPFAnnotation"]->max);
+                    }
+                }elseif(in_array($rawField["type"], ["date", "date_immutable", "datetime", "datetime_immutable"])){
+                    $field = new Field\Date($rawField["label"],$rawField["name"]);
+                }elseif(in_array($rawField["type"], ["array", "simple_array"])){
+                    $field = new Field\ArrayField($rawField["label"],$rawField["name"]);
+                }else{
+                    switch($rawField["type"]){
+                        case "string": $field = new Field\TextLine($rawField["label"],$rawField["name"]);break;
+                        case "text": $field = new Field\TextArea($rawField["label"],$rawField["name"]);break;
+                        case "boolean": $field = new Field\Checkbox($rawField["label"],$rawField["name"]);break;
+                        case "PasswordField": 
+                            $field = new Field\Password($rawField["label"],$rawField["name"], $options = [
+                                "hashFunction" => $rawField["VPFAnnotation"]->hashFunction,
                             ]);
-                    break;
+                        break;
+                        case "TextLineField":
+                            $field = new Field\TextLine($rawField["label"],$rawField["name"], $options = [
+                                "pattern" => $rawField["VPFAnnotation"]->pattern,
+                                "patternMessage" => $rawField["VPFAnnotation"]->patternMessage,
+                                "minLength" => $rawField["VPFAnnotation"]->minLength,
+                                "maxLength" => $rawField["VPFAnnotation"]->maxLength,
+                            ]);
+                        break;
+                        case "FileField": 
+                            $field = new Field\File($rawField["label"],$rawField["name"], $options = [
+                                "extensions" => $rawField["VPFAnnotation"]->extensions,
+                                "folder" => $rawField["VPFAnnotation"]->folder,
+                            ]);
+                        break;
+                        case "RelationField": 
+                            $field = new Field\Relation($rawField["label"],$rawField["name"], $options = [
+                                "elements" => $rawField["VPFAnnotation"]->getElements(),
+                                "repositoryClass" => $rawField["VPFAnnotation"]->repositoryClass,
+                            ]);
+                        break;
+                        case "EnumField": 
+                            $field = new Select($rawField["label"],$rawField["name"], $options = [
+                                "elements" => $rawField["VPFAnnotation"]->getElements()
+                                ]);
+                        break;
+                    }
                 }
                 $field->setNullable($rawField["nullable"]);
                 $fields[$field->getName()] = $field;
@@ -162,7 +172,7 @@ class Form
         return $this->fields;
     }
 
-    public function addField(AbstractField $field)
+    public function addField(Field\AbstractField $field)
     {
         $this->fields[$field->getName()] = $field;
 
@@ -206,7 +216,7 @@ class Form
         }
         foreach ($this->fields as $field) {
             $value = null;
-            if (!$field->isIgnored() && !($field instanceof Password) && $this->object != null)
+            if (!$field->isIgnored() && !($field instanceof Field\Password) && $this->object != null)
                 $value = ObjectReflection::getPropertyValue($this->object, $field->getName());
             $value = $this->parameters[$field->getName()] ?? $value;
             $html .= $field->getHTML($value);
@@ -218,7 +228,7 @@ class Form
     {
         $valid = true;
         foreach ($this->fields as $field) {
-            if ($field instanceof Password && $field->isDouble()) {
+            if ($field instanceof Field\Password && $field->isDouble()) {
                 if (!$field->isValid($this->parameters[$field->getName()], $this->parameters[$field->getConfirmName()])) {
                     $valid = false;
                 }
@@ -236,7 +246,7 @@ class Form
      */
     public function get(string $fieldName){
         $field = $this->fields[$fieldName];
-        if ($field instanceof File) {
+        if ($field instanceof Field\File) {
             $value = $field->getFileBaseName();
         }else{
             $value = $field->getRealValue($this->parameters[$field->getName()] ?? null);
