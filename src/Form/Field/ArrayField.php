@@ -46,12 +46,12 @@ class ArrayField extends AbstractField
                 }else{                        
                     $html .= '<input type="text" name="'.$this->name.'[]" class="form-control" />';
                 }
-                $html .= '<br><button type="button" class="add-array-element" id="'.$this->name.'-add" onclick="add_'.$this->name.'_element()">+</button>';
+                $html .= '<br><button type="button" class="input-button" id="'.$this->name.'-add" onclick="add_'.$this->name.'_element()">+</button>';
                 $html .= '
                     <script type="text/javascript">
                         function add_'.$this->name.'_element(){
                             let button = document.getElementById("'.$this->name.'-add");
-                            button.insertAdjacentHTML(\'beforebegin\', \'<input type="text" name="'.$this->name.'[]" class="form-control" />\');
+                            button.insertAdjacentHTML(\'beforebegin\', \'<input type="text" name="'.$this->name.'[]" class="form-control" /><br>\');
                         }
                     </script>
                 ';

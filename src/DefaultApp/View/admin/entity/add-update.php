@@ -26,6 +26,17 @@
     form .input-div *:not(:first-child) {
         margin-top:2px;
     }
+    form .input-link{
+        display:inline-block;
+        color:white;
+        background:var(--secondary-color);
+        border-radius:3px;
+        padding:3px;
+        margin:0 3px;
+    }
+    form .input-button{
+        margin:0 3px;
+    }
     form label{
         display:inline-block;width:150px;vertical-align: top;
     }
@@ -62,7 +73,7 @@
 <?php $_styles = ob_get_clean(); ?>
 
 <?php ob_start(); ?>
-    <h3 id="element-title"><?= ($mode == "add") ? "Ajout d'un élément" : $element ?></h3> 
+    <h3 id="element-title"><?= ($mode == "add") ? "Ajout d'un élément" : $element ?> (<?= $entityAdmin->name ?>)</h3> 
     <?php if($msg != ""){ ?> 
         <div class="alert"><?= $msg ?></div>
     <?php }?>

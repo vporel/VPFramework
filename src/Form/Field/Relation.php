@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use VPFramework\Core\DIC;
 use VPFramework\Model\Entity\Entity;
 use VPFramework\Model\Repository\Repository;
+use VPFramework\Utils\ClassUtil;
 use VPFramework\Utils\ObjectReflection;
 
 /**
@@ -103,17 +104,41 @@ class Relation extends Select
             }
             return "<span class='form-read-only-value'>$textToShow</span>";
         }else{
-            $select = '
-                    <select name="'.$this->name.'" id="'.$this->name.'" '.$this->getReadOnlyText().'>
+            $html = '
+                    <select name="'.$this->name.'" id="'.$this->name.'">
             ';
+            if($this->isNullable()){
+                $html .= '<option value="">Aucun</option>';
+            }
             foreach ($this->options["elements"] as $element) {
                 $elementValue = ObjectReflection::getPropertyValue($element, $this->getKeyProperty());
-                $select .= '<option value="'.$elementValue.'" '.($elementValue == $value ? 'selected' : '').'>'. (string) $element.'</option>';
+                $html .= '<option value="'.$elementValue.'" '.($elementValue == $value ? 'selected' : '').'>'. (string) $element.'</option>';
             }
 
-            $select .= '</select>';
-
-            return $select;
+            $html .= '</select>';
+            $entityName = ClassUtil::getSimpleName($this->getEntityClass());
+            $html .= '<button type="button" class="input-button" id="'.$this->name.'-reload" onclick="reload_'.$this->name.'_'.$entityName.'()">Recharger la liste</button>';
+            $html .= '<a class="input-link" href="/admin/'.$entityName.'/add" target="_blank">Ajouter</a>';
+            $html .= '
+                <script type="text/javascript">
+                    function reload_'.$this->name.'_'.$entityName.'(){
+					    var xhttp = new XMLHttpRequest();
+					    xhttp.onreadystatechange = function() {
+                            if (this.readyState == 4 && this.status == 200) {
+                                var elements = JSON.parse(this.responseText);
+                                var newSelectCode = "";
+                                for(element of elements){
+                                    newSelectCode += "<option value=\'"+element["value"]+"\'>"+element["text"]+"</option>";
+                                }
+                                document.getElementById("'.$this->name.'").innerHTML = newSelectCode;
+                            }
+                        };
+                        xhttp.open("GET", "/admin/'.$entityName.'/jsonList", true);
+                        xhttp.send();
+                    }
+                </script>
+            ';
+            return $html;
         }
     }
 

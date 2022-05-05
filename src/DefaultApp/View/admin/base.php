@@ -54,7 +54,10 @@
         aside section>div{
             padding:10px;
         }
-        aside section .element{display: flex;justify-content: space-between;border-bottom:1px solid lightgray;padding:5px 0;}
+        aside section .element{display: flex;justify-content: space-between;border-bottom:1px solid lightgray;padding:5px;}
+        aside section .element.active{
+            background:rgb(230,230,230);
+        }
         aside section .element:nth-child(2n){
             background:rgb(255,255,255,.5);
         }
@@ -87,18 +90,18 @@
                     <?php if(count($entitiesAdmin) > 0) { ?>
                     <?php 
                         $haveOneReadPermission = false;
-                        foreach($entitiesAdmin as $entityAdmin){ 
-                            if(!$entityAdmin->isBuiltin()){
-                                $permission = $app->user->getPermission($entityAdmin->getEntityClass());
+                        foreach($entitiesAdmin as $_entityAdmin){ 
+                            if(!$_entityAdmin->isBuiltin()){
+                                $permission = $app->user->getPermission($_entityAdmin->getEntityClass());
                                 if($permission != null){ //Droit de lecture
                                     $haveOneReadPermission = true;
                         ?>
-                            <div class="element">
-                                <a href="<?= $url("admin-entity-list", ["entityName" => $entityAdmin->getName()]) ?>" class="title"><?= $entityAdmin->getName() ?></a>
+                            <div class="element <?= ($entityAdmin->name == $_entityAdmin->name) ? 'active' : '' ?>">
+                                <a href="<?= $url("admin-entity-list", ["entityName" => $_entityAdmin->getName()]) ?>" class="title"><?= $_entityAdmin->getName() ?></a>
                                 <?php 
                                     if($permission->canAdd) { 
                                 ?>
-                                    <a href="<?= $url("admin-entity-add", ["entityName" => $entityAdmin->getName()]) ?>">Ajouter</a>
+                                    <a href="<?= $url("admin-entity-add", ["entityName" => $_entityAdmin->getName()]) ?>">Ajouter</a>
                             </div>
                         <?php 
                                     }

@@ -12,6 +12,7 @@ return [
     new Route("admin-logout", AdminController::class, "logout", "/admin/logout"),
 
     new Route("admin-entity-list", EntityAdminController::class, "list", "/admin/{entityName}/list"),
+    new Route("admin-entity-jsonList", EntityAdminController::class, "jsonList", "/admin/{entityName}/jsonList"),
     new Route("admin-entity-add", EntityAdminController::class, "add", "/admin/{entityName}/add"),
     new Route("admin-entity-update", EntityAdminController::class, "update", "/admin/{entityName}/{key}/update"),
     new Route("admin-entity-delete", EntityAdminController::class, "delete", "/admin/{entityName}/{key}/delete"),

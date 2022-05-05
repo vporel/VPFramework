@@ -68,8 +68,8 @@ class View
      */
     public function getBuiltinFunctions(){
         return [
-            "url" => function($name, $options = []){
-                $route = DIC::getInstance()->get(RouteConfiguration::class)->getRoute($name);
+            "url" => function($routeName, $options = []){
+                $route = DIC::getInstance()->get(RouteConfiguration::class)->getRoute($routeName);
                 return $route->getPath($options);
             },
             "asset" => function($element){

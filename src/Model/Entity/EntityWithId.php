@@ -35,8 +35,13 @@ abstract class EntityWithId extends Entity {
         return $this;
     }
 
-    public function getKeyProperty(){
+    public function getKeyProperty():string{
         return "id";
+    }
+
+    public function getNaturalOrderField():string
+    {
+        return "-id";
     }
 
 }

@@ -18,10 +18,14 @@ class RelationField extends Field
      */
     public $repositoryClass;
 
+    public function getEntityClass(){
+        return Repository::getRepositoryEntityClass($this->repositoryClass);
+    }
+
     public function getElements()
     {
         if($this->elements === null)
-            $this->elements = $this->getRepository()->findAll();
+            $this->elements = $this->getRepository()->findBy([], [Entity::getEntityNaturalOrderField($this->getEntityClass())]);
         return $this->elements;
     }
 
@@ -31,7 +35,7 @@ class RelationField extends Field
     }
 
     public function getKeyProperty(){
-        return Entity::getEntityKeyProperty(Repository::getRepositoryEntityClass($this->repositoryClass));
+        return Entity::getEntityKeyProperty($this->getEntityClass());
     }
 
 }

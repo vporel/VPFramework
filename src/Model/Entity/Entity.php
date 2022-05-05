@@ -20,7 +20,20 @@ use VPFramework\Utils\FlexibleClassTrait;
 abstract class Entity {
     use FlexibleClassTrait;
 
-    public abstract function getKeyProperty();
+    /**
+     * La propriété de l'entité qui est utilisée comme clée primaire
+     * Les clés composites ne sont pas gérées par le framework
+     */
+    public abstract function getKeyProperty():string;
+
+    /**
+     * Le champ utilisé naturellement pour ordoner les éléments de l'entité
+     * Pour un ordre décroissant il faut ajouter un tiret devant le nom de l'entité
+     */
+    public function getNaturalOrderField():string
+    {
+        return $this->getKeyProperty();
+    }
 
     public static function getEntityKeyProperty(string $entityClass){
         $reflectedClass = new \ReflectionClass($entityClass);
@@ -35,7 +48,27 @@ abstract class Entity {
             if(is_a($object, Entity::class)){
                 return $object->getKeyProperty();
             }else{
-                throw new EntityException("La Classe $entityClass n'est pas une sous classe d ela classe Entity");
+                throw new EntityException("La Classe $entityClass n'est pas une sous classe de la classe Entity");
+            }
+        }else{
+            throw new EntityException("Classe $entityClass non instanciable");
+        }
+    }
+
+    public static function getEntityNaturalOrderField(string $entityClass){
+        $reflectedClass = new \ReflectionClass($entityClass);
+
+        if ($reflectedClass->isInstantiable()) {
+            $constructor = $reflectedClass->getConstructor();
+            if ($constructor !== null) {
+                $object = $reflectedClass->newInstanceArgs([]);
+            } else {
+                $object = new $entityClass();
+            }
+            if(is_a($object, Entity::class)){
+                return $object->getNaturalOrderField();
+            }else{
+                throw new EntityException("La Classe $entityClass n'est pas une sous classe de la classe Entity");
             }
         }else{
             throw new EntityException("Classe $entityClass non instanciable");
@@ -79,7 +112,6 @@ abstract class Entity {
                 $field = [];
                 $field["name"] = $fieldName;
                 $field["label"] = $fieldName;
-                $field["type"] = null;
                 $joinColumnAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $fieldName, ORM\JoinColumn::class);
                 if($joinColumnAnnotation != null){
                     $field["nullable"] = $joinColumnAnnotation->nullable;

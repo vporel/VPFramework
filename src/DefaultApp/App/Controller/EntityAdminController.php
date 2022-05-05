@@ -23,7 +23,7 @@ use VPFramework\Utils\ObjectReflection;
 class EntityAdminController extends DefaultAppController
 {
 	private $em, $entitiesAdmin, $entityAdmin, $request, $adminGroupPermission;
-	private $keyProperty;
+	private $keyProperty, $orderField;
 	public function __construct(EntityManager $em, ServiceConfiguration $serviceConfig, Request $request){
 		$this->em = $em;
 		$this->request = $request;
@@ -39,10 +39,11 @@ class EntityAdminController extends DefaultAppController
 			$this->redirectRoute("admin");
 		}
 		$this->keyProperty = Entity::getEntityKeyProperty($this->entityAdmin->getEntityClass());
+		$this->orderField = Entity::getEntityNaturalOrderField($this->entityAdmin->getEntityClass());
 	}
 
 	public function list(){
-		$elements = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findBy([], ["-".$this->keyProperty]);
+		$elements = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findBy([], [$this->orderField]);
 		
 		$form = new Form("entity-add-form", $this->entityAdmin->getEntityClass());
 		return $this->render("admin/entity/list.php", [
@@ -55,6 +56,20 @@ class EntityAdminController extends DefaultAppController
 			"filterFields" => array_keys($this->entityAdmin->getFilterFields()),
 			"elements" => $elements
 		]);
+	}
+
+	public function jsonList(){
+		$elements = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findBy([], [$this->orderField]);
+		
+		$jsonElements = [];
+		$keyProperty = $this->keyProperty;
+		foreach($elements as $element){
+			$jsonElements[] = [
+				"value" => $element->$keyProperty,
+				"text" => (string) $element,
+			];
+		}
+		return json_encode($jsonElements);
 	}
 
 	public function add(){
@@ -77,6 +92,7 @@ class EntityAdminController extends DefaultAppController
 				//Réinitialisation
 				$msg = "Elément ajouté avec succès";
 				$form->setObject(new $class());
+				$form->setParameters([]);
 			}
 		}
 		return $this->render("admin/entity/add-update.php", [
