@@ -81,18 +81,20 @@ abstract class Entity {
                 $field["label"] = $fieldName;
                 $field["type"] = null;
                 $joinColumnAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $fieldName, ORM\JoinColumn::class);
-                $field["nullable"] = ($joinColumnAnnotation == null) ? false : $joinColumnAnnotation->nullable;
-                $field["VPFAnnotation"] = null;
-                $VPFFieldAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $fieldName, RelationField::class);
-                if($VPFFieldAnnotation != null){
-                    if($VPFFieldAnnotation->label != "")
-                        $field["label"] = $VPFFieldAnnotation->label;
-                    $field["type"] = "RelationField";
-                    $field["VPFAnnotation"] = $VPFFieldAnnotation;
-                }else{
-                    throw new EntityException("La propriété '$fieldName' ne possède pas l'annotation VPFramework\Model\Entity\Annotatios\RelationField");
+                if($joinColumnAnnotation != null){
+                    $field["nullable"] = $joinColumnAnnotation->nullable;
+                    $field["VPFAnnotation"] = null;
+                    $VPFFieldAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $fieldName, RelationField::class);
+                    if($VPFFieldAnnotation != null){
+                        if($VPFFieldAnnotation->label != "")
+                            $field["label"] = $VPFFieldAnnotation->label;
+                        $field["type"] = "RelationField";
+                        $field["VPFAnnotation"] = $VPFFieldAnnotation;
+                    }else{
+                        throw new EntityException("La propriété '$fieldName' ne possède pas l'annotation VPFramework\Model\Entity\Annotatios\RelationField");
+                    }
+                    $fields[$field["name"]] = $field;
                 }
-                $fields[$field["name"]] = $field;
             }
         }
         return $fields;
