@@ -96,7 +96,7 @@
                                 if($permission != null){ //Droit de lecture
                                     $haveOneReadPermission = true;
                         ?>
-                            <div class="element <?= ($entityAdmin->name == $_entityAdmin->name) ? 'active' : '' ?>">
+                            <div class="element <?= ($entityAdmin != null && $entityAdmin->name == $_entityAdmin->name) ? 'active' : '' ?>">
                                 <a href="<?= $url("admin-entity-list", ["entityName" => $_entityAdmin->getName()]) ?>" class="title"><?= $_entityAdmin->getName() ?></a>
                                 <?php 
                                     if($permission->canAdd) { 
