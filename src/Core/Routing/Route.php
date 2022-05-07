@@ -2,6 +2,7 @@
 
 namespace VPFramework\Core\Routing;
 
+use VPFramework\Core\Constants;
 use VPFramework\Core\DIC;
 
 /**
@@ -9,50 +10,50 @@ use VPFramework\Core\DIC;
  */
 class Route
 {
-    private $name, $path, $controllerClass, $controllerMethod, $pathParams, $pathParamsRegex;
+    private $name, $path, $controllerClass, $controllerMethod, $pathParams;
 
     private $pathRegex;
     private $controller;
         
     /**
      * __construct
-     * Les paramètes (champ pathParams doivent suivre l'ordre d'apparition dans le chemin (path))
-     * @param  mixed $name
-     * @param  mixed $controllerClass Ex : HomeController::class
-     * @param  mixed $controllerMethod
-     * @param  mixed $path
-     * @param  mixed $pathParams Un tableau associant à chaque paramètre du chemin une expression regulière pour vérifier sa validité. Ex : ["id" => "^[1-9][0-9]*$"] Pas d'options, pas de caractère de délimitation. par défaut, ces regex sont case insensitive
+     * @param  string $name
+     * @param  string $controllerAndMethod Ex : HomeController:index
+     * @param  string $path
      * @return void
      */
-    public function __construct(string $name, string $controllerClass, string $controllerMethod, string $path, array $pathParamsRegex = [])
+    public function __construct(string $name, string $controllerAndMethod, string $path)
     {
         $this->name = $name;
         $this->path = $path;
-        $this->controllerClass = $controllerClass;
-        $this->controllerMethod = $controllerMethod;
-        $this->pathParamsRegex = $pathParamsRegex;
-        $this->findAllPathParams();
+        $explodeControllerAndMethod = explode(":", $controllerAndMethod);
+        if(count($explodeControllerAndMethod) == 2){
+            $this->controllerClass = Constants::CONTROLLER_NAMESPACE."\\".$explodeControllerAndMethod[0];
+            $this->controllerMethod = $explodeControllerAndMethod[1];
+        }else{
+            throw new RouteException($this->getName(), "controllerAndMethod($controllerAndMethod)", RouteException::WRONG_PARAMETER);
+        }
+        $this->pathParams = $this->findPathParams($this->path);
         $this->pathRegex = "#^";
         $path = $this->path;
 
         //Construction de l'expression régulière à tester sur l'URL
         foreach($this->pathParams as $param){
-            if(in_array($param, $this->pathParamsRegex)){
-                $regex = $this->pathParamsRegex[$param];
-                $firstChar = substr($regex, 0, 1);
-                $lastChar = substr($regex, -1);
-                if($firstChar == "^") //le paramètre doit commencer par cette chaine
-                    $regex = substr($regex, 1);
-                else // On peut avoir un caractère avant
-                    $regex = ".*"+$regex;
-                if($lastChar == "$") //le paramètre doit se terminer par cette chaine
-                    $regex = substr($regex, 0, -1);
-                else // On peut avoir un caractère avant
-                    $regex = $regex+".*";
-                $path = str_replace("{".$param."}", "(".$regex.")", $path);
-            }else{
-                $path = str_replace("{".$param."}", "(.+)", $path);
-            }
+            $regex = $param["regex"];
+            $firstChar = substr($regex, 0, 1);
+            $lastChar = substr($regex, -1);
+            $beforeRegex = ($param["default"] != null) ? "(" : "";
+            $afterRegex = ($param["default"] != null) ? ")?" : "";
+            if($firstChar == "^") //le paramètre doit commencer par cette chaine
+                $regex = substr($regex, 1);
+            else // On peut avoir un caractère avant
+                $regex = ".*".$regex;
+            if($lastChar == "$") //le paramètre doit se terminer par cette chaine
+                $regex = substr($regex, 0, -1);
+            else // On peut avoir un caractère après
+                $regex = $regex.".*";
+            $path = str_replace("/<".$param["all"].">", "(/".$regex.")".(($param["default"] != null) ? "?" : ""), $path);
+            
         }
         $this->pathRegex .= $path."$#i";
     }
@@ -68,15 +69,37 @@ class Route
     /**
      * @return array Les paramètres dans le chemin
      */
-    private function findAllPathParams(){
-        $regex = "#".preg_replace("#{[^}]+}#", "({.*})", $this->path)."#";
-        if(preg_match($regex, $this->path, $matches)){
-            $this->pathParams = [];
+    private function findPathParams($path){
+        $pathParams = [];
+        if(preg_match("#<([^>]+)>#", $path, $matches)){
             foreach(array_slice($matches, 1) as $match){
-                $this->pathParams[] = substr(substr($match, 1), 0, -1);
+                $pathParam = [];
+                $pathParam["all"] = $match;
+                $pathParam["default"] = null;
+                $pathParam["regex"] = ".+"; // PAr défaut, nimporte quelle suite de caractères
+                $explodeForDefaultValue = explode("=", $pathParam["all"]);
+                if(count($explodeForDefaultValue) > 1){
+                    if(count($explodeForDefaultValue) == 2){
+                        $pathParam["default"] = $explodeForDefaultValue[1];
+                    }else{
+                        throw new RouteException($this->name, $pathParam["all"], RouteException::INVALID_PATH_PARAMETER_EXCEPTION);
+                    }
+                }
+
+                $explodeForRegex = explode("#", $pathParam["all"]);
+                if(count($explodeForRegex) > 1){
+                    if(count($explodeForRegex) == 3){
+                        $pathParam["regex"] = $explodeForRegex[1];
+                    }else{
+                        throw new RouteException($this->name, $pathParam["all"], RouteException::INVALID_PATH_PARAMETER_EXCEPTION);
+                    }
+                }
+                $explodeForName = explode("#", $explodeForDefaultValue[0]);
+                $pathParam["name"] = $explodeForName[0];
+                $pathParams[] = $pathParam;
             }
-        }else
-            $this->pathParams = [];
+        }
+        return $pathParams;
     }
 
     /**
@@ -86,12 +109,12 @@ class Route
     {
         if($this->controller == null){
             if(!class_exists($this->controllerClass, true)){
-                throw new ControllerNotFoundException($this->controllerClass);
+                throw new RouteException($this->name, $this->controllerClass, RouteException::CONTROLLER_NOT_FOUND);
             }else{
                 $this->controller = DIC::getInstance()->get($this->controllerClass);
             }
             if(!method_exists($this->controller, $this->controllerMethod)){
-                throw new ControllerMethodNotFoundException($this->controllerClass, $this->controllerMethod);
+                throw new RouteException($this->name, $this->controllerMethod, RouteException::CONTROLLER_METHOD_NOT_FOUND);
             }
         }
         return $this->controller;
@@ -134,10 +157,18 @@ class Route
 
     public function getData($matches){
         $data = [];
-        $i = 0; 
-        foreach($this->pathParams as $param){
-            $data[$param] = $matches[$i];
-            $i++;
+        if(count($this->pathParams) > 0){
+            if(count($matches) > 0){
+                $i = 0; 
+                foreach($this->pathParams as $param){
+                    $data[$param["name"]] = substr($matches[$i], 1);
+                
+                    $i++;
+                }
+            }else{
+                $lastParam = end($this->pathParams);
+                $data[$lastParam["name"]] = $lastParam["default"];
+            }
         }
         return $data;
     }

@@ -4,6 +4,7 @@ namespace VPFramework\Core\Configuration;
 
 use VPFramework\Core\Route\Route;
 use VPFramework\Core\Constants;
+use VPFramework\Core\Routing\RouteGroup;
 
 //Chargement des routes
 class RouteConfiguration{
@@ -24,7 +25,12 @@ class RouteConfiguration{
             $routes = array_merge($routes, require Constants::FRAMEWORK_ROOT."/DefaultApp/Config/routes.php");
             $this->routes = [];
             foreach($routes as $route){
-                $this->routes[$route->getName()] = $route;
+                if($route instanceof RouteGroup){
+                    foreach($route->getRoutes() as $r){
+                        $this->routes[$r->getName()] = $r;
+                    }
+                }else
+                    $this->routes[$route->getName()] = $route;
             }
         }
         return $this->routes;

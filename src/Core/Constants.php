@@ -12,4 +12,6 @@ class Constants{
     public static $PUBLIC_FOLDER;
 
     const FRAMEWORK_ROOT = __DIR__."/..";
+
+    const CONTROLLER_NAMESPACE = "App\\Controller";
 }
