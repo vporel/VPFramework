@@ -5,10 +5,6 @@ use VPFramework\Core\Constants;
 
 class FileUpload
 {
-    /**
-     * Chiffre à ajouter à la fin du nom du fichier s'il existe déjà  
-     */
-    private static $newFilePathCounter = 2;
 
     /**
      * @param string $key
@@ -26,7 +22,6 @@ class FileUpload
             if(count($extensions) == 0 || in_array($extension, $extensions)){
                 $absoluteDestFolder = self::absoluteDestinationFolder($destinationFolder);
                 $filePath = $absoluteDestFolder."/".$fileName;
-                self::$newFilePathCounter = 2;
                 $newFilePath = self::newFilePath($filePath);
                 if(!file_exists($absoluteDestFolder))
                     mkdir($absoluteDestFolder, 0777, true);
@@ -74,8 +69,15 @@ class FileUpload
         if(file_exists($filePath)){
             //On réessaye avec en incrémentant le compteur
             $pathinfo = pathinfo($filePath);
-            $updatedFilePath = $pathinfo["dirname"]."/".$pathinfo["filename"]."-".self::$newFilePathCounter.".".$pathinfo["extension"];
-            self::$newFilePathCounter++;
+            $parts = explode("--", $pathinfo["filename"]);
+            $lastElement = end($parts);
+            if((int) $lastElement > 0){
+                array_pop($parts);
+                $newName = implode("--", $parts)."--".((int) $lastElement+1);
+            }else{
+                $newName = $pathinfo["filename"]."--2";
+            }
+            $updatedFilePath = $pathinfo["dirname"]."/".$newName.".".$pathinfo["extension"];
             return self::newFilePath($updatedFilePath);
         }else{
             return $filePath;
