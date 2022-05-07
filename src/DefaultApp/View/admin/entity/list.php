@@ -101,14 +101,17 @@
             <?php foreach($elements as $element){ ?>
                 <tr>
                     <td><input type="checkbox" class="line-checkbox" data-key="<?= $element->$keyProperty ?>"/></td>
-                    <?php foreach($mainFields as $fieldName => $field){ ?>
+                    <?php foreach($mainFields as $fieldName => $field){ $value = $element->$fieldName;?>
                         <td class="<?= $fieldName ?>">
                             <?php
                                 if($field["type"] == "EnumField")
-                                    echo $formFields[$fieldName]->getElements()[$element->$fieldName];
+                                    echo $formFields[$fieldName]->getElements()[$value];
                                 else{
-                                    $value = $element->$fieldName;
-                                    echo (is_array($value)) ? implode(" | ",$value) : $value;
+                                    if($value instanceof \DateTime)
+                                        echo $value->format("d-m-Y");
+                                    else
+                                        echo (is_array($value)) ? implode(" | ",$value) : $value;
+                                    
                                 }
                                     
                             ?>

@@ -22,9 +22,9 @@ class AppGlobals
 
     public function getUser()
     {
-        if($this->user == null || ($this->user->getId() != $_SESSION["user"]["id"])){
-            if(isset($_SESSION["user"]) && (int) $_SESSION["user"]["id"] > 0){
-                $this->user = DIC::getInstance()->get($_SESSION["user"]["repository"])->find($_SESSION["user"]["id"]);
+        if($this->user == null){
+            if(isset($_SESSION["user"]) && isset($_SESSION["user"]["keyProperty"])){
+                $this->user = DIC::getInstance()->get($_SESSION["user"]["repository"])->findOneBy([$_SESSION["user"]["keyProperty"] => $_SESSION["user"]["keyPropertyValue"]]);
             }
         }
         return $this->user;

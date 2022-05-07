@@ -8,6 +8,7 @@ use VPFramework\Core\Configuration\ServiceNotFoundException;
 use VPFramework\Core\Constants;
 use VPFramework\Core\DIC;
 use VPFramework\Model\Entity\Entity;
+use VPFramework\Model\Repository\Repository;
 
 /**
  * Classe permettant de sécurisé certaines parties de l'applciation
@@ -41,6 +42,7 @@ final class Security
                 if (preg_match("#$safeUrl#i", $urlPath)) { // Ajout des délimiteurs car dans le fichier de configuration ils ne sont pas mis
                     
                     $user = DIC::getInstance()->get(AppGlobals::class)->getUser();
+                    echo $user == null;
                     foreach($rule->getEntitiesRoles() as $entity => $roles){
                         if ($user == null || (count($roles) > 0 && !in_array($user->getRole(), $roles)) || !($user instanceof $entity)) {
                             //Récupération de l'adresse précédente de la page avant la redirection
@@ -71,7 +73,10 @@ final class Security
     
     public static function login(Entity $object, string $repositoryClass){
         $_SESSION['user'] = [];
-        $_SESSION['user']['id'] = $object->getId();
+        $keyProperty = $object->getKeyProperty();
+        
+        $_SESSION['user']['keyProperty'] = $keyProperty;
+        $_SESSION['user']['keyPropertyValue'] = $object->$keyProperty;
         $_SESSION['user']['repository'] = $repositoryClass;
     }
 

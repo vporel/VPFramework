@@ -2,6 +2,8 @@
 
 namespace VPFramework\Form\Field;
 
+use DateTime;
+
 abstract class AbstractField implements \Serializable
 {
     protected $label;
@@ -118,9 +120,10 @@ abstract class AbstractField implements \Serializable
 
     public function getHTML($value)
     {
-        /*
-            Cette function est faite pour être redéfinie par la class Password uniquement
-         */
+        if($value instanceof DateTime){
+            $value = $value->format("Y-m-d");
+        }
+
         return '
             <div class="form-group">
                 <label class="form-label" for="'.$this->getName().'">'.$this->getLabel().'</label>
