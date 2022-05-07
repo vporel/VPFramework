@@ -61,7 +61,8 @@ class File extends AbstractField
             return true;
         }catch(FileUploadException $e){
             if($e->getCode() == FileUploadException::FILE_NOT_RECEIVED){
-                if(!$this->isNullable()){
+        
+                if(!$this->isNullable() && $value === null){
                     $this->error = "Choisissez un fichier";
                 }
             }else{                
