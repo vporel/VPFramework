@@ -7,6 +7,7 @@ use VPFramework\Core\DIC;
 use VPFramework\Core\Request;
 use VPFramework\DefaultApp\App\Entity\Admin;
 use VPFramework\DefaultApp\App\Repository\AdminRepository;
+use VPFramework\Form\Field\File;
 use VPFramework\Form\Form;
 use VPFramework\Model\Entity\Annotations\Field;
 use VPFramework\Model\Entity\Annotations\FileField;
@@ -113,7 +114,10 @@ class EntityAdminController extends DefaultAppController
 		$element = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findOneBy([$this->keyProperty => $this->request->get("key")]);
 		
 		$form = new Form("entity-update", $this->entityAdmin->getEntityClass(), $element);
-
+		foreach($form->getFields() as $field){
+			if($field instanceof File)
+				$field->setNullable(true);
+		}
 		if(!$this->adminGroupPermission->canUpdate) 
 			$form->setFormReadOnly(true);
 		$msg = "";
