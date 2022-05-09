@@ -62,4 +62,17 @@ class RouteGroup
     {
         return $this->routes;
     }
+
+    /**
+     * @param string $namespace
+     * 
+     * @return RouteGroup
+     */
+    public function setControllerNamespace(string $namespace):RouteGroup
+    {
+        foreach($this->routes as $route){
+            $route->setControllerNamespace($namespace);
+        }
+        return $this;
+    }
 }

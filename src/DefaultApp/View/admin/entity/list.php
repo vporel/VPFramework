@@ -13,7 +13,7 @@
             border-bottom:1px solid rgb(170,170,170);
             text-align:left;
             text-transform: uppercase;
-            font-size: 14px;
+            font-size: 12px;
         }
         #list .action{
             display:inline-block;

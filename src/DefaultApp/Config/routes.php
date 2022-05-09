@@ -1,18 +1,22 @@
 <?php
-use VPFramework\Core\Routing\Route;
+use VPFramework\Core\Routing\RouteGroup;
+use VPFramework\Core\Routing\RouteInGroup;
 
 return [
-    new Route("admin", "AdminController:index", "/admin"),
+    (new RouteGroup("AdminController", "/admin", [
+        new RouteInGroup("admin", "index", ""),
 
-    new Route("admin-login", "AdminController:login", "/admin/login"),
-    new Route("admin-first-admin", "AdminController:firstAdmin", "/admin/first-admin"),
-    new Route("admin-update-password", "AdminController:updatePassword", "/admin/update-password"),
-    new Route("admin-logout", "AdminController:logout", "/admin/logout"),
-
-    new Route("admin-entity-list", "EntityAdminController:list", "/admin/{entityName}/list"),
-    new Route("admin-entity-jsonList", "EntityAdminController:jsonList", "/admin/{entityName}/jsonList"),
-    new Route("admin-entity-add", "EntityAdminController:add", "/admin/{entityName}/add"),
-    new Route("admin-entity-update", "EntityAdminController:update", "/admin/{entityName}/{key}/update"),
-    new Route("admin-entity-delete", "EntityAdminController:delete", "/admin/{entityName}/{key}/delete"),
-    new Route("admin-entity-delete-many", "EntityAdminController:deleteMany", "/admin/{entityName}/delete-many"),
+        new RouteInGroup("admin-login", "login", "/login"),
+        new RouteInGroup("admin-first-admin", "firstAdmin", "/first-admin"),
+        new RouteInGroup("admin-update-password", "updatePassword", "/update-password"),
+        new RouteInGroup("admin-logout", "logout", "/logout"),
+    ]))->setControllerNamespace("VPFramework\\DefaultApp\\App\\Controller"),
+    (new RouteGroup("EntityAdminController", "/admin/<entityName>", [
+        new RouteInGroup("admin-entity-list", "list", "/list"),
+        new RouteInGroup("admin-entity-jsonList", "jsonList", "/jsonList"),
+        new RouteInGroup("admin-entity-add", "add", "/add"),
+        new RouteInGroup("admin-entity-update", "update", "/<key>/update"),
+        new RouteInGroup("admin-entity-delete", "delete", "/<key>/delete"),
+        new RouteInGroup("admin-entity-delete-many", "deleteMany", "/delete-many"),
+    ]))->setControllerNamespace("VPFramework\\DefaultApp\\App\\Controller"),
 ];

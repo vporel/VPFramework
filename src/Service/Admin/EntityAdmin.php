@@ -24,6 +24,7 @@ class EntityAdmin
     private $entityClass, $repositoryClass, $mainFieldsNames;
 
     private $filterFieldsNames;  
+    private $ignoredFieldsNames;  
     /**
      * __construct
      * 
@@ -32,15 +33,17 @@ class EntityAdmin
      * @param string $repositoryClass Ex : UserRepository::class
      * @param array $mainFieldsNames La liste des champs qui seront affichés lorsqu'on présentera la liste des éléments
      * @param array $filterFieldsNames La liste des champs qui seront utilisés comme critère pour le filtre
+     * @param array $ignoredFieldsNames La liste des champs qui ne doivent pas être gérés par l'administration. Assurez-vous que ces champs peuvent être nuls
      * Les éléments du filterFieldsNames qui sont du type text (pour textarea) ne seront pas pris en compte
      * Si le paramètre $mainFields n'est pas vide, les éléments du $filterFieldsNames qui n'y figurent pas ne seront pas pris en compte
      * @return void
      */
-    public function __construct(string $repositoryClass, array $mainFieldsNames = [], array $filterFieldsNames = [])
+    public function __construct(string $repositoryClass, array $mainFieldsNames = [], array $filterFieldsNames = [], array $ignoredFieldsNames = [])
     {
         $this->repositoryClass = $repositoryClass;
         $this->mainFieldsNames = $mainFieldsNames;
         $this->filterFieldsNames = $filterFieldsNames;
+        $this->ignoredFieldsNames = $ignoredFieldsNames;
         $this->entityClass = Repository::getRepositoryEntityClass($this->repositoryClass);
     }
 
@@ -91,7 +94,13 @@ class EntityAdmin
      * @return array Tableau associant chaque propriété de l'attribut à son type dans doctrine (Ex : name => string)
      */
     public function getFields(){
-        return Entity::getFields($this->entityClass);
+        $fields = [];
+        foreach(Entity::getFields($this->entityClass) as $fieldName => $field){
+            if(!in_array($fieldName, $this->ignoredFieldsNames)){
+                $fields[$fieldName] = $field;
+            }
+        }
+        return $fields;
     }
 
     /**
