@@ -35,6 +35,7 @@
         header{
             background:var(--primary-color);padding:0 15px;height:40px;display:flex;
             justify-content: space-between;align-items: center;position: sticky;top:0;
+            z-index:10;
         }
         header h2{margin:0;color:white;text-shadow:1px 1px 1px black;}
         header h2 a{color:inherit;}
