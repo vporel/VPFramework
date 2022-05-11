@@ -103,7 +103,7 @@ class Form
         foreach($rawFields as $rawField){
             if(count($fieldsToBuild) == 0 || in_array($rawField["name"], $fieldsToBuild)){
                 $field = null;
-                if(in_array($rawField["type"], ["integer", "smallint", "bigint", "NumberField"])){
+                if(in_array($rawField["type"], ["integer", "smallint", "bigint", "float", "NumberField"])){
                     $field = new Field\Number($rawField["label"],$rawField["name"]);
                     if($rawField["type"] == "NumberField"){
                         $field->setMin($rawField["VPFAnnotation"]->min);
@@ -248,6 +248,12 @@ class Form
         $field = $this->fields[$fieldName];
         if ($field instanceof Field\File) {
             $value = $field->getFileBaseName();
+            if($value == ""){
+                $valueFromObject = ObjectReflection::getPropertyValue($this->object, $field->getName());
+                if($valueFromObject != null){
+                    $value = $valueFromObject;
+                }
+            }
         }else{
             $value = $field->getRealValue($this->parameters[$field->getName()] ?? null);
         }

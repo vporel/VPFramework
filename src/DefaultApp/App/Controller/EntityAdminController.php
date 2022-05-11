@@ -123,7 +123,6 @@ class EntityAdminController extends DefaultAppController
 		$msg = "";
 		if($form->isSubmitted() && $form->isValid()){
 			$form->updateObject();
-			$this->em->merge($element);
 			$this->em->flush();
 			$msg = "Modification effectuée";
 		}

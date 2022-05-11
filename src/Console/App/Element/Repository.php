@@ -25,7 +25,7 @@ class Repository
                 $repositoryPath = REPOSITORY_DIR."/".$entityClassName."Repository.php";
                 Console::createFile($repositoryPath,  self::getCode($entityClassName));
             }else{
-                echo "\nLa classe entité App\\entity\\$entityClassName n'existe pas\n";
+                echo "\nLa classe entité App\\Entity\\$entityClassName n'existe pas\n";
             }
         }
         

@@ -37,7 +37,6 @@ class Route
         $this->pathParams = $this->findPathParams($this->path);
         $this->pathRegex = "#^";
         $path = $this->path;
-
         //Construction de l'expression régulière à tester sur l'URL
         foreach($this->pathParams as $param){
             $regex = $param["regex"];
@@ -48,11 +47,11 @@ class Route
             if($firstChar == "^") //le paramètre doit commencer par cette chaine
                 $regex = substr($regex, 1);
             else // On peut avoir un caractère avant
-                $regex = ".*".$regex;
+                $regex = "[^/]*".$regex;
             if($lastChar == "$") //le paramètre doit se terminer par cette chaine
                 $regex = substr($regex, 0, -1);
             else // On peut avoir un caractère après
-                $regex = $regex.".*";
+                $regex = $regex."[^/]*";
             $path = str_replace("/<".$param["all"].">", "(/".$regex.")".(($param["default"] != null) ? "?" : ""), $path);
             
         }
@@ -83,7 +82,7 @@ class Route
                     $pathParam = [];
                     $pathParam["all"] = $match;
                     $pathParam["default"] = null;
-                    $pathParam["regex"] = ".+"; // PAr défaut, nimporte quelle suite de caractères
+                    $pathParam["regex"] = "[^/]+"; // PAr défaut, nimporte quelle suite de caractères
                     $explodeForDefaultValue = explode("=", $pathParam["all"]);
                     if(count($explodeForDefaultValue) > 1){
                         if(count($explodeForDefaultValue) == 2){
