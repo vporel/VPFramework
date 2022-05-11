@@ -105,7 +105,7 @@
                         <td class="<?= $fieldName ?>">
                             <?php
                                 if($field["type"] == "EnumField")
-                                    echo $formFields[$fieldName]->getElements()[$value];
+                                    echo $formFields[$fieldName]->getElements()[$value] ?? "";
                                 else{
                                     if($value instanceof \DateTime)
                                         echo $value->format("d-m-Y"); 
