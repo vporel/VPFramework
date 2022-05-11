@@ -144,7 +144,7 @@ class Form
                             ]);
                         break;
                         case "EnumField": 
-                            $field = new Select($rawField["label"],$rawField["name"], $options = [
+                            $field = new Field\Select($rawField["label"],$rawField["name"], $options = [
                                 "elements" => $rawField["VPFAnnotation"]->getElements()
                                 ]);
                         break;
