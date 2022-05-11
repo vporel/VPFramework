@@ -107,7 +107,7 @@
                                 if($field["type"] == "EnumField")
                                     echo $formFields[$fieldName]->getElements()[$value] ?? "";
                                 else{
-                                    if($value instanceof \DateTime)
+                                    if($value instanceof \DateTime) 
                                         echo $value->format("d-m-Y"); 
                                     else
                                         echo (is_array($value)) ? implode(" | ",$value) : $value;
