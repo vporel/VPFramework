@@ -108,7 +108,7 @@
                                     echo $formFields[$fieldName]->getElements()[$value] ?? "";
                                 else{
                                     if($value instanceof \DateTime) 
-                                        echo $value->format("d-m-Y"); 
+                                        echo $value->format("d-m-Y H:i"); 
                                     else
                                         echo (is_array($value)) ? implode(" | ",$value) : $value;
                                     
