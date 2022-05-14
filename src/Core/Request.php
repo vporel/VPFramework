@@ -91,4 +91,9 @@ class Request
     public function getMethod(){
         return $_SERVER["REQUEST_METHOD"];
     }
+
+    public function isXMLHttpRequest(){
+        
+		return isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest";
+    }
 }
