@@ -3,13 +3,15 @@
 namespace VPFramework\Model\Repository;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query\Parameter;
 use VPFramework\Core\DIC;
 use Doctrine\ORM\Tools\SchemaTool;
-use VPFramework\DefaultApp\App\Repository\AdminRepository;
 
 /**
  * Classe repository
@@ -34,52 +36,86 @@ abstract class Repository extends EntityRepository
     public abstract function getEntityClass();
 
     /**
-     * @param array $criteria Les critères seront tous passés avec l'opération AND, pour un filtre plus poussé, créer une méthode personnalisée
+     * @param string $propertyName
+     * @param string $operatorAlias Ex : neq, gt, gte
+     * 
+     * @return string
+     */
+    final protected function getConditionText(string $propertyName, string $operatorAlias):string
+    {
+        $text = "entity.".$propertyName;
+        switch (strtolower($operatorAlias)){
+            case "neq": $text .= " != "; break;
+            case "gt": $text .=" > "; break;
+            case "gte": $text .=" >= "; break;
+            case "lt": $text .=" < "; break;
+            case "lte": $text .=" <= "; break;
+            case "like": $text .=" LIKE "; break;
+            default: $text .=" = ";break;
+        }
+        $text .= ":".$propertyName;
+        return $text;
+    }
+
+    /**
+     * Create the condition with with the given criteria
+     * @param QueryBuilder $queryBuilder
+     * @param array $criteria
+     * 
+     * @return void
+     */
+    protected function createCondition(array $criteria, ArrayCollection &$parameters = null):string
+    {
+        $parameters = new ArrayCollection();
+        $conditionTexts = [];
+        $nonArrayElements = 0; //The elements in criteria which are not arrays
+        foreach($criteria as $key => $element){
+            if(!is_array($element)){
+                $nonArrayElements++;
+                $dividedKey = explode("__", $key);
+                $propertyName = $dividedKey[0];
+                $operatorAlias = $dividedKey[1] ?? "eq";
+                $conditionTexts[] = $this->getConditionText($propertyName, $operatorAlias);
+                if($element instanceof DateTime)
+                    $parameters[] = new Parameter($propertyName, $element, Types::DATE_IMMUTABLE);
+                else
+                    $parameters[] = new Parameter($propertyName, $element);
+            }else{
+                $conditionTexts[] = $this->createCondition($element, $params);
+                foreach($params as $param)
+                    $parameters[] = $param;
+            }
+        }
+        $operator = ($nonArrayElements > 0) ? "AND" :" OR "; // If there is at least one element which are not an array, we use AND
+        return "(".implode(" $operator ", $conditionTexts).")";
+    }
+
+    /**
+     * @param array $criteria Le passage des crit_res respectes des conventions précises
+     * La tableau est à deux dimensions
+     * Tous les éléments d'un sous tableau sont associés avec l'opérateur AND
+     * Tous les sous tableaux  sont associés avec l'opérateur OR
+     * 
+     * Pour des critèes plus poussés, créer un méthode personnalisée
      * @return Query
      */
     private function buildQuery(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
         $queryBuilder
-            ->select("e")
-            ->from($this->getEntityClass(), "e");
-
+            ->select("entity")
+            ->from($this->getEntityClass(), "entity");
         //Criteria
-        $alreadyHasWhereClose = false;
-        foreach($criteria as $key => $value){
-            $dividedKey = explode("__", $key);
-            $realKey = $dividedKey[0];
-            if(!$alreadyHasWhereClose){
-                $whereMethod = "where";
-                $alreadyHasWhereClose = true;
-            }else{
-                $whereMethod = "andWhere";
-            }
-            if(count($dividedKey) < 2){ //Pas de paramètre particulier : recherche d'une égalité
-                $queryBuilder->$whereMethod("e.".$realKey." = :".$realKey);
-            }else{
-                switch (strtolower($dividedKey[1])){
-                    case "neq": $queryBuilder->$whereMethod("e.".$realKey." != :".$realKey); break;
-                    case "gt": $queryBuilder->$whereMethod("e.".$realKey." > :".$realKey); break;
-                    case "gte": $queryBuilder->$whereMethod("e.".$realKey." >= :".$realKey); break;
-                    case "lt": $queryBuilder->$whereMethod("e.".$realKey." < :".$realKey); break;
-                    case "lte": $queryBuilder->$whereMethod("e.".$realKey." <= :".$realKey); break;
-                    case "like": $queryBuilder->$whereMethod("e.".$realKey." LIKE :".$realKey); break;
-                    default: $queryBuilder->$whereMethod("e.".$realKey." = :".$realKey);break;
-                }
-            }
-            if($value instanceof DateTime)
-                $queryBuilder->setParameter($realKey, $value, Types::DATE_IMMUTABLE);
-            else
-                $queryBuilder->setParameter($realKey, $value);
-        }
+        $condition = $this->createCondition($criteria, $parameters);
+        $queryBuilder->where($condition);
+        $queryBuilder->setParameters($parameters);
         //Order
         if($orderBy != null && is_array($orderBy)){
             foreach($orderBy as $order){
                 if(substr($order, 0,1) == "-"){
-                    $queryBuilder->orderBy("e.".substr($order, 1), "DESC");
+                    $queryBuilder->orderBy("entity.".substr($order, 1), "DESC");
                 }else{
-                    $queryBuilder->orderBy("e.".$order, "ASC");
+                    $queryBuilder->orderBy("entity.".$order, "ASC");
                 }
             }
         }
