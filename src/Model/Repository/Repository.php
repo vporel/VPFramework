@@ -87,7 +87,7 @@ abstract class Repository extends EntityRepository
             }
         }
         $operator = ($nonArrayElements > 0) ? "AND" :" OR "; // If there is at least one element which are not an array, we use AND
-        return "(".implode(" $operator ", $conditionTexts).")";
+        return count($conditionTexts) > 0 ? "(".implode(" $operator ", $conditionTexts).")" : "";
     }
 
     /**
@@ -107,8 +107,10 @@ abstract class Repository extends EntityRepository
             ->from($this->getEntityClass(), "entity");
         //Criteria
         $condition = $this->createCondition($criteria, $parameters);
-        $queryBuilder->where($condition);
-        $queryBuilder->setParameters($parameters);
+        if($condition != ""){
+            $queryBuilder->where($condition);
+            $queryBuilder->setParameters($parameters);
+        }
         //Order
         if($orderBy != null && is_array($orderBy)){
             foreach($orderBy as $order){
