@@ -11,6 +11,7 @@ namespace VPFramework\Form;
 use VPFramework\Core\DIC;
 use VPFramework\Core\Request;
 use VPFramework\Form\Field;
+use VPFramework\Form\Field\AbstractField;
 use VPFramework\Model\Entity\Entity;
 use VPFramework\Utils\ObjectReflection;
 
@@ -186,6 +187,16 @@ class Form
     public function getFields()
     {
         return $this->fields;
+    }
+
+    /**
+     * @param string $fieldName
+     * 
+     * @return AbstractField|null
+     */
+    public function getField(string $fieldName):?AbstractField
+    {
+        return $this->fields[$fieldName] ?? null;
     }
 
     public function addField(Field\AbstractField $field)

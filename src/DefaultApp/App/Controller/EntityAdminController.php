@@ -8,6 +8,7 @@ use VPFramework\Core\Request;
 use VPFramework\DefaultApp\App\Entity\Admin;
 use VPFramework\DefaultApp\App\Repository\AdminRepository;
 use VPFramework\Form\Field\File;
+use VPFramework\Form\Field\Relation;
 use VPFramework\Form\Form;
 use VPFramework\Model\Entity\Annotations\Field;
 use VPFramework\Model\Entity\Annotations\FileField;
@@ -17,6 +18,7 @@ use VPFramework\Model\Entity\Annotations\RelationField;
 use VPFramework\Model\Entity\Annotations\TextLineField;
 use VPFramework\Model\Entity\Entity;
 use VPFramework\Utils\AnnotationReader;
+use VPFramework\Utils\ClassUtil;
 use VPFramework\Utils\FileUpload;
 use VPFramework\Utils\FileUploadException;
 use VPFramework\Utils\ObjectReflection;
@@ -78,7 +80,12 @@ class EntityAdminController extends DefaultAppController
 		$class = $this->entityAdmin->getEntityClass();
 		$element = new $class();
 		$form = new Form("entity-add", $class, $element, array_keys($this->entityAdmin->getFields()));
-		
+		foreach($form->getFields() as $field){
+			if($field instanceof Relation){
+				$relatedEntityName = ClassUtil::getSimpleName($field->getEntityClass());
+				$field->setLinkToAdd("/admin/".$relatedEntityName."/add");
+			}
+		}
 		$msg = "";
 		$continueAdd = false;
 		if($form->isSubmitted() && $form->isValid()){

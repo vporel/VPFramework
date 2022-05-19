@@ -9,30 +9,24 @@ use VPFramework\Core\DIC;
  */
 class Route
 {
-    private $name, $path, $controllerClassBaseName, $controllerMethod, $pathParams;
+    private $name, $path, $controllerClass, $controllerMethod, $pathParams;
 
     private $pathRegex;
-    private $controller;
-    private $controllerNamespace = null;
         
     /**
      * __construct
      * @param  string $name
-     * @param  string $controllerAndMethod Ex : HomeController:index
+     * @param  string $controllerClass
+     * @param  string $controllerMethod
      * @param  string $path
      * @return void
      */
-    public function __construct(string $name, string $controllerAndMethod, string $path)
+    public function __construct(string $name, string $controllerClass, string $controllerMethod, string $path)
     {
         $this->name = $name;
         $this->path = $path;
-        $explodeControllerAndMethod = explode(":", $controllerAndMethod);
-        if(count($explodeControllerAndMethod) == 2){
-            $this->controllerClassBaseName = $explodeControllerAndMethod[0];
-            $this->controllerMethod = $explodeControllerAndMethod[1];
-        }else{
-            throw new RouteException($this->getName(), "controllerAndMethod($controllerAndMethod)", RouteException::WRONG_PARAMETER);
-        }
+        $this->controllerClass = $controllerClass;
+        $this->controllerMethod = $controllerMethod;
         $this->pathParams = $this->findPathParams($this->path);
         $this->pathRegex = "#^";
         $path = $this->path;
@@ -66,9 +60,7 @@ class Route
     }
 
     public function getControllerClass(){
-        if($this->controllerNamespace == null)
-            throw new RouteException($this->getName(), "", RouteException::CONTROLLER_NAMESPACE_NOT_SET);
-        return $this->controllerNamespace."\\".$this->controllerClassBaseName;
+        return $this->controllerClass;
     }
 
     /**
@@ -108,35 +100,6 @@ class Route
             }
         }
         return $pathParams;
-    }
-
-    /**
-     * @param string $namespace
-     * 
-     * @return void
-     */
-    public function setControllerNamespace(string $namespace):void
-    {
-        $this->controllerNamespace = $namespace;
-    }
-
-    /**
-     * @return Controller le controller appelé par la route
-     */
-    public function getController()
-    {
-        $controllerClass = $this->getControllerClass();
-        if($this->controller == null){
-            if(!class_exists($controllerClass, true)){
-                throw new RouteException($this->name, $controllerClass, RouteException::CONTROLLER_NOT_FOUND);
-            }else{
-                $this->controller = DIC::getInstance()->get($controllerClass);
-            }
-            if(!method_exists($this->controller, $this->controllerMethod)){
-                throw new RouteException($this->name, $this->controllerMethod, RouteException::CONTROLLER_METHOD_NOT_FOUND);
-            }
-        }
-        return $this->controller;
     }
 
     /**

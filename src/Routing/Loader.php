@@ -59,8 +59,7 @@ class Loader{
             $methodName = $method->getName();
             $routeAnnotation = AnnotationReader::getMethodAnnotation($class, $methodName, RouteAnnotation::class);
             if($routeAnnotation != null){
-                $controllerName = ClassUtil::getSimpleName($class);
-                $route = new Route($routeAnnotation->name, "$controllerName:$methodName", $pathStart.$routeAnnotation->path);
+                $route = new Route($routeAnnotation->name, $class, $methodName, $pathStart.$routeAnnotation->path);
                 $routes[$route->getName()] = $route;
             }
         }

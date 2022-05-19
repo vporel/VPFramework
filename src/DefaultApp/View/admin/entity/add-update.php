@@ -29,7 +29,7 @@
     form .input-div *:not(:first-child) {
         margin-top:2px;
     }
-    form .input-link{
+    form .add-related-element-link{
         display:inline-block;
         color:white;
         background:var(--secondary-color);
@@ -37,7 +37,7 @@
         padding:3px;
         margin:0 3px;
     }
-    form .input-button{
+    form .reload-related-elements-btn{
         margin:0 3px;
     }
     form label{

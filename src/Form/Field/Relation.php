@@ -119,8 +119,8 @@ class Relation extends Select
             $html .= '</select>';
             $entityName = ClassUtil::getSimpleName($this->getEntityClass());
             if($this->getLinkToAdd() != null){
-                $html .= '<button type="button" class="input-button" id="'.$this->name.'-reload" onclick="reload_'.$this->name.'_'.$entityName.'()">Recharger la liste</button>';
-                $html .= '<a class="input-link" href="'.$this->getLinkToAdd().'" target="_blank">Ajouter</a>';
+                $html .= '<button type="button" class="reload-related-elements-btn" id="'.$this->name.'-reload" onclick="reload_'.$this->name.'_'.$entityName.'()">Recharger la liste</button>';
+                $html .= '<a class="add-related-element-link" href="'.$this->getLinkToAdd().'" target="_blank">Ajouter</a>';
                 $html .= '
                     <script type="text/javascript">
                         function reload_'.$this->name.'_'.$entityName.'(){

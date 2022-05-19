@@ -7,6 +7,7 @@ namespace VPFramework\Routing\Annotations;
  * 
  * @Annotation
  * @Target({"CLASS"})
+ * @NamedArgumentConstructor
  */
 class RouteGroup
 {
@@ -15,5 +16,10 @@ class RouteGroup
      * @Requireds
      */
     public $pathStart;
+
+    public function __construct(string $pathStart)
+    {
+        $this->pathStart = $pathStart;
+    }
 
 }
