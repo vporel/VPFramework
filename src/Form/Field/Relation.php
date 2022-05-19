@@ -128,7 +128,7 @@ class Relation extends Select
                             xhttp.onreadystatechange = function() {
                                 if (this.readyState == 4 && this.status == 200) {
                                     var elements = JSON.parse(this.responseText);
-                                    var newSelectCode = "";
+                                    var newSelectCode = "<option value=\'\'>Aucun</option>";
                                     for(element of elements){
                                         newSelectCode += "<option value=\'"+element["value"]+"\'>"+element["text"]+"</option>";
                                     }
