@@ -6,7 +6,8 @@ class RouteException extends \Exception
     const CONTROLLER_NOT_FOUND = 0,
         CONTROLLER_METHOD_NOT_FOUND = 1,
         WRONG_PARAMETER = 2,
-        INVALID_PATH_PARAMETER_EXCEPTION = 3;
+        INVALID_PATH_PARAMETER_EXCEPTION = 3,
+        CONTROLLER_NAMESPACE_NOT_SET = 4;
     /**
      * @param string $routeName
      * @param string $element

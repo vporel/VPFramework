@@ -8,8 +8,8 @@ class Constants{
 
 
     
-    const PROJECT_ROOT = self::FRAMEWORK_ROOT."/../../VPFramework-test"; //In dev mode according to the test folder
-    //const PROJECT_ROOT = self::FRAMEWORK_ROOT."/../../../.."; //In production mode
+    //const PROJECT_ROOT = self::FRAMEWORK_ROOT."/../../VPFramework-test"; //In dev mode according to the test folder
+    const PROJECT_ROOT = self::FRAMEWORK_ROOT."/../../../.."; //In production mode
 
     const APP_DIR = self::PROJECT_ROOT."/App";
         const CONTROLLER_DIR = self::APP_DIR."/Controller";

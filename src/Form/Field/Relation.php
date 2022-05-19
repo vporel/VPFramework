@@ -21,6 +21,7 @@ class Relation extends Select
     public function __construct($label, $name, $options = [])
     {
         $this->addOption('repositoryClass', null);
+        $this->addOption('linkToAdd', null);
         parent::__construct($label, $name, $options);
         $this->entityClass = Repository::getRepositoryEntityClass($this->getRepositoryClass());
         $this->keyProperty = Entity::getEntityKeyProperty($this->entityClass);
@@ -117,27 +118,29 @@ class Relation extends Select
 
             $html .= '</select>';
             $entityName = ClassUtil::getSimpleName($this->getEntityClass());
-            $html .= '<button type="button" class="input-button" id="'.$this->name.'-reload" onclick="reload_'.$this->name.'_'.$entityName.'()">Recharger la liste</button>';
-            $html .= '<a class="input-link" href="/admin/'.$entityName.'/add" target="_blank">Ajouter</a>';
-            $html .= '
-                <script type="text/javascript">
-                    function reload_'.$this->name.'_'.$entityName.'(){
-					    var xhttp = new XMLHttpRequest();
-					    xhttp.onreadystatechange = function() {
-                            if (this.readyState == 4 && this.status == 200) {
-                                var elements = JSON.parse(this.responseText);
-                                var newSelectCode = "";
-                                for(element of elements){
-                                    newSelectCode += "<option value=\'"+element["value"]+"\'>"+element["text"]+"</option>";
+            if($this->getLinkToAdd() != null){
+                $html .= '<button type="button" class="input-button" id="'.$this->name.'-reload" onclick="reload_'.$this->name.'_'.$entityName.'()">Recharger la liste</button>';
+                $html .= '<a class="input-link" href="'.$this->getLinkToAdd().'" target="_blank">Ajouter</a>';
+                $html .= '
+                    <script type="text/javascript">
+                        function reload_'.$this->name.'_'.$entityName.'(){
+                            var xhttp = new XMLHttpRequest();
+                            xhttp.onreadystatechange = function() {
+                                if (this.readyState == 4 && this.status == 200) {
+                                    var elements = JSON.parse(this.responseText);
+                                    var newSelectCode = "";
+                                    for(element of elements){
+                                        newSelectCode += "<option value=\'"+element["value"]+"\'>"+element["text"]+"</option>";
+                                    }
+                                    document.getElementById("'.$this->name.'").innerHTML = newSelectCode;
                                 }
-                                document.getElementById("'.$this->name.'").innerHTML = newSelectCode;
-                            }
-                        };
-                        xhttp.open("GET", "/admin/'.$entityName.'/jsonList", true);
-                        xhttp.send();
-                    }
-                </script>
-            ';
+                            };
+                            xhttp.open("GET", "/admin/'.$entityName.'/jsonList", true);
+                            xhttp.send();
+                        }
+                    </script>
+                ';
+            }
             return $html;
         }
     }

@@ -2,7 +2,6 @@
 
 namespace VPFramework\Routing;
 
-use VPFramework\Core\Constants;
 use VPFramework\Core\DIC;
 
 /**
@@ -14,7 +13,7 @@ class Route
 
     private $pathRegex;
     private $controller;
-    private $controllerNamespace = Constants::CONTROLLER_NAMESPACE;
+    private $controllerNamespace = null;
         
     /**
      * __construct
@@ -67,6 +66,8 @@ class Route
     }
 
     public function getControllerClass(){
+        if($this->controllerNamespace == null)
+            throw new RouteException($this->getName(), "", RouteException::CONTROLLER_NAMESPACE_NOT_SET);
         return $this->controllerNamespace."\\".$this->controllerClassBaseName;
     }
 
