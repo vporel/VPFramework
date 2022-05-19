@@ -1,7 +1,6 @@
 <?php
 namespace VPFramework\Utils;
 
-use VPFramework\Core\Constants;
 
 class FileUpload
 {
@@ -20,11 +19,10 @@ class FileUpload
             $pathinfo = pathinfo($fileName);
             $extension = strtolower($pathinfo["extension"]);
             if(count($extensions) == 0 || in_array($extension, $extensions)){
-                $absoluteDestFolder = self::absoluteDestinationFolder($destinationFolder);
-                $filePath = $absoluteDestFolder."/".$fileName;
+                $filePath = $destinationFolder."/".$fileName;
                 $newFilePath = self::newFilePath($filePath);
-                if(!file_exists($absoluteDestFolder))
-                    mkdir($absoluteDestFolder, 0777, true);
+                if(!file_exists($destinationFolder))
+                    mkdir($destinationFolder, 0777, true);
                 if(move_uploaded_file($_FILES[$key]["tmp_name"], $newFilePath)){
                     return pathinfo($newFilePath)["basename"];
                 }
@@ -53,13 +51,6 @@ class FileUpload
         }else{
             throw new FileUploadException(FileUploadException::FILE_NOT_RECEIVED, $key);
         }
-    }
-
-    private static function absoluteDestinationFolder($destinationFolder){
-        if($destinationFolder != null && $destinationFolder != "")
-            return Constants::$PUBLIC_FOLDER."/".$destinationFolder;
-        else
-            return Constants::$PUBLIC_FOLDER;
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace VPFramework\Core;
 
 use VPFramework\Core\Configuration\RouteConfiguration;
-use VPFramework\Core\Routing\Route;
+use VPFramework\Routing\Route;
 
 /**
  * Classe qui modélise une requete et recoit dans son constructeur les parametres de cette requete
@@ -11,43 +11,24 @@ use VPFramework\Core\Routing\Route;
 
 class Request
 {
-    public const DEFAULT_ROUTE_NAME = "default-vpframework-route";
     private 
         $parameters,
         $route = null,
+        $routeConfig = null,
         $urlPath;
 
     /**
      * Constructeur
      * @param array $parameters parametres de la requete
      */
-    public function __construct(RouteConfiguration $config)
+    public function __construct(RouteConfiguration $routeConfig)
     {
         $this->parameters = array_merge($_GET, $_POST);
         if(strpos($_SERVER["REQUEST_URI"], "?") > -1)
             $this->urlPath = substr($_SERVER["REQUEST_URI"], 0, strpos($_SERVER["REQUEST_URI"], "?"));
         else
             $this->urlPath = $_SERVER["REQUEST_URI"];
-        $routes = $config->getRoutes();
-        if(count($routes) > 0){
-            foreach($routes as $route){
-                if(preg_match( $route->getPathRegex(), $this->urlPath, $matches)){
-                    $this->route = $route;
-                    break;
-                }
-            }
-            if($this->route == null)
-                throw new \Exception("URL $this->urlPath non reconnue");
-            //Récupération des paramètres de la route
-            //array_slice($matches, 1) car le premier resultat dans matches est la chaine complete
-            foreach($this->route->getData(array_slice($matches, 1)) as $key => $value)
-                $this->set($key, $value);
-        }else{
-
-            //Route par défaut définie par le framework
-            $this->route = new Route(self::DEFAULT_ROUTE_NAME, "", "", "");
-        }
-
+        $this->routeConfig = $routeConfig;
     }
 
     /**
@@ -85,6 +66,26 @@ class Request
 
     public function getRoute(): Route 
     {
+        if($this->route == null){
+            $routes = $this->routeConfig->getRoutes();
+            if(count($routes) > 0){
+                foreach($routes as $route){
+                    if(preg_match( $route->getPathRegex(), $this->urlPath, $matches)){
+                        $this->route = $route;
+                        break;
+                    }
+                }
+                if($this->route == null)
+                    throw new \Exception("URL $this->urlPath non reconnue");
+                //Récupération des paramètres de la route
+                //array_slice($matches, 1) car le premier resultat dans matches est la chaine complete
+                foreach($this->route->getData(array_slice($matches, 1)) as $key => $value)
+                    $this->set($key, $value);
+            }else{
+
+                throw InternalException::NoRouteFound();
+            }
+        }
         return $this->route;
     }
 

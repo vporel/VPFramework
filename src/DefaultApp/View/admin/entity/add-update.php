@@ -14,6 +14,9 @@
         padding:5px 0;
     }
 
+    form{
+        padding-bottom:10px;
+    }
     form .form-group{
         display:flex;
         padding:10px 0;

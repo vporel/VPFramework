@@ -1,6 +1,6 @@
 <?php
 
-namespace VPFramework\Core\Routing;
+namespace VPFramework\Routing;
 
 use VPFramework\Core\DIC;
 

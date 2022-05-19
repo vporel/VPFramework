@@ -1,7 +1,7 @@
 <?php
 namespace VPFramework\Core\Configuration;
 
-class VPFrameworkConfigurationException extends \Exception
+class ConfigurationException extends \Exception
 {
     public function __construct($msg)
     {

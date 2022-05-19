@@ -1,11 +1,21 @@
 <?php
-
+/*
+ * This file is part of VPFramework Framework
+ *
+ * (c) Porel Nkouanang
+ *
+ */
 namespace VPFramework\Core;
 
 use VPFramework\Service\Security\Security;
 
 session_start();
 
+
+/**
+ * [Description Router]
+ * @author NKOUANANG KEPSEU VIVIAN POREL (dev.vporel@gmail.com)
+ */
 class Router
 {
     private $request;
@@ -16,25 +26,25 @@ class Router
     }
 
     public function end(Security $security){
-        if($security->requireAccess($this->request->getUrlPath())){
-            $route = $this->request->getRoute();
-            if($route->getName() != Request::DEFAULT_ROUTE_NAME){
+        try{
+            if($security->requireAccess($this->request->getUrlPath())){
+                $route = $this->request->getRoute();
                 $controller = $route->getController();
                 echo DIC::getInstance()->invoke($controller, $this->request->getRoute()->getControllerMethod());
-            }else{
-                require Constants::FRAMEWORK_ROOT."/View/views/defaultView.php";
+            
             }
+        }catch(InternalException $e){
+            if($e->getCode() == InternalException::NO_ROUTE_FOUND)
+                require Constants::FRAMEWORK_ROOT."/View/views/defaultView.php";
         }
     }
 
     /**
-     * @param string $APP_ROOT Le dossier racine de l'application
+     * @param string PROJECT_ROOT Le dossier racine de l'application
      */
-    public static function start(string $PUBLIC_FOLDER){
+    public static function start(){
+        \Doctrine\Common\Annotations\AnnotationRegistry::registerAutoloadNamespace("VPFramework\\Model\\Entity\\Annotations", Constants::FRAMEWORK_ROOT."/Model/Entity/Annotations");
         \Doctrine\Common\Annotations\AnnotationRegistry::registerLoader("class_exists");
-        //Initialisation de la propriété $APP_ROOT
-        Constants::$PUBLIC_FOLDER = $PUBLIC_FOLDER;
-        Constants::$APP_ROOT = $PUBLIC_FOLDER."/..";
         $DIC = DIC::getInstance();
         $router = $DIC->get(Router::class);
         $DIC->invoke($router, "end");

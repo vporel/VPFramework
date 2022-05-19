@@ -158,6 +158,22 @@ class Form
     }
 
     /**
+     * Retirer certains champs du formulaire
+     * @param string ...$fieldsToRemove
+     * 
+     * @return Form
+     */
+    public function removeFields(string ...$fieldsToRemove):Form
+    {
+        foreach($fieldsToRemove as $field){
+            if(in_array($field, array_keys($this->fields))){
+                unset($this->fields[$field]);
+            }
+        }
+        return $this;
+    }
+
+    /**
      * @param array $parameters
      */
     public function setParameters($parameters)

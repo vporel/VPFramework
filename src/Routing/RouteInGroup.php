@@ -1,6 +1,6 @@
 <?php
 
-namespace VPFramework\Core\Routing;
+namespace VPFramework\Routing;
 
 /**
  * Cette classe définit une route dans lun groupe

@@ -21,7 +21,7 @@ class Rule{
      *
      * @param  string $name Nom de la règle (ce nom pourra être utilisé pour savoir quelle règle a provoqué la redirection)
      * @param  array $safeUrls Tableau des chemin protégés par la règles (chemin sont exprimé en expression régulières) Ex: "^/account" pour toutes les urls commencant par /account - "user" pour els urls contenant la chaine user 
-     * @param  array $entitiesRoles tableau associatif contenant les entitées(implémentant l'interface VPFramework\Core\Routing\Security\UserInterface) et les roles nécessaires(dans des tableaux)
+     * @param  array $entitiesRoles tableau associatif contenant les entitées(implémentant l'interface VPFramework\Routing\Security\UserInterface) et les roles nécessaires(dans des tableaux)
      * @param  string $redirection Le chemin de redirection si la règle n'est pas satisfaite, si aucun chemin n'est défini, un chemin par défaut sera suivi par le framework. Le chemin doit commencer par / au cas contraire, on cherchera dans le fichier routes.php la route portant le nom défini dans ce paramètre
      * Le chamin de redirection ne doit pas prendre de paramètres
      * @return void

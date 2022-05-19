@@ -2,9 +2,11 @@
 
 namespace VPFramework\Core\Configuration;
 
-use VPFramework\Core\Route\Route;
+use InvalidArgumentException;
 use VPFramework\Core\Constants;
-use VPFramework\Core\Routing\RouteGroup;
+use VPFramework\Routing\Loader;
+use VPFramework\Routing\RouteGroup;
+use VPFramework\Utils\PHPFile;
 
 //Chargement des routes
 class RouteConfiguration{
@@ -17,21 +19,28 @@ class RouteConfiguration{
     public function getRoutes(): ?array
     {        
         if($this->routes == null){
-            $routes = require Constants::$APP_ROOT."/Config/routes.php";
-            if($routes === null || !is_array($routes)){
-                throw new VPFrameworkConfigurationException("La valeur retournée par le fichier routes.php est invalide");
+            try{
+                $routes = Loader::fromFile(Constants::PROJECT_ROOT."/Config/routes.php");
+                //Prise en compte des routes par défaut du framework (ex:/admin)
+                $routes = array_merge(Loader::fromFile(Constants::FRAMEWORK_ROOT."/DefaultApp/Config/routes.php"), $routes);
+            }catch(InvalidArgumentException $e){
+                throw new ConfigurationException("Le fichier routes.php doit retoruner un tableau");
             }
-            //Prise en compte des routes par défaut du framework (ex:/admin)
-            $routes = array_merge($routes, require Constants::FRAMEWORK_ROOT."/DefaultApp/Config/routes.php");
-            $this->routes = [];
-            foreach($routes as $route){
-                if($route instanceof RouteGroup){
-                    foreach($route->getRoutes() as $r){
-                        $this->routes[$r->getName()] = $r;
+            $controllers = [];
+            foreach(scandir(Constants::CONTROLLER_DIR) as $file){
+                if(!is_dir(Constants::CONTROLLER_DIR."/".$file)){
+                    try{
+                        $phpFile = new PHPFile(Constants::CONTROLLER_DIR."/".$file);
+                    }catch(InvalidArgumentException $e){
+                        continue;
                     }
-                }else
-                    $this->routes[$route->getName()] = $route;
+                    if($class = $phpFile->findClass()){
+                        $routes = array_merge($routes, Loader::fromClass($class));
+                    }
+                }
             }
+            //Recherche des routes dans les controllers
+            $this->routes = $routes;
         }
         return $this->routes;
     }

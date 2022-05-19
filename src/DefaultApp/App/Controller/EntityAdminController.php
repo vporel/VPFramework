@@ -77,8 +77,8 @@ class EntityAdminController extends DefaultAppController
 		
 		$class = $this->entityAdmin->getEntityClass();
 		$element = new $class();
-		$form = new Form("entity-add", $class, $element);
-
+		$form = new Form("entity-add", $class, $element, array_keys($this->entityAdmin->getFields()));
+		
 		$msg = "";
 		$continueAdd = false;
 		if($form->isSubmitted() && $form->isValid()){
@@ -113,7 +113,7 @@ class EntityAdminController extends DefaultAppController
 		
 		$element = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findOneBy([$this->keyProperty => $this->request->get("key")]);
 		
-		$form = new Form("entity-update", $this->entityAdmin->getEntityClass(), $element);
+		$form = new Form("entity-update", $this->entityAdmin->getEntityClass(), $element, array_keys($this->entityAdmin->getFields()));
 		foreach($form->getFields() as $field){
 			if($field instanceof File)
 				$field->setNullable(true);

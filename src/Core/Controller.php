@@ -55,7 +55,7 @@ abstract class Controller
      */
     protected function getViewDir()
     {
-        return Constants::$APP_ROOT."/View";
+        return Constants::PROJECT_ROOT."/View";
     }
 
 }

@@ -5,7 +5,7 @@ namespace VPFramework\Console\App\Element;
 use VPFramework\Console\Console;
 use VPFramework\Core\Constants;
 
-define("CONTROLLER_DIR", Constants::$APP_ROOT."/app/Controller");
+define("CONTROLLER_DIR", Constants::PROJECT_ROOT."/app/Controller");
 if(!is_dir(CONTROLLER_DIR))
     mkdir(CONTROLLER_DIR, 0777, true);
 

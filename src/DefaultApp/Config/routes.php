@@ -1,6 +1,6 @@
 <?php
-use VPFramework\Core\Routing\RouteGroup;
-use VPFramework\Core\Routing\RouteInGroup;
+use VPFramework\Routing\RouteGroup;
+use VPFramework\Routing\RouteInGroup;
 
 return [
     (new RouteGroup("AdminController", "/admin", [

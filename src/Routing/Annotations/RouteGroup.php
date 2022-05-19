@@ -1,17 +1,19 @@
 <?php
-namespace VPFramework\Model\Entity\Annotations;
+namespace VPFramework\Routing\Annotations;
 
 /**
  * Annotation permettant de définir des éléments supplémetaires pour une entité
  * Ex : Un label qui sera utilisé dans les formulaires
  * 
  * @Annotation
- * @Target({"PROPERTY"})
+ * @Target({"CLASS"})
  */
-class Field
+class RouteGroup
 {
     /**
-     * Le texte à afficher si la propriété est utilisée dans un formulaire
+     * Le debut de l'url pour toute les routes du group
+     * @Requireds
      */
-    public $label = "";
+    public $pathStart;
+
 }

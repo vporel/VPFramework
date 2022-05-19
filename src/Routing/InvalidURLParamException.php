@@ -1,5 +1,5 @@
 <?php
-namespace VPFramework\Core\Routing;
+namespace VPFramework\Routing;
 
 class InvalidURLParamException extends \Exception
 {
