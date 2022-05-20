@@ -12,6 +12,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
 use VPFramework\Core\DIC;
 use Doctrine\ORM\Tools\SchemaTool;
+use VPFramework\Model\Entity\Entity;
 
 /**
  * Classe repository
@@ -32,6 +33,7 @@ abstract class Repository extends EntityRepository
      * Retourne la classe entité à laquelle le repository est lié
      * Ex :
      *      return Entity::class
+     * @return Entity
      */
     public abstract function getEntityClass();
 

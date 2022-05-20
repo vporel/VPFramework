@@ -104,7 +104,9 @@ class Form
         foreach($rawFields as $rawField){
             if(count($fieldsToBuild) == 0 || in_array($rawField["name"], $fieldsToBuild)){
                 $field = null;
-                if(in_array($rawField["type"], ["integer", "smallint", "bigint", "float", "NumberField"])){
+                if($rawField["type"] == "FormIgnoredField"){
+                    continue;
+                }elseif(in_array($rawField["type"], ["integer", "smallint", "bigint", "float", "NumberField"])){
                     $field = new Field\Number($rawField["label"],$rawField["name"]);
                     if($rawField["type"] == "NumberField"){
                         $field->setMin($rawField["VPFAnnotation"]->min);

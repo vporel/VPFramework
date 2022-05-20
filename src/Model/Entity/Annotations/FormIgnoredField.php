@@ -7,7 +7,7 @@ namespace VPFramework\Model\Entity\Annotations;
  * @Annotation
  * @Target({"PROPERTY"})
  */
-class IgnoredField extends Field
+class FormIgnoredField extends Field
 {
     
 }

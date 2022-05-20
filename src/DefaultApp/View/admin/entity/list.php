@@ -92,7 +92,7 @@
             <tr>
                 <th></th><!-- check case -->
                 <?php foreach($mainFields as $fieldName => $field){ ?>
-                    <th><?= $formFields[$fieldName]->getLabel(); ?></th>
+                    <th><?= $field["label"]; ?></th>
                 <?php } ?>
                 <th>Actions</th>
             </tr>
@@ -105,7 +105,7 @@
                         <td class="<?= $fieldName ?>">
                             <?php
                                 if($field["type"] == "EnumField")
-                                    echo $formFields[$fieldName]->getElements()[$value] ?? "";
+                                    echo $field["VPFAnnotation"]->getElements()[$value] ?? "";
                                 else{
                                     if($value instanceof \DateTime) 
                                         echo $value->format("d-m-Y H:i"); 

@@ -10,7 +10,7 @@ use VPFramework\Model\Entity\Annotations\PasswordField;
 use VPFramework\Utils\AnnotationReader;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use VPFramework\Model\Entity\Annotations\Field;
-use VPFramework\Model\Entity\Annotations\IgnoredField;
+use VPFramework\Model\Entity\Annotations\FormIgnoredField;
 use VPFramework\Model\Entity\Annotations\RelationField;
 use VPFramework\Utils\FlexibleClassTrait;
 
@@ -99,8 +99,6 @@ abstract class Entity {
                 $field["VPFAnnotation"] = null;
                 $VPFFieldAnnotation = self::getVPFFieldAnnotation($entityClass, $fieldName);
                 if($VPFFieldAnnotation != null){
-                    if($VPFFieldAnnotation["type"] == "IgnoredField")
-                        continue; // On passe le champ
                     if($VPFFieldAnnotation["annotation"]->label != "")
                         $field["label"] = $VPFFieldAnnotation["annotation"]->label;
                     if($VPFFieldAnnotation["type"] !== null)
@@ -144,7 +142,7 @@ abstract class Entity {
     public static function getVPFFieldAnnotation(string $entityClass, string $property){
         $VPFFieldAnnotation = null;
         $VPFFieldsClasses = [
-            IgnoredField::class, //Première annotation recherchée car si elle est présente les autres ne sont pas prises en compte
+            FormIgnoredField::class, //Première annotation recherchée car si elle est présente les autres ne sont pas prises en compte
             FileField::class, EnumField::class, NumberField::class,
             PasswordField::class, TextLineField::class
         ];
