@@ -14,18 +14,12 @@ class Password extends AbstractInput
     /**
      * @var bool
      */
-    protected $isDouble = false;
+    protected $double = false;// Si ce champ doit créer un champ de confirmation
     /**
      * @var string
      */
-    protected $secondLabel = "Confirmation";
-    /**
-     * @param array $options Les options de AbstractInput + :
-     *  hashFunction : "sha1",
-     *  isDouble : false // Si ce champ doit créer un champ de confirmation
-     *  secondLabel : "Confirmation" // Nom du champ de confirmation Si isDouble = true
-     * 
-     */
+    protected $secondLabel = "Confirmation";// Nom du champ de confirmation Si double = true
+    
     public function __construct(string $label, string $name, $hashFunction = "sha1")
     {            
         parent::__construct($label, $name);    
