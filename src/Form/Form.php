@@ -276,12 +276,6 @@ class Form
                 if (!$field->isValid($this->parameters[$field->getName()], $this->parameters[$field->getConfirmName()])) {
                     $valid = false;
                 }
-            } elseif($field instanceof Field\File){
-                $valueFromObject = ObjectReflection::getPropertyValue($this->object, $field->getName());
-                if($field->isValid($valueFromObject)){
-                    ObjectReflection::setPropertyValue($this->object, $field->getName(), $field->getFileBaseName($valueFromObject));
-                }else
-                    $valid = false;
             }elseif (!$field->isValid($this->parameters[$field->getName()] ?? null)) {
                 $valid = false;
             }
