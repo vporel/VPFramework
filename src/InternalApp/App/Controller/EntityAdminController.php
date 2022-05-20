@@ -5,23 +5,11 @@ use Doctrine\ORM\EntityManager;
 use VPFramework\Core\Configuration\ServiceConfiguration;
 use VPFramework\Core\DIC;
 use VPFramework\Core\Request;
-use VPFramework\InternalApp\App\Entity\Admin;
-use VPFramework\InternalApp\App\Repository\AdminRepository;
 use VPFramework\Form\Field\File;
 use VPFramework\Form\Field\Relation;
 use VPFramework\Form\Form;
-use VPFramework\Form\Annotations\Field;
-use VPFramework\Form\Annotations\FileField;
-use VPFramework\Form\Annotations\NumberField;
-use VPFramework\Form\Annotations\PasswordField;
-use VPFramework\Form\Annotations\RelationField;
-use VPFramework\Form\Annotations\TextLineField;
 use VPFramework\Model\Entity\Entity;
-use VPFramework\Utils\AnnotationReader;
 use VPFramework\Utils\ClassUtil;
-use VPFramework\Utils\FileUpload;
-use VPFramework\Utils\FileUploadException;
-use VPFramework\Utils\ObjectReflection;
 
 class EntityAdminController extends InternalAppController
 {
@@ -59,20 +47,6 @@ class EntityAdminController extends InternalAppController
 			"filterFields" => array_keys($this->entityAdmin->getFilterFields()),
 			"elements" => $elements
 		]);
-	}
-
-	public function jsonList(){
-		$elements = DIC::getInstance()->get($this->entityAdmin->getRepositoryClass())->findBy([], [$this->orderField]);
-		
-		$jsonElements = [];
-		$keyProperty = $this->keyProperty;
-		foreach($elements as $element){
-			$jsonElements[] = [
-				"value" => $element->$keyProperty,
-				"text" => (string) $element,
-			];
-		}
-		return json_encode($jsonElements);
 	}
 
 	public function add(){

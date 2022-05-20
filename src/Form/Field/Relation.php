@@ -133,8 +133,10 @@ class Relation extends Select
                                     document.getElementById("'.$this->name.'").innerHTML = newSelectCode;
                                 }
                             };
-                            xhttp.open("GET", "/admin/'.$entityName.'/jsonList", true);
-                            xhttp.send();
+                            xhttp.open("POST", "/entityJsonList", true);
+                            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            let data = "repositoryClass='.str_replace("\\", "\\\\", $this->repositoryClass).'"; 
+                            xhttp.send(data);
                         }
                     </script>
                 ';
