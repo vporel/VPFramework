@@ -62,7 +62,10 @@ class Number extends AbstractInput
     public function setMax($max)
     {
         $this->max = $max;
-
+        $this->addValidationRule("max", "Le nombre maximal est : ".$max, function($value){
+            echo $this->getMax();
+            return $this->getMax() === null || (double) $value <= $this->getMax();
+        });
         return $this;
     }
 
@@ -86,7 +89,9 @@ class Number extends AbstractInput
     public function setMin(int $min)
     {
         $this->min = $min;
-
+        $this->addValidationRule("min", "Le nombre minimal est : ".$min, function($value){
+            return $this->getMin() <= (double) $value;
+        });
         return $this;
     }
 }

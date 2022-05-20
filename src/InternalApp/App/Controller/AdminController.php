@@ -76,7 +76,7 @@ class AdminController extends InternalAppController
 	public function updatePassword(ServiceConfiguration $serviceConfig){
 		$form = new Form("update-password");
 		$currentPasswordField = new Password("Mot de passe actuel", "currentPassword", $options = ["nullable" => false]);
-		$currentPasswordField->addValidationRule("Mot de passe actuel incorrect", function($value){
+		$currentPasswordField->addValidationRule("actualPasswordIncorrect", "Mot de passe actuel incorrect", function($value){
 			
 			return sha1($value) == $this->getUser()->getPassword();
 		});

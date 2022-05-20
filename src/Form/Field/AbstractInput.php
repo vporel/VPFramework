@@ -8,19 +8,17 @@ abstract class AbstractInput extends AbstractField
      * @var string
      * Expression régulière que doit respecter la valeur
      */
-    protected $pattern = "#^(.[\s]*.*)*$#";
+    protected $pattern;
 
     /**
      * @var string
      */
-    protected $patternMessage = "Ne respecte pas le motif défini";
+    protected $patternMessage;
 
     public function __construct($label, $name, $options = [])
     {
         parent::__construct($label, $name, $options);  
-        $this->addValidationRule($this->getPatternMessage(), function($value){
-            return preg_match($this->getPattern(), $value);
-        });    
+        $this->setPattern("#^(.[\s]*.*)*$#", "Ne respecte pas le motif défini");   
     }
 
     /**
@@ -57,12 +55,17 @@ abstract class AbstractInput extends AbstractField
      * Set expression régulière que doit respecter la valeur
      *
      * @param  string  $pattern  Expression régulière que doit respecter la valeur
+     * @param  string  $patternMessage  EMEssage en cas d'erreur
      *
      * @return  self
      */ 
-    public function setPattern(string $pattern)
+    public function setPattern(string $pattern, string $patternMessage)
     {
         $this->pattern = $pattern;
+        $this->patternMessage = $patternMessage;
+        $this->addValidationRule("pattern", $this->getPatternMessage(), function($value){
+            return preg_match($this->getPattern(), $value);
+        }); 
 
         return $this;
     }
@@ -75,19 +78,5 @@ abstract class AbstractInput extends AbstractField
     public function getPatternMessage()
     {
         return $this->patternMessage;
-    }
-
-    /**
-     * Set the value of patternMessage
-     *
-     * @param  string  $patternMessage
-     *
-     * @return  self
-     */ 
-    public function setPatternMessage(string $patternMessage)
-    {
-        $this->patternMessage = $patternMessage;
-
-        return $this;
     }
 }

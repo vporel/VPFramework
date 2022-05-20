@@ -128,9 +128,7 @@ class Form
                         break;
                         case "TextLineField":
                             $field = new Field\TextLine($rawField["label"],$rawField["name"]);
-                            $field
-                                ->setPattern($rawField["formAnnotation"]->pattern)
-                                ->setPatternMessage($rawField["formAnnotation"]->patternMessage);
+                            $field->setPattern($rawField["formAnnotation"]->pattern, $rawField["formAnnotation"]->patternMessage);
                             $field
                                 ->setMinLength($rawField["formAnnotation"]->minLength)
                                 ->setMaxLength($rawField["formAnnotation"]->maxLength);

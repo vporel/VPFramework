@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use VPFramework\Form\Annotations\Field;
 use VPFramework\Form\Annotations\IgnoredField;
 use VPFramework\Form\Annotations\RelationField;
+use VPFramework\Form\Annotations\TextLineField;
 use VPFramework\Service\Admin\Annotations\ForFilter;
 use VPFramework\Service\Admin\Annotations\ShowInList;
 use VPFramework\Utils\FlexibleClassTrait;

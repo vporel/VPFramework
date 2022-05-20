@@ -16,14 +16,7 @@ abstract class AbstractTextLine extends AbstractInput
     public function __construct(string $label, string $name)
     {
         
-        parent::__construct($label, $name);   
-        $this
-            ->addValidationRule("La longueur minimale est : ".$this->getMinLength(), function($value){
-                return strlen($value) >= $this->getMinLength();
-            })
-            ->addValidationRule("La longueur maximale est : ".$this->getMaxLength(), function($value){
-                return $this->getMaxLength() === null || strlen($value) <= $this->getMaxLength();
-            });   
+        parent::__construct($label, $name);    
     }
 
     protected function getCustomHTMLForFilter(): string
@@ -60,6 +53,9 @@ abstract class AbstractTextLine extends AbstractInput
     public function setMinLength(int $minLength)
     {
         $this->minLength = $minLength;
+        $this->addValidationRule("minLength", "La longueur minimale est : ".$this->getMinLength(), function($value){
+            return strlen($value) >= $this->getMinLength();
+        }); 
 
         return $this;
     }
@@ -71,6 +67,7 @@ abstract class AbstractTextLine extends AbstractInput
      */ 
     public function getMaxLength()
     {
+        
         return $this->maxLength;
     }
 
@@ -84,6 +81,10 @@ abstract class AbstractTextLine extends AbstractInput
     public function setMaxLength($maxLength)
     {
         $this->maxLength = $maxLength;
+        $this->addValidationRule("maxLength", "La longueur maximale est : ".$maxLength, function($value){
+           
+            return $this->getMaxLength() === null || strlen($value) <= $this->getMaxLength();
+        }); 
 
         return $this;
     }

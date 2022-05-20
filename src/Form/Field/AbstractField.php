@@ -54,7 +54,7 @@ abstract class AbstractField implements \Serializable
     {
         $this->label = $label;
         $this->name = $name;
-        $this->addValidationRule('Ce champ doit être renseigné', function($value){
+        $this->addValidationRule("nullability", 'Ce champ doit être renseigné', function($value){
             if(is_array($value)){
                 return $this->isNullable() || count($this->getRealValue($value)) > 0;
             }
@@ -65,9 +65,9 @@ abstract class AbstractField implements \Serializable
     /**
      * @param callable $rule
      */
-    public function addValidationRule(string $message, callable $rule)
+    public function addValidationRule(string $ruleName, string $message, callable $rule)
     {
-        $this->validationRules[] = new ValidationRule($message, $rule);
+        $this->validationRules[$ruleName] = new ValidationRule($ruleName, $message, $rule);
         return $this;
     }
 
