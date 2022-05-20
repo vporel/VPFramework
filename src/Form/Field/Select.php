@@ -4,24 +4,25 @@ namespace VPFramework\Form\Field;
 
 class Select extends AbstractField
 {
-    public function __construct($label, $name, $options = [])
+    /**
+     * @var array
+     */
+    private $elements = null;
+
+    public function __construct(string $label, string $name, array $elements)
     {
-        $this->addOption('elements', null);
-        parent::__construct($label, $name, $options);
+        parent::__construct($label, $name);
+        $this->elements = $elements;
     }
 
     public function getElements()
     {
-        if ($this->options['elements'] != null) {
-            return $this->options['elements'];
-        } else {
-            throw new \Exception("Les éléments pour le champ select n'ont pas été fournis");
-        }
+        return $this->elements;
     }
 
     protected function getCustomHTML($value)
     {
-        $value = $value ?? $this->getDefault();
+        $value = $value ?? $this->getDefaultValue();
         if($this->isReadOnly()){
             $textToShow = "";
             foreach ($this->getElements() as $key => $text) {

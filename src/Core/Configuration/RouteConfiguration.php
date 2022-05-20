@@ -22,7 +22,7 @@ class RouteConfiguration{
             try{
                 $routes = Loader::fromFile(Constants::PROJECT_ROOT."/Config/routes.php");
                 //Prise en compte des routes par défaut du framework (ex:/admin)
-                $routes = array_merge(Loader::fromFile(Constants::FRAMEWORK_ROOT."/DefaultApp/Config/routes.php"), $routes);
+                $routes = array_merge(Loader::fromFile(Constants::FRAMEWORK_ROOT."/InternalApp/Config/routes.php"), $routes);
             }catch(InvalidArgumentException $e){
                 throw new ConfigurationException("Le fichier routes.php doit retoruner un tableau");
             }

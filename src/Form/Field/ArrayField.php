@@ -4,11 +4,6 @@ namespace VPFramework\Form\Field;
 
 class ArrayField extends AbstractField
 {
-    public function __construct($label, $name, $options = [])
-    {
-       
-        parent::__construct($label, $name, $options);        
-    }
 
     public function getCustomHTMLForFilter():string{}
 
@@ -32,7 +27,7 @@ class ArrayField extends AbstractField
 
     protected function getCustomHTML($values){
         if($values == null || is_array($values)){
-            if($this->isReadOnly()){
+            if($this->readOnly){
                 if($values != null)
                     return "<span class='form-read-only-value'>".implode(" | ", $values)."</span>";
                 else
@@ -41,12 +36,12 @@ class ArrayField extends AbstractField
                 $html = '';
                 if($values != null){
                     foreach($values as $value){
-                        $html .= '<input type="text" name="'.$this->name.'[]" class="form-control" value="'.$value.'" />';
+                        $html .= '<input type="text" name="'.$this->name.'[]" class="form-control" value="'.$value.'" /><br>';
                     }
                 }else{                        
-                    $html .= '<input type="text" name="'.$this->name.'[]" class="form-control" />';
+                    $html .= '<input type="text" name="'.$this->name.'[]" class="form-control" /><br>';
                 }
-                $html .= '<br><button type="button" class="input-button" id="'.$this->name.'-add" onclick="add_'.$this->name.'_element()">+</button>';
+                $html .= '<button type="button" class="add-array-element-button" id="'.$this->name.'-add" onclick="add_'.$this->name.'_element()">+</button>';
                 $html .= '
                     <script type="text/javascript">
                         function add_'.$this->name.'_element(){

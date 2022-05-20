@@ -3,15 +3,17 @@ namespace VPFramework\Model\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\EntityManager;
 use VPFramework\Core\DIC;
-use VPFramework\Model\Entity\Annotations\EnumField;
-use VPFramework\Model\Entity\Annotations\FileField;
-use VPFramework\Model\Entity\Annotations\NumberField;
-use VPFramework\Model\Entity\Annotations\PasswordField;
+use VPFramework\Form\Annotations\EnumField;
+use VPFramework\Form\Annotations\FileField;
+use VPFramework\Form\Annotations\NumberField;
+use VPFramework\Form\Annotations\PasswordField;
 use VPFramework\Utils\AnnotationReader;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use VPFramework\Model\Entity\Annotations\Field;
-use VPFramework\Model\Entity\Annotations\FormIgnoredField;
-use VPFramework\Model\Entity\Annotations\RelationField;
+use VPFramework\Form\Annotations\Field;
+use VPFramework\Form\Annotations\IgnoredField;
+use VPFramework\Form\Annotations\RelationField;
+use VPFramework\Service\Admin\Annotations\ForFilter;
+use VPFramework\Service\Admin\Annotations\ShowInList;
 use VPFramework\Utils\FlexibleClassTrait;
 
 /**
@@ -96,15 +98,16 @@ abstract class Entity {
                 $field["label"] = $fieldName;
                 $field["type"] = $entityMetaData->getTypeOfField($fieldName);
                 $field["nullable"] = $entityMetaData->isNullable($fieldName);
-                $field["VPFAnnotation"] = null;
-                $VPFFieldAnnotation = self::getVPFFieldAnnotation($entityClass, $fieldName);
-                if($VPFFieldAnnotation != null){
-                    if($VPFFieldAnnotation["annotation"]->label != "")
-                        $field["label"] = $VPFFieldAnnotation["annotation"]->label;
-                    if($VPFFieldAnnotation["type"] !== null)
-                        $field["type"] = $VPFFieldAnnotation["type"];
-                    $field["VPFAnnotation"] = $VPFFieldAnnotation["annotation"];
+                $field["formAnnotation"] = null;
+                $formAnnotation = self::getFormAnnotation($entityClass, $fieldName);
+                if($formAnnotation != null){
+                    if($formAnnotation["annotation"]->label != "")
+                        $field["label"] = $formAnnotation["annotation"]->label;
+                    if($formAnnotation["type"] !== null)
+                        $field["type"] = $formAnnotation["type"];
+                    $field["formAnnotation"] = $formAnnotation["annotation"];
                 }
+                $field["adminAnnotations"] = self::getAdminAnnotations($entityClass, $fieldName);
                 $fields[$field["name"]] = $field;
             }
         }
@@ -116,16 +119,17 @@ abstract class Entity {
                 $joinColumnAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $fieldName, ORM\JoinColumn::class);
                 if($joinColumnAnnotation != null){
                     $field["nullable"] = $joinColumnAnnotation->nullable;
-                    $field["VPFAnnotation"] = null;
-                    $VPFFieldAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $fieldName, RelationField::class);
-                    if($VPFFieldAnnotation != null){
-                        if($VPFFieldAnnotation->label != "")
-                            $field["label"] = $VPFFieldAnnotation->label;
+                    $field["formAnnotation"] = null;
+                    $formAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $fieldName, RelationField::class);
+                    if($formAnnotation != null){
+                        if($formAnnotation->label != "")
+                            $field["label"] = $formAnnotation->label;
                         $field["type"] = "RelationField";
-                        $field["VPFAnnotation"] = $VPFFieldAnnotation;
+                        $field["formAnnotation"] = $formAnnotation;
                     }else{
                         throw new EntityException("La propriété '$fieldName' ne possède pas l'annotation VPFramework\Model\Entity\Annotatios\RelationField");
                     }
+                    $field["adminAnnotations"] = self::getAdminAnnotations($entityClass, $fieldName);
                     $fields[$field["name"]] = $field;
                 }
             }
@@ -134,29 +138,47 @@ abstract class Entity {
     }
 
     /**
-     * Retourne l'objet annotation de VPFramework sur le champ
+     * Retourne l'objet annotation du formulaire du le champ
      * Si plusieurs annoations ont été définies, seule la première sera renvoyée
-     * VPF = VPFramework
      * @return null|Object
      */
-    public static function getVPFFieldAnnotation(string $entityClass, string $property){
-        $VPFFieldAnnotation = null;
-        $VPFFieldsClasses = [
-            FormIgnoredField::class, //Première annotation recherchée car si elle est présente les autres ne sont pas prises en compte
+    public static function getFormAnnotation(string $entityClass, string $property){
+        $formAnnotation = null;
+        $formAnnotationsClasses = [
+            IgnoredField::class, //Première annotation recherchée car si elle est présente les autres ne sont pas prises en compte
             FileField::class, EnumField::class, NumberField::class,
             PasswordField::class, TextLineField::class
         ];
-        foreach($VPFFieldsClasses as $VPFFieldClass){
-            $VPFFieldAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $property, $VPFFieldClass);
-            if($VPFFieldAnnotation != null){
-                $classNameParts = explode("\\", $VPFFieldClass);
-                return ["type" => end($classNameParts), "annotation" => $VPFFieldAnnotation];
+        foreach($formAnnotationsClasses as $formAnnotationClass){
+            $formAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $property, $formAnnotationClass);
+            if($formAnnotation != null){
+                $classNameParts = explode("\\", $formAnnotationClass);
+                return ["type" => end($classNameParts), "annotation" => $formAnnotation];
             }
         }
-        $VPFFieldAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $property, Field::class);
-        if($VPFFieldAnnotation != null){
-            return ["type" => null, "annotation" => $VPFFieldAnnotation];
+        $formAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $property, Field::class);
+        if($formAnnotation != null){
+            return ["type" => null, "annotation" => $formAnnotation];
         }
         return null;
+    }
+
+    /**
+     * Get from the field, the admin annotations defined
+     * @return array
+     */
+    public static function getAdminAnnotations(string $entityClass, string $property):array
+    {
+        $adminAnnotations = [];
+        $adminAnnotationsClasses = [
+            ShowInList::class, ForFilter::class
+        ];
+        foreach($adminAnnotationsClasses as $adminAnnotationClass){
+            $adminAnnotation = AnnotationReader::getPropertyAnnotation($entityClass, $property, $adminAnnotationClass);
+            if($adminAnnotation != null){
+                $adminAnnotations[] = $adminAnnotation;
+            }
+        }
+        return $adminAnnotations;
     }
 }

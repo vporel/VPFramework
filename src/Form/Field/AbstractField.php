@@ -6,15 +6,42 @@ use DateTime;
 
 abstract class AbstractField implements \Serializable
 {
+    /**
+     * @var string
+     */
     protected $label;
+
+    /**
+     * @var string
+     */
     protected $name;
-    protected $options = [
-            'default' => '',
-            'ignored' => false, // Cette option est mise à "true" sur un champ n'étant pas un attribut de la classe entité à la quelle le formulaire est lié
-            'nullable' => true, 
-            'readOnly' => false
-        ];
+    
+    /**
+     * @var mixed
+     */
+    protected $defaultValue = null;
+    /**
+     * @var bool
+     */
+    protected $ignored = false; // Cette option est mise à "true" sur un champ n'étant pas un attribut de la classe entité à la quelle le formulaire est lié
+    /**
+     * @var bool
+     */
+    protected $nullable = true;
+
+    /**
+     * @var bool
+     */
+    protected $readOnly = false;
+
+    /**
+     * @var array
+     */
     private $validationRules = [];
+
+    /**
+     * @var string
+     */
     protected $error = '';
 
     /**
@@ -22,26 +49,17 @@ abstract class AbstractField implements \Serializable
      *
      * @param $label
      * @param $name
-     * @param $options
      */
-    public function __construct($label, $name, $options = [])
+    public function __construct(string $label, string $name)
     {
         $this->label = $label;
         $this->name = $name;
-        $this->options = array_slice(array_merge($this->options, $options), 0, count($this->options));
         $this->addValidationRule('Ce champ doit être renseigné', function($value){
             if(is_array($value)){
                 return $this->isNullable() || count($this->getRealValue($value)) > 0;
             }
             return $this->isNullable() || trim($value) != '';
         });
-    }
-
-    protected function addOption(string $name, $value)
-    {
-        $this->options[$name] = $value;
-
-        return $this;
     }
 
     /**
@@ -53,40 +71,6 @@ abstract class AbstractField implements \Serializable
         return $this;
     }
 
-    public function existOption(string $name)
-    {
-        return array_key_exists($name, $this->options);
-    }
-
-    public function __call($name, $arguments)
-    {
-        $nameStart2 = substr($name, 0, 2);
-        $nameStart3 = substr($name, 0, 3);
-        if ($nameStart2 == 'is') {
-            $option = lcfirst(substr($name, 2, strlen($name)));
-            if (array_key_exists($option, $this->options)) {
-                return $this->options[$option];
-            } elseif (array_key_exists($name, $this->options)) {
-                return $this->options[$name];
-            } else {
-                throw new \Exception("L'option $option n'existe pas");
-            }
-        } elseif ($nameStart3 == 'get' || $nameStart3 == 'set') {
-            $option = lcfirst(substr($name, 3, strlen($name)));
-            if (array_key_exists($option, $this->options)) {
-                if ($nameStart3 == 'get') {
-                    return $this->options[$option];
-                } elseif ($nameStart3 == 'set') {
-                    $this->options[$option] = $arguments[0];
-
-                    return $this;
-                }
-            } else {
-                throw new \Exception("L'option $option n'existe pas");
-            }
-        }
-        throw new \Exception("Fonction $name n'existe pas");
-    }
 
     public function getLabel()
     {
@@ -147,7 +131,12 @@ abstract class AbstractField implements \Serializable
         ';
     }
 
-    public function isValid($value)
+    /**
+     * @param mixed $value
+     * 
+     * @return bool
+     */
+    public function isValid($value):bool
     {
         foreach($this->validationRules as $rule){
             if(!$rule->getRule()($value)){
@@ -173,16 +162,112 @@ abstract class AbstractField implements \Serializable
         $calledClassArray = explode("\\", get_called_class());
 
         return [
-            'label' => $this->getLabel(),
-            'name' => $this->getName(),
-            "default" => $this->getDefault(),
-            'required' => $this->isRequired(),
-            'readOnly' => $this->isReadOnly(),
+            'label' => $this->label,
+            'name' => $this->name,
+            "default" => $this->defaultValue,
+            'nullable' => $this->nullable,
+            'readOnly' => $this->readOnly,
             "class"=> end($calledClassArray)
         ];
     }
 
     public function unserialize($data)
     {
+    }
+
+    /**
+     * Get the value of defaultValue
+     *
+     * @return  mixed
+     */ 
+    public function getDefaultValue()
+    {
+        return $this->defaultValue;
+    }
+
+    /**
+     * Set the value of defaultValue
+     *
+     * @param  mixed  $defaultValue
+     *
+     * @return  self
+     */ 
+    public function setDefaultValue($defaultValue)
+    {
+        $this->defaultValue = $defaultValue;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of ignored
+     *
+     * @return  bool
+     */ 
+    public function isIgnored()
+    {
+        return $this->ignored;
+    }
+
+    /**
+     * Set the value of ignored
+     *
+     * @param  bool  $ignored
+     *
+     * @return  self
+     */ 
+    public function setIgnored(bool $ignored)
+    {
+        $this->ignored = $ignored;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of nullable
+     *
+     * @return  bool
+     */ 
+    public function isNullable()
+    {
+        return $this->nullable;
+    }
+
+    /**
+     * Set the value of nullable
+     *
+     * @param  bool  $nullable
+     *
+     * @return  self
+     */ 
+    public function setNullable(bool $nullable)
+    {
+        $this->nullable = $nullable;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of readOnly
+     *
+     * @return  bool
+     */ 
+    public function isReadOnly()
+    {
+        return $this->readOnly;
+    }
+
+    /**
+     * Set the value of readOnly
+     *
+     * @param  bool  $readOnly
+     *
+     * @return  self
+     */ 
+    public function setReadOnly(bool $readOnly)
+    {
+        $this->readOnly = $readOnly;
+
+        return $this;
     }
 }

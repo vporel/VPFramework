@@ -4,12 +4,6 @@ namespace VPFramework\Form\Field;
 
 class Checkbox extends AbstractField
 {
-    public function __construct($label, $name, $options = [])
-    {
-       
-        parent::__construct($label, $name, $options);        
-    }
-
     public function getRealValue($value)
     {
         if($value != null){
@@ -42,7 +36,7 @@ class Checkbox extends AbstractField
         }
     }
 
-    public function isValid($value)
+    public function isValid($value):bool
     {
         return true;
     }

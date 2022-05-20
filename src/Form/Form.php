@@ -59,11 +59,11 @@ class Form
         $this->name = "form-".$name;
         $this->entityClass = $entityClass;
         $this->parameters = DIC::getInstance()->get(Request::class)->getAll(); // Par défaut, les paramètres sont ceux de la requetes
+        
+        
+        $this->object = $object;
         if($entityClass != null){
-            $this->object = $object;
             $this->fields = self::buildFieldsFromEntity($entityClass, $fieldsToShow);
-        }else{
-            $this->object = null;
         }
     }
 
@@ -104,15 +104,16 @@ class Form
         foreach($rawFields as $rawField){
             if(count($fieldsToBuild) == 0 || in_array($rawField["name"], $fieldsToBuild)){
                 $field = null;
-                if($rawField["type"] == "FormIgnoredField"){
+                if($rawField["type"] == "IgnoredField"){
                     continue;
                 }elseif(in_array($rawField["type"], ["integer", "smallint", "bigint", "float", "NumberField"])){
                     $field = new Field\Number($rawField["label"],$rawField["name"]);
                     if($rawField["type"] == "NumberField"){
-                        $field->setMin($rawField["VPFAnnotation"]->min);
-                        $field->setMax($rawField["VPFAnnotation"]->max);
+                        $field->setMin($rawField["formAnnotation"]->min);
+                        $field->setMax($rawField["formAnnotation"]->max);
                     }
                 }elseif(in_array($rawField["type"], ["date", "date_immutable", "datetime", "datetime_immutable"])){
+                    
                     $field = new Field\Date($rawField["label"],$rawField["name"]);
                 }elseif(in_array($rawField["type"], ["array", "simple_array"])){
                     $field = new Field\ArrayField($rawField["label"],$rawField["name"]);
@@ -122,34 +123,26 @@ class Form
                         case "text": $field = new Field\TextArea($rawField["label"],$rawField["name"]);break;
                         case "boolean": $field = new Field\Checkbox($rawField["label"],$rawField["name"]);break;
                         case "PasswordField": 
-                            $field = new Field\Password($rawField["label"],$rawField["name"], $options = [
-                                "hashFunction" => $rawField["VPFAnnotation"]->hashFunction,
-                            ]);
+                            $field = new Field\Password($rawField["label"],$rawField["name"], $rawField["formAnnotation"]->hashFunction);
+
                         break;
                         case "TextLineField":
-                            $field = new Field\TextLine($rawField["label"],$rawField["name"], $options = [
-                                "pattern" => $rawField["VPFAnnotation"]->pattern,
-                                "patternMessage" => $rawField["VPFAnnotation"]->patternMessage,
-                                "minLength" => $rawField["VPFAnnotation"]->minLength,
-                                "maxLength" => $rawField["VPFAnnotation"]->maxLength,
-                            ]);
+                            $field = new Field\TextLine($rawField["label"],$rawField["name"]);
+                            $field
+                                ->setPattern($rawField["formAnnotation"]->pattern)
+                                ->setPatternMessage($rawField["formAnnotation"]->patternMessage);
+                            $field
+                                ->setMinLength($rawField["formAnnotation"]->minLength)
+                                ->setMaxLength($rawField["formAnnotation"]->maxLength);
                         break;
                         case "FileField": 
-                            $field = new Field\File($rawField["label"],$rawField["name"], $options = [
-                                "extensions" => $rawField["VPFAnnotation"]->extensions,
-                                "folder" => $rawField["VPFAnnotation"]->folder,
-                            ]);
+                            $field = new Field\File($rawField["label"],$rawField["name"], $rawField["formAnnotation"]->extensions, $rawField["formAnnotation"]->folder);
                         break;
                         case "RelationField": 
-                            $field = new Field\Relation($rawField["label"],$rawField["name"], $options = [
-                                "elements" => $rawField["VPFAnnotation"]->getElements(),
-                                "repositoryClass" => $rawField["VPFAnnotation"]->repositoryClass,
-                            ]);
+                            $field = new Field\Relation($rawField["label"],$rawField["name"], $rawField["formAnnotation"]->repositoryClass, $rawField["formAnnotation"]->getElements());
                         break;
                         case "EnumField": 
-                            $field = new Field\Select($rawField["label"],$rawField["name"], $options = [
-                                "elements" => $rawField["VPFAnnotation"]->getElements()
-                                ]);
+                            $field = new Field\Select($rawField["label"],$rawField["name"], $rawField["formAnnotation"]->getElements());
                         break;
                     }
                 }
@@ -161,7 +154,7 @@ class Form
     }
 
     /**
-     * Retirer certains champs du formulaire
+     * Remove some fields from the form
      * @param string ...$fieldsToRemove
      * 
      * @return Form
@@ -186,7 +179,11 @@ class Form
         return $this;
     }
 
-    public function getFields()
+    /**
+     * Get an array containing all the fields of the form
+     * @return array
+     */
+    public function getFields():array
     {
         return $this->fields;
     }
@@ -201,7 +198,13 @@ class Form
         return $this->fields[$fieldName] ?? null;
     }
 
-    public function addField(Field\AbstractField $field)
+    /**
+     * Add an extra field to the form
+     * @param Field\AbstractField $field
+     * 
+     * @return self
+     */
+    public function addField(Field\AbstractField $field):self
     {
         $this->fields[$field->getName()] = $field;
 
@@ -209,16 +212,18 @@ class Form
     }
 
     /**
-     * Retourne l'objet Field correspondant au nom en paramètre
+     * Get the field corresponding to $name
      * @return Field
      */
     public function __get($name) 
     {
-        return $this->fields[$name];
+        return $this->getField($name);
     }
 
     /**
-     * Vérifier si le formulaire a été envoyé
+     * Check if the form is submitted
+     * When you call the createHTML method, a hidden field is created
+     * So this method checks if this field is in the request parameters
      * @return bool
      */
     public function isSubmitted()
@@ -227,7 +232,7 @@ class Form
     }
 
     /**
-     * Vérifier si le formulaire a un message d'erreur
+     * Check if there is any error in the form fields
      * @return bool
      */
     public function hasError()
@@ -235,7 +240,14 @@ class Form
         return $this->isSubmitted() && !$this->isValid();
     }
 
-    public function createHTML()
+
+    /**
+     * Create the HTML code for the form
+     * Only the fields are created. It means that you must on your own write the <form> tag
+     * You must also add the submit button
+     * @return string
+     */
+    public function createHTML():string
     {
         $html = "
             <input type='hidden' name='".$this->name."'/>
@@ -253,7 +265,12 @@ class Form
         return $html;
     }
 
-    public function isValid()
+    
+    /**
+     * Check if the form is valid (we start by checking each field)
+     * @return bool
+     */
+    public function isValid():bool
     {
         $valid = true;
         foreach ($this->fields as $field) {
@@ -261,7 +278,13 @@ class Form
                 if (!$field->isValid($this->parameters[$field->getName()], $this->parameters[$field->getConfirmName()])) {
                     $valid = false;
                 }
-            } elseif (!$field->isValid($this->parameters[$field->getName()] ?? null)) {
+            } elseif($field instanceof Field\File){
+                $valueFromObject = ObjectReflection::getPropertyValue($this->object, $field->getName());
+                if($field->isValid($valueFromObject)){
+                    ObjectReflection::setPropertyValue($this->object, $field->getName(), $field->getFileBaseName($valueFromObject));
+                }else
+                    $valid = false;
+            }elseif (!$field->isValid($this->parameters[$field->getName()] ?? null)) {
                 $valid = false;
             }
         }
@@ -271,9 +294,10 @@ class Form
 
     /**
      * @param string $fieldName
-     * @return Valeur du champ $fieldName
+     * @return mixed Valeur du champ $fieldName
      */
-    public function get(string $fieldName){
+    public function get(string $fieldName):mixed
+    {
         $field = $this->fields[$fieldName];
         if ($field instanceof Field\File) {
             $value = $field->getFileBaseName();
@@ -289,7 +313,11 @@ class Form
         return $value;
     }
 
-    public function updateObject()
+    /**
+     * Fill the object given in constructor with the values of the fidderent fields
+     * @return void
+     */
+    public function updateObject():void
     {
         if($this->object != null){
             foreach ($this->fields as $field) {

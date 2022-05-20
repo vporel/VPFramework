@@ -17,14 +17,37 @@ class Relation extends Select
 {
 
     private $entityClass, $keyProperty;
+    /**
+     * @var string
+     */
+    private $repositoryClass = null;
+    /**
+     * @var string
+     */
+    private $linkToAdd = null;
 
-    public function __construct($label, $name, $options = [])
+    /**
+     * @var array
+     */
+    private $objects;
+    
+    /**
+     * @param string $label
+     * @param string $name
+     * @param string $repositoryClass
+     * @param array $elements
+     */
+    public function __construct(string $label, string $name, string $repositoryClass, array $objects)
     {
-        $this->addOption('repositoryClass', null);
-        $this->addOption('linkToAdd', null);
-        parent::__construct($label, $name, $options);
-        $this->entityClass = Repository::getRepositoryEntityClass($this->getRepositoryClass());
+        $this->repositoryClass = $repositoryClass;
+        $this->entityClass = Repository::getRepositoryEntityClass($this->repositoryClass);
         $this->keyProperty = Entity::getEntityKeyProperty($this->entityClass);
+        $this->objects = $objects;
+        $selectElements = [];
+        foreach($this->objects as $object){
+            $selectElements[ObjectReflection::getPropertyValue($object, $this->getKeyProperty())] = (string) $object;
+        }
+        parent::__construct($label, $name, $selectElements);
     }
 
     public function getEntityClass()
@@ -35,29 +58,6 @@ class Relation extends Select
     public function getKeyProperty()
     {
         return $this->keyProperty;
-    }
-
-    public function getRepositoryClass()
-    {
-        if ($this->options['repositoryClass'] !== null) {
-            return $this->options['repositoryClass'];
-        } else {
-            throw new \Exception('Aucune classe Repository passée dans les options pour la relation');
-        }
-    }
-
-    /**
-     * Ne retourne pas un tableau d'objets tels que passés dans les options
-     * Retourne un tableau associatif
-     * Ce tableau associe la valeur de la propriété 'keyProperty' des objets à la chaine correspondante via la méthode toString
-     */
-    public function getElements()
-    {
-        $array = [];
-        foreach($this->options["elements"] as $element){
-            $array[ObjectReflection::getPropertyValue($element, $this->getKeyProperty())] = (string) $element;
-        }
-        return $array;
     }
 
     public function getElementsAndAssociationsFields()
@@ -73,7 +73,7 @@ class Relation extends Select
                 $associationFields[] = $field['fieldName'];
             }
         }
-        foreach ($this->options["elements"] as $element) {
+        foreach ($this->objects as $element) {
             $option = [
                 'value' => ObjectReflection::getPropertyValue($element, $this->getKeyProperty()),
                 'text' => (string) $element
@@ -91,12 +91,12 @@ class Relation extends Select
     protected function getCustomHTML($value)
     {
 
-        $value = $value ?? $this->getDefault();
+        $value = $value ?? $this->getDefaultValue();
         if(is_object($value))
             $value = ObjectReflection::getPropertyValue($value, $this->getKeyProperty());
         if($this->isReadOnly()){
             $textToShow = "";
-            foreach ($this->options["elements"] as $element) {
+            foreach ($this->objects as $element) {
                 $elementValue = ObjectReflection::getPropertyValue($element, $this->getKeyProperty());
                 if($elementValue == $value){
                     $textToShow = (string) $element;
@@ -108,10 +108,8 @@ class Relation extends Select
             $html = '
                     <select name="'.$this->name.'" id="'.$this->name.'">
             ';
-            if($this->isNullable()){
-                $html .= '<option value="">Aucun</option>';
-            }
-            foreach ($this->options["elements"] as $element) {
+            $html .= '<option value="">Aucun</option>';
+            foreach ($this->objects as $element) {
                 $elementValue = ObjectReflection::getPropertyValue($element, $this->getKeyProperty());
                 $html .= '<option value="'.$elementValue.'" '.($elementValue == $value ? 'selected' : '').'>'. (string) $element.'</option>';
             }
@@ -148,7 +146,7 @@ class Relation extends Select
     public function getRealValue($value)
     {
         $element = null;
-        foreach($this->options["elements"] as $el){
+        foreach($this->objects as $el){
             if(ObjectReflection::getPropertyValue($el, $this->getKeyProperty()) == $value){
                 $element = $el;
             }
@@ -167,5 +165,53 @@ class Relation extends Select
             'elements' => $elementsAndAssoc['elements'],
             'associationFields' => $elementsAndAssoc['associationFields'],
         ]);
+    }
+
+    /**
+     * Get the value of repositoryClass
+     *
+     * @return  string
+     */ 
+    public function getRepositoryClass()
+    {
+        return $this->repositoryClass;
+    }
+
+    /**
+     * Set the value of repositoryClass
+     *
+     * @param  string  $repositoryClass
+     *
+     * @return  self
+     */ 
+    public function setRepositoryClass(string $repositoryClass)
+    {
+        $this->repositoryClass = $repositoryClass;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of linkToAdd
+     *
+     * @return  string|null
+     */ 
+    public function getLinkToAdd()
+    {
+        return $this->linkToAdd;
+    }
+
+    /**
+     * Set the value of linkToAdd
+     *
+     * @param  string  $linkToAdd
+     *
+     * @return  self
+     */ 
+    public function setLinkToAdd(string|null $linkToAdd)
+    {
+        $this->linkToAdd = $linkToAdd;
+
+        return $this;
     }
 }

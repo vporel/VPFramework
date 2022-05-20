@@ -4,12 +4,19 @@ namespace VPFramework\Form\Field;
 
 abstract class AbstractTextLine extends AbstractInput
 {
-    public function __construct($label, $name, $options = [])
+    /**
+     * @var int
+     */
+    protected $minLength = 0;
+
+    /**
+     * @var int|null
+     */
+    protected $maxLength = null;
+    public function __construct(string $label, string $name)
     {
-        $this->addOption("minLength", 0);
-        $this->addOption("maxLength", null);
         
-        parent::__construct($label, $name, $options);   
+        parent::__construct($label, $name);   
         $this
             ->addValidationRule("La longueur minimale est : ".$this->getMinLength(), function($value){
                 return strlen($value) >= $this->getMinLength();
@@ -27,10 +34,57 @@ abstract class AbstractTextLine extends AbstractInput
     public function serialize()
     {
         return array_merge(parent::serialize(), [
-            'minLength' => $this->getMinLength(),
-            'maxLength' => $this->getMaxLength(),
-            'pattern' => $this->getPattern()
+            'minLength' => $this->minLength,
+            'maxLength' => $this->maxLength,
         ]);
     }
 
+
+    /**
+     * Get the value of minLength
+     *
+     * @return  int
+     */ 
+    public function getMinLength()
+    {
+        return $this->minLength;
+    }
+
+    /**
+     * Set the value of minLength
+     *
+     * @param  int  $minLength
+     *
+     * @return  self
+     */ 
+    public function setMinLength(int $minLength)
+    {
+        $this->minLength = $minLength;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of maxLength
+     *
+     * @return  int|null
+     */ 
+    public function getMaxLength()
+    {
+        return $this->maxLength;
+    }
+
+    /**
+     * Set the value of maxLength
+     *
+     * @param  int|null  $maxLength
+     *
+     * @return  self
+     */ 
+    public function setMaxLength($maxLength)
+    {
+        $this->maxLength = $maxLength;
+
+        return $this;
+    }
 }

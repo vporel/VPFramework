@@ -7,7 +7,18 @@ namespace VPFramework\Form\Field;
  */
 class Password extends AbstractInput
 {
-
+    /**
+     * @var string
+     */
+    protected $hashFunction;
+    /**
+     * @var bool
+     */
+    protected $isDouble = false;
+    /**
+     * @var string
+     */
+    protected $secondLabel = "Confirmation";
     /**
      * @param array $options Les options de AbstractInput + :
      *  hashFunction : "sha1",
@@ -15,25 +26,15 @@ class Password extends AbstractInput
      *  secondLabel : "Confirmation" // Nom du champ de confirmation Si isDouble = true
      * 
      */
-    public function __construct($label, $name, $options = [])
-    {
-        $this
-            ->addOption("hashFunction", "sha1")
-            ->addOption("isDouble", false)
-            ->addOption("secondLabel", "Confirmation");
-        parent::__construct($label, $name, $options);        
+    public function __construct(string $label, string $name, $hashFunction = "sha1")
+    {            
+        parent::__construct($label, $name);    
+        $this->hashFunction = $hashFunction;    
     }
 
     protected function getInputType(){ return "password";}
 
     public function getConfirmName(){ return "confirm-".$this->name;}
-
-    public function getHashFunction(){ 
-        if($this->options["hashFunction"] != null)
-            return $this->options["hashFunction"]; 
-        else
-            throw new \Exception("L'option hashFunction n'a pas été renseignée");
-    }
     
     protected function getCustomHTMLForFilter():string{}
     
@@ -45,7 +46,7 @@ class Password extends AbstractInput
                 <span class="form-field-error text-error">'.$this->error.'</span>
             </div>
         ';
-        if($this->isDouble()){
+        if($this->double){
             $html .= '
                 <div class="form-group">
                     <label class="form-label" for="'.$this->getConfirmName().'">'.$this->getSecondLabel().'</label>
@@ -61,10 +62,10 @@ class Password extends AbstractInput
         return $this->getHashFunction()($value);
     }
 
-    public function isValid($value, $confirmValue = null)
+    public function isValid($value, $confirmValue = null):bool
     {
         if(parent::isValid($value)){
-            if($this->isDouble()){
+            if($this->double){
                 if($confirmValue !== null){
                     if($value != $confirmValue){
                         $this->error = "Les deux mots de passe ne sont pas identiques";
@@ -82,4 +83,76 @@ class Password extends AbstractInput
         return false;
     }
 
+
+    /**
+     * Get the value of hashFunction
+     *
+     * @return  string
+     */ 
+    public function getHashFunction()
+    {
+        return $this->hashFunction;
+    }
+
+    /**
+     * Set the value of hashFunction
+     *
+     * @param  string  $hashFunction
+     *
+     * @return  self
+     */ 
+    public function setHashFunction(string $hashFunction)
+    {
+        $this->hashFunction = $hashFunction;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of $double
+     *
+     * @return  bool
+     */ 
+    public function isDouble()
+    {
+        return $this->double;
+    }
+
+    /**
+     * Set the value of double
+     *
+     * @param  bool  $double
+     *
+     * @return  self
+     */ 
+    public function setDouble(bool $double)
+    {
+        $this->double = $double;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of secondLabel
+     *
+     * @return  string
+     */ 
+    public function getSecondLabel()
+    {
+        return $this->secondLabel;
+    }
+
+    /**
+     * Set the value of secondLabel
+     *
+     * @param  string  $secondLabel
+     *
+     * @return  self
+     */ 
+    public function setSecondLabel(string $secondLabel)
+    {
+        $this->secondLabel = $secondLabel;
+
+        return $this;
+    }
 }
