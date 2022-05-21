@@ -2,6 +2,7 @@
 
 namespace VPFramework\Routing;
 
+use InvalidArgumentException;
 use VPFramework\Core\DIC;
 
 /**
@@ -12,6 +13,11 @@ class Route
     private $name, $path, $controllerClass, $controllerMethod, $pathParams;
 
     private $pathRegex;
+
+    /**
+     * @var array
+     */
+    private $requiredParameters;
         
     /**
      * __construct
@@ -19,14 +25,16 @@ class Route
      * @param  string $controllerClass
      * @param  string $controllerMethod
      * @param  string $path
+     * @param  array $requiredParameters Paramètres qui doivent être présents dans la requête quelque soit la méthode utilisée
      * @return void
      */
-    public function __construct(string $name, string $controllerClass, string $controllerMethod, string $path)
+    public function __construct(string $name, string $controllerClass, string $controllerMethod, string $path, $requiredParameters = [])
     {
         $this->name = $name;
         $this->path = $path;
         $this->controllerClass = $controllerClass;
         $this->controllerMethod = $controllerMethod;
+        $this->requiredParameters = $requiredParameters;
         $this->pathParams = $this->findPathParams($this->path);
         $this->pathRegex = "#^";
         $path = $this->path;
@@ -35,10 +43,9 @@ class Route
             $regex = $param["regex"];
             $firstChar = substr($regex, 0, 1);
             $lastChar = substr($regex, -1);
-            $beforeRegex = ($param["default"] != null) ? "(" : "";
-            $afterRegex = ($param["default"] != null) ? ")?" : "";
-            if($firstChar == "^") //le paramètre doit commencer par cette chaine
+            if($firstChar == "^"){ //le paramètre doit commencer par cette chaine
                 $regex = substr($regex, 1);
+            }
             else // On peut avoir un caractère avant
                 $regex = "[^/]*".$regex;
             if($lastChar == "$") //le paramètre doit se terminer par cette chaine
@@ -81,16 +88,16 @@ class Route
                         if(count($explodeForDefaultValue) == 2){
                             $pathParam["default"] = $explodeForDefaultValue[1];
                         }else{
-                            throw new RouteException($this->name, $pathParam["all"], RouteException::INVALID_PATH_PARAMETER_EXCEPTION);
+                            throw new InvalidArgumentException("Route : ".$this->name." Définition du paramètre incorrecte (".$pathParam["all"].")");
                         }
                     }
 
                     $explodeForRegex = explode("#", $pathParam["all"]);
                     if(count($explodeForRegex) > 1){
-                        if(count($explodeForRegex) == 3){
+                        if(count($explodeForRegex) == 2){
                             $pathParam["regex"] = $explodeForRegex[1];
                         }else{
-                            throw new RouteException($this->name, $pathParam["all"], RouteException::INVALID_PATH_PARAMETER_EXCEPTION);
+                            throw new InvalidArgumentException("Route : ".$this->name." Définition du paramètre incorrecte (".$pathParam["all"].")");
                         }
                     }
                     $explodeForName = explode("#", $explodeForDefaultValue[0]);
@@ -153,5 +160,15 @@ class Route
             }
         }
         return $data;
+    }
+
+    /**
+     * Get the value of requiredParameters
+     *
+     * @return  array
+     */ 
+    public function getRequiredParameters()
+    {
+        return $this->requiredParameters;
     }
 }

@@ -19,9 +19,10 @@ class Route extends RoutingRoute
      * @param  string $name
      * @param  string $controllerAndMethod Ex : HomeController:index (Controller without the namespace)
      * @param  string $path
+     * @param  array $requiredParameters
      * @return void
      */
-    public function __construct(string $name, string $controllerAndMethod, string $path)
+    public function __construct(string $name, string $controllerAndMethod, string $path, array $requiredParameters = [])
     {
         $explodeControllerAndMethod = explode(":", $controllerAndMethod);
         if(count($explodeControllerAndMethod) == 2){
@@ -30,7 +31,7 @@ class Route extends RoutingRoute
         }else{
             throw new InvalidArgumentException("Le parametre controllerAndMethod doit respecter le pattern [controller:method]");
         }
-        parent::__construct($name, $controllerClass, $controllerMethod, $path);
+        parent::__construct($name, $controllerClass, $controllerMethod, $path, $requiredParameters);
     }
 
 }

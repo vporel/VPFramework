@@ -8,20 +8,22 @@ namespace VPFramework\Routing;
  */
 class RouteInGroup
 {
-    private $name, $path, $controllerMethod;
+    private $name, $path, $controllerMethod, $requiredParameters;
         
     /**
      * __construct
      * @param  string $name
      * @param  string $controllerMethod
      * @param  string $path
+     * @param  array $requiredParameters
      * @return void
      */
-    public function __construct(string $name, string $controllerMethod, string $path)
+    public function __construct(string $name, string $controllerMethod, string $path, array $requiredParameters = [])
     {
         $this->name = $name;
         $this->path = $path;
         $this->controllerMethod = $controllerMethod;
+        $this->requiredParameters = $requiredParameters;
     }
 
     public function getName(){
@@ -34,5 +36,13 @@ class RouteInGroup
 
     public function getPath(){
         return $this->path;
+    }
+
+    /**
+     * Get the value of requiredParameters
+     */ 
+    public function getRequiredParameters()
+    {
+        return $this->requiredParameters;
     }
 }

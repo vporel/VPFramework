@@ -81,6 +81,12 @@ class Request
                 //array_slice($matches, 1) car le premier resultat dans matches est la chaine complete
                 foreach($this->route->getData(array_slice($matches, 1)) as $key => $value)
                     $this->set($key, $value);
+                //Check if the route required paramters are present
+                foreach($route->getRequiredParameters() as $requiredParam){
+                    if(!in_array($requiredParam, array_keys($this->parameters)))
+                        throw new RouteException($requiredParam, RouteException::MISSING_REQUIRED_PARAMETER);
+                }
+                
             }else{
 
                 throw InternalException::NoRouteFound();

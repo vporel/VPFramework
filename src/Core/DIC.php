@@ -6,6 +6,7 @@ use VPFramework\Core\Configuration\AppConfiguration;
 use VPFramework\Model\Doctrine\Config;
 use Doctrine\ORM\EntityManager;
 use ReflectionClass;
+use ReflectionException;
 
 /**
  * Conteneur d'injection de dépendances dans l'application.
@@ -124,7 +125,11 @@ class DIC
                 if ($param->getType() && !$param->getType()->isBuiltin()) {
                     $parametersValues[] = $this->get($param->getClass()->getName());
                 } else {
-                    $parametersValues[] = $param->getDefaultValue();
+                    try{
+                        $parametersValues[] = $param->getDefaultValue();
+                    }catch(ReflectionException $e){
+                        $parametersValues[] = null;
+                    }
                 }
             } else {
                 $parametersValues[] = $values[$param->getName()];
@@ -133,7 +138,10 @@ class DIC
         return $parametersValues;
     }
 
-    public static function getInstance()
+    /**
+     * @return DIC
+     */
+    public static function getInstance():DIC
     {
         if (self::$instance == null) {
             self::$instance = new DIC();

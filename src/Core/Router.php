@@ -33,7 +33,7 @@ class Router
                 $controller = $this->getController($route->getControllerClass());
                 if(!method_exists($controller, $controllerMethod))
                     throw new RouteException($controllerMethod, RouteException::CONTROLLER_METHOD_NOT_FOUND);
-                echo DIC::getInstance()->invoke($controller, $controllerMethod);
+                echo DIC::getInstance()->invoke($controller, $controllerMethod, $this->request->getAll());
             
             }
         }catch(InternalException $e){

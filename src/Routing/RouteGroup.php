@@ -31,7 +31,7 @@ class RouteGroup
 
         foreach($routesInGroup as $routeInGroup){
             $routePath = $pathStart.$routeInGroup->getPath();
-            $this->routes[] = new Route($routeInGroup->getName(), $this->controllerClass, $routeInGroup->getControllerMethod(), $routePath);
+            $this->routes[] = new Route($routeInGroup->getName(), $this->controllerClass, $routeInGroup->getControllerMethod(), $routePath, $routeInGroup->getRequiredParameters());
         }
     }
 

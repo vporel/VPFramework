@@ -21,9 +21,15 @@ class Route
      */
     public $path;
 
-    public function __construct(string $name, string $path)
+    /**
+    * @var string
+    */
+    public $requiredParameters;
+
+    public function __construct(string $name, string $path, array $requiredParameters = [])
     {
         $this->name = $name;
         $this->path = $path;
+        $this->requiredParameters = $requiredParameters;
     }
 }
