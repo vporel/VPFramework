@@ -96,7 +96,7 @@ final class Security
      */
     public static function getRuleName():?string
     {
-        return $_SESSION['security-rule-name'] ?? null;
+        return $_SESSION['security-rule-name'] ?? null; 
         
     }
 
