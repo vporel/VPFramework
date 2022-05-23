@@ -32,9 +32,18 @@ class Password extends AbstractInput
     
     protected function getCustomHTMLForFilter():string{}
     
-    public function getHTML($value){
+    public function getHTML($value, $attrs = []){
+        $classAttrText = "form-group";
+        $attrsText = "";
+        foreach($attrs as $name => $value){
+            if(strtolower($name) != "class"){
+                $attrsText .= ' '.$name.'="'.$value.'"';
+            }else{
+                $classAttrText .= " ".$attrs[$name];
+            }
+        }
         $html = '
-            <div class="form-group">
+            <div class="'.$classAttrText.'" '.$attrsText.'>
                 <label class="form-label" for="'.$this->name.'">'.$this->label.'</label>
                 <input type="password" name="'.$this->name.'" class="form-control" id="'.$this->name.'" '.$this->getReadOnlyText().'>
                 <span class="form-field-error text-error">'.$this->error.'</span>
@@ -42,7 +51,7 @@ class Password extends AbstractInput
         ';
         if($this->double){
             $html .= '
-                <div class="form-group">
+                <div class="'.$classAttrText.'" '.$attrsText.'>
                     <label class="form-label" for="'.$this->getConfirmName().'">'.$this->getSecondLabel().'</label>
                     <input type="password" name="'.$this->getConfirmName().'" class="form-control" id="'.$this->getConfirmName().'" '.$this->getReadOnlyText().'>
                 </div>

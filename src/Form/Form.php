@@ -243,9 +243,10 @@ class Form
      * Create the HTML code for the form
      * Only the fields are created. It means that you must on your own write the <form> tag
      * You must also add the submit button
+     * @param array $fieldsBlocksAttrs Des attributs à passer aux divisions des champs
      * @return string
      */
-    public function createHTML():string
+    public function createHTML($fieldsBlocksAttrs = []):string
     {
         $html = "
             <input type='hidden' name='".$this->name."'/>
@@ -258,7 +259,7 @@ class Form
             if (!$field->isIgnored() && !($field instanceof Field\Password) && $this->object != null)
                 $value = ObjectReflection::getPropertyValue($this->object, $field->getName());
             $value = $this->parameters[$field->getName()] ?? $value;
-            $html .= $field->getHTML($value);
+            $html .= $field->getHTML($value, $fieldsBlocksAttrs);
         }
         return $html;
     }

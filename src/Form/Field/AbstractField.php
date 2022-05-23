@@ -102,14 +102,22 @@ abstract class AbstractField implements \Serializable
      */
     abstract protected function getCustomHTML($value);
 
-    public function getHTML($value)
+    public function getHTML($value, $attrs = [])
     {
         if($value instanceof DateTime){
             $value = $value->format("Y-m-d");
         }
-
+        $classAttrText = "form-group";
+        $attrsText = "";
+        foreach($attrs as $name => $value){
+            if(strtolower($name) != "class"){
+                $attrsText .= ' '.$name.'="'.$value.'"';
+            }else{
+                $classAttrText .= " ".$attrs[$name];
+            }
+        }
         return '
-            <div class="form-group">
+            <div class="'.$classAttrText.'" '.$attrsText.'>
                 <label class="form-label" for="'.$this->getName().'">'.$this->getLabel().'</label>
                 <div class="input-div">
                     '.$this->getCustomHTML($value).' 
