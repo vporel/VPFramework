@@ -55,7 +55,7 @@ class Route
             $path = str_replace("/<".$param["all"].">", "(/".$regex.")".(($param["default"] != null) ? "?" : ""), $path);
             
         }
-        $this->pathRegex .= $path."$#i";
+        $this->pathRegex .= $path."/?$#i"; // /? Pour accepter qu'il y ait un slash à la fin
     }
 
     public function getName(){
