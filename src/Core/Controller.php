@@ -39,6 +39,7 @@ abstract class Controller
     {
         $route = DIC::getInstance()->get(RouteConfiguration::class)->getRoute($routeName);
         header("Location: ".$route->getPath($options));
+        exit(0);
     }
 
     /**
@@ -48,6 +49,7 @@ abstract class Controller
     final protected function redirect($url)
     {   
         header("Location: $url");
+        exit(0);
     }
     
     /**
