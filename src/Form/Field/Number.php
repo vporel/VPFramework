@@ -63,7 +63,6 @@ class Number extends AbstractInput
     {
         $this->max = $max;
         $this->addValidationRule("max", "Le nombre maximal est : ".$max, function($value){
-            echo $this->getMax();
             return $this->getMax() === null || (double) $value <= $this->getMax();
         });
         return $this;
