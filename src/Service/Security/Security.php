@@ -45,14 +45,7 @@ final class Security
                     echo $user == null;
                     foreach($rule->getEntitiesRoles() as $entity => $roles){
                         if ($user == null || (count($roles) > 0 && !in_array($user->getRole(), $roles)) || !($user instanceof $entity)) {
-                            //Récupération de l'adresse précédente de la page avant la redirection
-                            $fullUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != '') ? 'https' : 'http';
-                            $fullUrl .= '://'.$_SERVER['HTTP_HOST'].$urlPath;
-                            if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] != $fullUrl) {
-                                $_SESSION['URL-before-redirection'] = $_SERVER['HTTP_REFERER'];
-                            } else {
-                                $_SESSION['URL-before-redirection'] = $_SESSION['URL-before-redirection'] ?? '';
-                            }
+                            $_SESSION['URL-before-redirection'] = $_SERVER["REQUEST_URI"];
                             if ($rule->getRedirection() != null && $rule->getRedirection() != "") {
                                 $_SESSION['security-rule-name'] = $rule->getName();
                                 header('Location: '.$rule->getRedirection());
@@ -85,18 +78,25 @@ final class Security
         session_destroy();
     }
 
+    /**
+     * Can be called only one time after the redirection
+     * Once you call it, the name is cleaned
+     * @return string|null
+     */
     public static function getURLBeforeRedirection()
     {
-        return $_SESSION['URL-before-redirection'] ?? "";
+        return $_SESSION['URL-before-redirection'] ?? null;
         
     }
 
-    public static function getRuleName()
+    /**
+     * Can be called only one time after the redirection
+     * Once you call it, the name is cleaned
+     * @return string|null
+     */
+    public static function getRuleName():?string
     {
-        if(isset($_SESSION['security-rule-name']))
-            return $_SESSION['security-rule-name'];
-        else
-            throw new SecurityException("Aucune règle de sécurité n'a été appelée");
+        return $_SESSION['security-rule-name'] ?? null;
         
     }
 

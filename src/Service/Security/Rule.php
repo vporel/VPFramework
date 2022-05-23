@@ -37,7 +37,7 @@ class Rule{
             $routeConfig = DIC::getInstance()->get(RouteConfiguration::class);
             //Pour savoir si l'accès à la route est le résultat d'une redirection pour la sécurité, 
             // il suffira de vérifier que l paramètre GET "security-redirection" est présent dans l'url
-            $this->redirection = $routeConfig->getRoute($redirection)->getPath(["security-redirection" => true]);
+            $this->redirection = $routeConfig->getRoute($redirection)->getPath(["security-redirection" => true]); // Le paramètre security-redirection inquera que la redirection a été fait epour la sécurité
         }
         foreach($entitiesRoles as $entity => $roles){
             if(class_exists($entity, true)){
