@@ -106,7 +106,7 @@ class Relation extends Select
             return "<span class='form-read-only-value'>$textToShow</span>";
         }else{
             $html = '
-                    <select name="'.$this->name.'" id="'.$this->name.'">
+                    <select name="'.$this->name.'" id="'.$this->name.'" class="form-select">
             ';
             $html .= '<option value="">Aucun</option>';
             foreach ($this->objects as $element) {

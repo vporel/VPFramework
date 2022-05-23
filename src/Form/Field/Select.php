@@ -34,7 +34,7 @@ class Select extends AbstractField
             return "<span class='form-read-only-value'>$textToShow</span>";
         }else{
             $select = '
-                    <select name="'.$this->name.'"  id="'.$this->name.'" class="form-control">
+                    <select name="'.$this->name.'"  id="'.$this->name.'" class="form-select">
             ';
             foreach ($this->getElements() as $key => $text) {
                 $select .= '<option value="'.$key.'" '.($key == $value ? 'selected' : '').'>'.$text.'</option>';
