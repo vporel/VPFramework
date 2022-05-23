@@ -109,11 +109,11 @@ abstract class AbstractField implements \Serializable
         }
         $classAttrText = "form-group";
         $attrsText = "";
-        foreach($attrs as $name => $value){
+        foreach($attrs as $name => $attrValue){
             if(strtolower($name) != "class"){
-                $attrsText .= ' '.$name.'="'.$value.'"';
+                $attrsText .= ' '.$name.'="'.$attrValue.'"';
             }else{
-                $classAttrText .= " ".$attrs[$name];
+                $classAttrText .= " ".$attrValue;
             }
         }
         return '
