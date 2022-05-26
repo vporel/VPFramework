@@ -8,6 +8,7 @@
 
 namespace VPFramework\Form;
 
+use InvalidArgumentException;
 use VPFramework\Core\DIC;
 use VPFramework\Core\Request;
 use VPFramework\Form\Field;
@@ -73,6 +74,28 @@ class Form
     public function setObject(Entity $object)
     {
         $this->object = $object;
+    }
+
+    /**
+     * @param array $order
+     * 
+     * @return self
+     */
+    public function setFieldsOrder(array $order)
+    {
+        $newArray = [];
+        foreach($order as $fieldName){
+            $newArray[$fieldName] = $this->getField($fieldName);
+        }
+        if(count($order) < count($this->fields)){
+            foreach($this->fields as $fieldName => $field){
+                if(!in_array($fieldName, $order)){
+                    $newArray[$fieldName] = $field;
+                }
+            }
+        }
+        $this->fields = $newArray;
+        return $this;
     }
 
     /**
@@ -193,7 +216,10 @@ class Form
      */
     public function getField(string $fieldName):?AbstractField
     {
-        return $this->fields[$fieldName] ?? null;
+        if(array_key_exists($fieldName, $this->fields))
+            return $this->fields[$fieldName];
+        else
+            throw new InvalidArgumentException("Le champ '$fieldName' n'existe pas");
     }
 
     /**
